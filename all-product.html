@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <script>
+        if (localStorage.getItem('isAuthenticated') !== 'true' || !localStorage.getItem('sessionId') || !localStorage.getItem('sessionPort')) {
+            window.location.replace('index.html');
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Products</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* macOS Sleek Glassmorphism Variables */
+        :root {
+            --bs-primary: #6366f1;
+            --bs-body-font-family: 'Inter', sans-serif;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-bg-hover: rgba(255, 255, 255, 0.85);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.8);
+            --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            --glass-shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.08);
+            --glass-blur: blur(16px);
+            --page-bg: #f3f4f6;
+            --orb-1: rgba(99, 102, 241, 0.3);
+            --orb-2: rgba(168, 85, 247, 0.25);
+        }
+
+        [data-bs-theme="dark"] {
+            --glass-bg: rgba(30, 30, 30, 0.55);
+            --glass-bg-hover: rgba(45, 45, 45, 0.65);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --glass-shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.4);
+            --page-bg: #0f172a;
+            --orb-1: rgba(99, 102, 241, 0.15);
+            --orb-2: rgba(168, 85, 247, 0.15);
+            color: #f8fafc;
+        }
+
+        body {
+            font-family: var(--bs-body-font-family);
+            background: var(--page-bg) !important;
+            background-attachment: fixed !important;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            position: relative;
+            z-index: 0;
+            overflow-x: hidden;
+        }
+
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            z-index: -1;
+            filter: blur(80px);
+            pointer-events: none;
+        }
+
+        body::before {
+            width: 500px;
+            height: 500px;
+            background: var(--orb-1);
+            top: -150px;
+            left: -100px;
+        }
+
+        body::after {
+            width: 400px;
+            height: 400px;
+            background: var(--orb-2);
+            bottom: -50px;
+            right: -50px;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 80px 30px 40px 30px;
+            flex-grow: 1;
+        }
+
+        .product-card {
+            background: var(--glass-bg) !important;
+            backdrop-filter: var(--glass-blur);
+            border: var(--glass-border) !important;
+            box-shadow: var(--glass-shadow) !important;
+            transition: all 0.3s ease-in-out;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            background: var(--glass-bg-hover) !important;
+            box-shadow: var(--glass-shadow-hover) !important;
+        }
+
+        .stat-card {
+            background: var(--glass-bg) !important;
+            backdrop-filter: var(--glass-blur);
+            border: var(--glass-border) !important;
+            border-radius: .75rem;
+            box-shadow: var(--glass-shadow) !important;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--glass-shadow-hover) !important;
+        }
+
+        .stat-card .card-body {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stat-card .icon-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--glass-bg);
+            border: var(--glass-border);
+            box-shadow: var(--glass-shadow) !important;
+        }
+
+        .product-card img {
+            height: 180px;
+            object-fit: contain;
+            background-color: #ffffff;
+            border-radius: 20px 20px 0 0;
+            padding: 20px;
+        }
+
+        [data-bs-theme="dark"] .product-card img {
+            background-color: rgba(255,255,255,0.05);
+        }
+
+        .product-card .card-body { position: relative; padding: 1.5rem; }
+
+        .card-actions {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+        }
+
+        .product-card:hover .card-actions { opacity: 1; }
+
+        .card-actions .btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .list-group-item {
+            background-color: transparent !important;
+            border-color: rgba(255,255,255,0.1) !important;
+            padding-left: 0;
+            padding-right: 0;
+            color: inherit;
+        }
+        
+        .modal-content {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: var(--glass-border);
+            color: inherit;
+        }
+        
+        .form-control, .form-select {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        .form-control:focus, .form-select:focus {
+            background: rgba(15, 23, 42, 0.8);
+            border-color: var(--bs-primary);
+            color: white;
+        }
+
+        @keyframes slideIn { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+            /* Custom Alert Cards */
+        #custom-alert-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .custom-alert {
+            min-width: 300px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: var(--bs-body-bg);
+            border-left: 4px solid var(--bs-success);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: slideIn 0.3s ease-out forwards;
+            position: relative;
+        }
+
+        .custom-alert.error {
+            border-left-color: var(--bs-danger);
+        }
+
+        .custom-alert .icon {
+            color: var(--bs-success);
+            flex-shrink: 0;
+            display: flex;
+        }
+
+        .custom-alert.error .icon {
+            color: var(--bs-danger);
+        }
+
+        .custom-alert .content {
+            flex-grow: 1;
+        }
+
+        .custom-alert .title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 2px;
+            color: var(--bs-body-color);
+        }
+
+        .custom-alert .message {
+            font-size: 0.85rem;
+            color: var(--bs-secondary-color);
+        }
+
+        .custom-alert .close-btn {
+            background: none;
+            border: none;
+            color: var(--bs-secondary-color);
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            transition: color 0.2s;
+        }
+
+        .custom-alert .close-btn:hover {
+            color: var(--bs-body-color);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    </style>
+</head>
+<body style="background-color: #212529;">
+    <script src="template/layout.js"></script>
+    <script>
+        renderTopbar();
+        renderSidebar('products', 'all-product');
+    </script>
+
+    <div id="custom-alert-container"></div>
+    <main class="main-content">
+        <div class="container-fluid px-0">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mb-4 border-bottom border-secondary pb-3">
+                <h2 class="fw-bold mb-0">Product List</h2>
+                <div>
+                    <button class="btn btn-outline-primary me-2">
+                        <i class="bi bi-clock-history me-1"></i> Stock History
+                    </button>
+                    <div id="bulkActions" class="d-inline-block me-2" style="display: none !important;">
+                         <span id="selectedCount" class="me-2 fw-bold text-warning">0 selected</span>
+                         <button id="bulkDeleteBtn" class="btn btn-danger" onclick="bulkDelete()"><i class="bi bi-trash-fill"></i> Delete</button>
+                         <button id="bulkRestoreBtn" class="btn btn-success" onclick="bulkRestore()" style="display:none;"><i class="bi bi-arrow-counterclockwise"></i> Restore</button>
+                    </div>
+                    <button id="printFullReportBtn" class="btn btn-secondary me-2">
+                        <i class="bi bi-printer-fill me-2"></i> Print
+                    </button>
+                    <button id="trashToggleBtn" class="btn btn-outline-danger rounded-3 fw-semibold shadow-sm me-2" onclick="toggleTrashMode()">
+                        <i class="bi bi-trash3 me-2"></i> View Trash
+                    </button>
+                    <button class="btn btn-success rounded-3 fw-semibold shadow-sm" onclick="window.location.href='add-product.html'">
+                        <i class="bi bi-plus-lg me-2"></i> Add Product
+                    </button>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="card stat-card bg-primary-subtle text-primary-emphasis h-100">
+                        <div class="card-body">
+                            <div>
+                                <h6 class="card-title text-uppercase small">Total Products</h6>
+                                <h3 class="fw-bold mb-0" id="totalProductsCard">0</h3>
+                            </div>
+                            <div class="icon-circle bg-primary text-white"><i class="bi bi-box-seam"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card stat-card bg-success-subtle text-success-emphasis h-100">
+                        <div class="card-body">
+                            <div>
+                                <h6 class="card-title text-uppercase small">In Stock</h6>
+                                <h3 class="fw-bold mb-0" id="inStockCountCard">0</h3>
+                            </div>
+                            <div class="icon-circle bg-success text-white"><i class="bi bi-check-circle"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card stat-card bg-danger-subtle text-danger-emphasis h-100">
+                        <div class="card-body">
+                            <div>
+                                <h6 class="card-title text-uppercase small">Out of Stock</h6>
+                                <h3 class="fw-bold mb-0" id="outOfStockCountCard">0</h3>
+                            </div>
+                            <div class="icon-circle bg-danger text-white"><i class="bi bi-x-circle"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card stat-card bg-warning-subtle text-warning-emphasis h-100">
+                        <div class="card-body">
+                            <div>
+                                <h6 class="card-title text-uppercase small">Low Stock Alert</h6>
+                                <h3 class="fw-bold mb-0" id="stockAlertCountCard">0</h3>
+                            </div>
+                            <div class="icon-circle bg-warning text-white"><i class="bi bi-exclamation-triangle"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search and Filter Bar -->
+            <div class="row mb-4">
+                <div class="col-lg-12">
+                    <div class="input-group input-group-lg" style="box-shadow: var(--glass-shadow); border-radius: 12px; overflow: hidden; border: var(--glass-border);">
+                        <select id="sortBy" class="form-select border-0" style="max-width: 220px; background: var(--glass-bg); backdrop-filter: var(--glass-blur);">
+                            <option value="name-asc" selected>Sort by Name (A-Z)</option>
+                            <option value="name-desc">Sort by Name (Z-A)</option>
+                            <option value="in-stock-only">Only In Stock</option>
+                            <option value="out-of-stock-only">Out of Stock</option>
+                            <option value="alert-only">Low Stock Alerts</option>
+                            <option value="price-asc">Sell Price (Low-High)</option>
+                            <option value="price-desc">Sell Price (High-Low)</option>
+                            <option value="qty-asc">Quantity (Low-High)</option>
+                            <option value="qty-desc">Quantity (High-Low)</option>
+                        </select>
+                        <input type="search" id="productSearch" class="form-control border-0" placeholder="Search by name, barcode, category, or brand..." style="background: var(--glass-bg); backdrop-filter: var(--glass-blur);">
+                        <button class="btn btn-primary px-4 d-flex align-items-center gap-2 text-white fw-bold" id="aiSearchBtn" type="button" style="background: linear-gradient(135deg, #6366f1, #a855f7); border: none;">
+                            <i class="bi bi-stars"></i> AI Search
+                        </button>
+                    </div>
+                    
+                    <!-- Advanced AI Filters Panel -->
+                    <div id="aiSearchPanel" class="mt-3 p-4" style="display: none; background: var(--glass-bg); backdrop-filter: var(--glass-blur); border-radius: 12px; border: var(--glass-border); box-shadow: var(--glass-shadow); animation: slideIn 0.3s ease-out;">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold mb-0 d-flex align-items-center gap-2 text-primary">
+                                <i class="bi bi-robot"></i> Advanced AI Filters
+                            </h5>
+                            <button id="clearAiFiltersBtn" class="btn btn-sm btn-outline-danger rounded-pill">
+                                <i class="bi bi-x-circle"></i> Clear Filters
+                            </button>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Brand</label>
+                                <select id="aiSupplier" class="form-select bg-dark text-light border-secondary">
+                                    <option value="">All Brands</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Stock Status</label>
+                                <select id="aiStockStatus" class="form-select bg-dark text-light border-secondary">
+                                    <option value="all">All Products</option>
+                                    <option value="in-stock">Only In Stock</option>
+                                    <option value="out-of-stock">Only Out of Stock</option>
+                                    <option value="alert">Low Stock Alert</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Price Range</label>
+                                <div class="d-flex gap-2">
+                                    <input type="number" id="aiMinPrice" class="form-control bg-dark text-light border-secondary" placeholder="Min">
+                                    <input type="number" id="aiMaxPrice" class="form-control bg-dark text-light border-secondary" placeholder="Max">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row" id="productList">
+                <div class="col-12 text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                </div>
+            </div>
+
+            <div id="noProductsMessage" class="text-center py-5" style="display: none;">
+                <i class="bi bi-box-seam text-muted" style="font-size: 4rem;"></i>
+                <h3 class="mt-3">No Products Found</h3>
+                <p class="lead text-muted">Click "Add Product" to get started.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Detailed Product Modal -->
+    <div class="modal fade" id="productDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header border-bottom border-secondary">
+                    <h5 class="modal-title fw-bold" id="productDetailsModalLabel">Product Details</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4" id="productDetailsContainer">
+                    <!-- Dynamic Details Rendered Here -->
+                </div>
+                <div class="modal-footer border-top border-secondary">
+                    <button type="button" class="btn btn-info text-white" id="sendToAdminsBtn">
+                        <i class="bi bi-send-fill me-2"></i> Send to Admins
+                    </button>
+                    <button type="button" class="btn btn-secondary rounded-3" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap & Logic -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { getCollection, addDocument, updateDocument, deleteDocument, fetchAPI } from './script/api.js';
+        
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            alert(`JS Error: ${msg}\nLine: ${lineNo}:${columnNo}`);
+            return false;
+        };
+        window.addEventListener('unhandledrejection', function(event) {
+            alert(`Promise Error: ${event.reason}`);
+        });
+
+        function generateUUID() {
+            if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+                return crypto.randomUUID();
+            }
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        let selectedProductIds = new Set();
+        
+        
+        
+        window.showCustomAlert = function(title, message, type = 'success') {
+            const container = document.getElementById('custom-alert-container');
+            const alert = document.createElement('div');
+            alert.className = `custom-alert ${type === 'failed' ? 'error' : type}`;
+            
+            let iconSvg = type === 'success' 
+                ? `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg>`
+                : `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/></svg>`;
+
+            alert.innerHTML = `<div class="icon">${iconSvg}</div><div class="content"><div class="title">${title}</div><div class="message">${message}</div></div><button class="close-btn" onclick="this.parentElement.remove()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646-2.647a.5.5 0 0 1-.708-.708L8 7.293 5.354 4.646z"/></svg></button>`;
+
+            container.appendChild(alert);
+            setTimeout(() => {
+                alert.style.animation = 'slideOut 0.3s ease-in forwards';
+                alert.addEventListener('animationend', () => alert.remove());
+            }, 3000);
+        };
+
+        let viewTrashMode = false;
+        let allProducts = [];
+        let filteredProducts = [];
+        let allPurchases = [];
+        let allProductions = [];
+        
+        
+        let detailsModal = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            detailsModal = new bootstrap.Modal(document.getElementById('productDetailsModal'));
+            
+            // Toggle AI Panel
+            document.getElementById('aiSearchBtn').addEventListener('click', () => {
+                const panel = document.getElementById('aiSearchPanel');
+                panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+            });
+            
+            document.getElementById('clearAiFiltersBtn').addEventListener('click', () => {
+                document.getElementById('aiSupplier').value = '';
+                document.getElementById('aiStockStatus').value = 'all';
+                document.getElementById('aiMinPrice').value = '';
+                document.getElementById('aiMaxPrice').value = '';
+                filterAndSortProducts();
+            });
+
+            document.getElementById('productSearch').addEventListener('input', filterAndSortProducts);
+            document.getElementById('productSearch').addEventListener('keyup', filterAndSortProducts);
+            document.getElementById('productSearch').addEventListener('search', filterAndSortProducts);
+            document.getElementById('sortBy').addEventListener('change', filterAndSortProducts);
+            document.getElementById('aiSupplier').addEventListener('change', filterAndSortProducts);
+            document.getElementById('aiStockStatus').addEventListener('change', filterAndSortProducts);
+            document.getElementById('aiMinPrice').addEventListener('input', filterAndSortProducts);
+            document.getElementById('aiMaxPrice').addEventListener('input', filterAndSortProducts);
+
+            document.getElementById('printFullReportBtn').addEventListener('click', () => window.print());
+
+            loadProducts();
+            loadHistoryMock(); // Mocks since tables don't exist yet
+        });
+
+        
+        // Auto-run DB migrations safely in background
+        fetchAPI('init-db', { method: 'GET' }).catch(console.error);
+
+        async function loadProducts() {
+            try {
+                
+                const res = await getCollection('products');
+                const deletedRes = await getCollection('deleted_products');
+                const deletedIds = deletedRes.docs.map(d => d.data().productId);
+
+                
+                allProducts = res.docs.map(d => {
+                    const data = d.data();
+                    return {
+                        firestoreId: d.id,
+                        isDeleted: !!data.deleteScheduledAt,
+                        ...data,
+                        buyPrice: data.buyPrice || data.buy_price || 0,
+                        sellPrice: data.sellPrice || data.sell_price || 0,
+                        wholesalePrice: data.wholesalePrice || data.wholesale_price || 0
+                    };
+                });
+
+                
+                // Populate AI Supplier Dropdown
+                const suppliers = [...new Set(allProducts.map(p => p.brand).filter(s => s))].sort();
+                document.getElementById('aiSupplier').innerHTML = '<option value="">All Brands</option>' + 
+                    suppliers.map(s => `<option value="${s}">${s}</option>`).join('');
+
+                updateStats();
+                filterAndSortProducts();
+            } catch (error) {
+                console.error("Error loading products:", error);
+                document.getElementById('productList').innerHTML = `<div class="col-12 text-center text-danger py-5">Failed to load products: ${error.message}</div>`;
+            }
+        }
+
+        async function loadHistoryMock() {
+            // Safe fallback since purchase/production tables don't exist in our schema yet
+            try {
+                const purRes = await getCollection('purchases').catch(() => ({ docs: [] }));
+                allPurchases = purRes.docs.map(d => d.data());
+                
+                const prodRes = await getCollection('productions').catch(() => ({ docs: [] }));
+                allProductions = prodRes.docs.map(d => d.data());
+            } catch (e) {
+                console.log("History tables missing, defaulting to empty");
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('totalProductsCard').textContent = allProducts.length;
+            document.getElementById('inStockCountCard').textContent = allProducts.filter(p => (p.quantity || 0) > 0).length;
+            document.getElementById('outOfStockCountCard').textContent = allProducts.filter(p => (p.quantity || 0) <= 0).length;
+            document.getElementById('stockAlertCountCard').textContent = allProducts.filter(p => (p.quantity || 0) <= (p.alertQuantity || 5) && (p.quantity || 0) > 0).length;
+        }
+
+        function filterAndSortProducts() {
+            const searchTerm = document.getElementById('productSearch').value.toLowerCase().trim();
+            const sortBy = document.getElementById('sortBy').value;
+            const aiBrand = document.getElementById('aiSupplier').value.toLowerCase();
+            const aiStatus = document.getElementById('aiStockStatus').value;
+            const aiMin = parseFloat(document.getElementById('aiMinPrice').value) || 0;
+            const aiMax = parseFloat(document.getElementById('aiMaxPrice').value) || Infinity;
+
+            filteredProducts = allProducts.filter(p => {
+                if (viewTrashMode && !p.isDeleted) return false;
+                if (!viewTrashMode && p.isDeleted) return false;
+                
+                if (aiBrand && (p.brand || '').toLowerCase() !== aiBrand) return false;
+                
+                const qty = p.quantity || 0;
+                const alertQty = p.alertQuantity || 5;
+                if (aiStatus === 'in-stock' && qty <= 0) return false;
+                if (aiStatus === 'out-of-stock' && qty > 0) return false;
+                if (aiStatus === 'alert' && (qty <= 0 || qty > alertQty)) return false;
+                
+                if (sortBy === 'in-stock-only' && qty <= 0) return false;
+                if (sortBy === 'out-of-stock-only' && qty > 0) return false;
+                if (sortBy === 'alert-only' && (qty <= 0 || qty > alertQty)) return false;
+
+                const price = p.sellPrice || 0;
+                if (price < aiMin || price > aiMax) return false;
+
+                p._searchScore = 0;
+                if (searchTerm) {
+                    const name = (p.name || '').toLowerCase();
+                    const brand = (p.brand || '').toLowerCase();
+                    const category = (p.category || '').toLowerCase();
+                    const barcode = (p.barcode || '').toLowerCase();
+                    const fullStr = `${name} ${category} ${brand} ${barcode}`;
+                    
+                    const terms = searchTerm.split(/\s+/);
+                    
+                    for (const term of terms) {
+                        if (!fullStr.includes(term)) return false;
+                    }
+                    
+                    // Smart Scoring
+                    if (barcode === searchTerm) p._searchScore += 100;
+                    else if (name === searchTerm) p._searchScore += 80;
+                    else if (name.startsWith(searchTerm)) p._searchScore += 60;
+                    else if (name.includes(searchTerm)) p._searchScore += 40;
+                    
+                    for (const term of terms) {
+                        if (name.includes(term)) p._searchScore += 10;
+                        if (brand.includes(term)) p._searchScore += 5;
+                        if (category.includes(term)) p._searchScore += 2;
+                    }
+                }
+                
+                return true;
+            });
+
+            filteredProducts.sort((a, b) => {
+                if (searchTerm && (b._searchScore || 0) !== (a._searchScore || 0)) {
+                    return (b._searchScore || 0) - (a._searchScore || 0);
+                }
+                
+                if (sortBy === 'name-asc') return (a.name || '').localeCompare(b.name || '');
+                if (sortBy === 'name-desc') return (b.name || '').localeCompare(a.name || '');
+                if (sortBy === 'price-asc') return (a.sellPrice || 0) - (b.sellPrice || 0);
+                if (sortBy === 'price-desc') return (b.sellPrice || 0) - (a.sellPrice || 0);
+                if (sortBy === 'qty-asc') return (a.quantity || 0) - (b.quantity || 0);
+                if (sortBy === 'qty-desc') return (b.quantity || 0) - (a.quantity || 0);
+                
+                return 0;
+            });
+
+            renderProductsLazy();
+        }
+
+        // Lazy Rendering Implementation
+        let renderTimeoutId = null;
+        function renderProductsLazy() {
+            const container = document.getElementById('productList');
+            const noMsg = document.getElementById('noProductsMessage');
+            
+            if (renderTimeoutId) clearTimeout(renderTimeoutId);
+            container.innerHTML = '';
+
+            if (filteredProducts.length === 0) {
+                noMsg.style.display = 'block';
+                return;
+            }
+            noMsg.style.display = 'none';
+
+            let index = 0;
+            const chunkSize = 20;
+
+            function processChunk() {
+                let cardsHtml = '';
+                const end = Math.min(index + chunkSize, filteredProducts.length);
+
+                for (; index < end; index++) {
+                    const p = filteredProducts[index];
+                    const qty = p.quantity || 0;
+                    const alertQty = p.alertQuantity || 5;
+
+                    let borderColor = '#32cd32'; 
+                    if (qty <= 0) borderColor = '#ff1a1a'; 
+                    else if (qty <= alertQty) borderColor = '#ffe600'; 
+
+                    const formatCurrency = (amt) => `৳${Number(amt||0).toFixed(2)}`;
+
+                    let priceTiersObj = p.priceTiers;
+                    if (typeof priceTiersObj === 'string') {
+                        try { priceTiersObj = JSON.parse(priceTiersObj); } catch(e) { priceTiersObj = null; }
+                    }
+
+                    let pricingHtml = '';
+                    if (priceTiersObj && priceTiersObj.pcs) {
+                        pricingHtml = `
+                            <li class="list-group-item d-flex justify-content-between pt-3 border-secondary"><span>Buy (Pcs):</span> <strong>${formatCurrency(priceTiersObj.pcs.buy)}</strong></li>
+                            <li class="list-group-item d-flex justify-content-between border-secondary"><span>Wholesale:</span> <strong>${formatCurrency(priceTiersObj.pcs.wholesale)}</strong></li>
+                            <li class="list-group-item d-flex justify-content-between border-secondary"><span>Retail:</span> <strong>${formatCurrency(priceTiersObj.pcs.sell)}</strong></li>
+                        `;
+                    } else {
+                        pricingHtml = `
+                            <li class="list-group-item d-flex justify-content-between pt-3 border-secondary"><span>Buy Price:</span> <strong>${formatCurrency(p.buyPrice)}</strong></li>
+                            <li class="list-group-item d-flex justify-content-between border-secondary"><span>Wholesale:</span> <strong>${formatCurrency(p.wholesalePrice)}</strong></li>
+                            <li class="list-group-item d-flex justify-content-between border-secondary"><span>Sell Price:</span> <strong>${formatCurrency(p.sellPrice)}</strong></li>
+                        `;}
+                    const isSelected = typeof selectedProductIds !== 'undefined' && selectedProductIds.has(p.firestoreId);
+                    const selectedBg = isSelected ? 'rgba(0, 123, 255, 0.1)' : '';
+
+                    cardsHtml += `
+                    <div class="col-md-6 col-lg-4 col-xl-3 mb-4" id="card-col-${p.firestoreId}">
+                        <div class="card product-card h-100" id="card-${p.firestoreId}" onclick="handleCardClick(event, '${p.firestoreId}')" style="border: 2px solid ${borderColor} !important; box-shadow: 0 8px 32px ${borderColor}30 !important; cursor: pointer; background-color: ${selectedBg};">
+                            <div class="position-relative text-center ${p.imageUrl ? '' : 'pt-4'}">
+                                <div class="form-check position-absolute top-0 start-0 m-2" style="z-index: 10;">
+                                    <input class="form-check-input product-select-cb" type="checkbox" id="cb-${p.firestoreId}" value="${p.firestoreId}" ${isSelected ? 'checked' : ''} style="transform: scale(1.5); cursor: pointer;">
+                                </div>
+                                ${p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.name}" class="w-100" style="pointer-events: none;">` : `<i class="bi bi-box-seam" style="font-size: 5rem; color: rgba(255,255,255,0.1); pointer-events: none;"></i>`}
+                            </div>
+                            <div class="card-body d-flex flex-column mt-2">
+                                <div class="card-actions">
+        ${viewTrashMode ? 
+            `<button class="btn btn-success me-2" onclick="restoreProd('${p.firestoreId}')" title="Restore Product"><i class="bi bi-arrow-counterclockwise"></i> Restore</button>
+             <button class="btn btn-danger" onclick="hardDeleteProd('${p.firestoreId}')" title="Delete Permanently"><i class="bi bi-trash-fill"></i></button>` :
+            `<button class="btn btn-success" onclick="openDetails('${p.firestoreId}')"><i class="bi bi-eye-fill"></i></button>
+             <button class="btn btn-warning" onclick="editProduct('${p.firestoreId}')"><i class="bi bi-pencil-square"></i></button>
+             <button class="btn btn-danger" onclick="deleteProd('${p.firestoreId}')"><i class="bi bi-trash3-fill"></i></button>`
+        }
+    </div>
+                                <h5 class="card-title fw-bold mb-1">${p.name} ${viewTrashMode ? '<span class="badge bg-danger ms-2" style="font-size: 0.6rem;">Pending Deletion</span>' : ''}</h5>
+                                <p class="card-text text-muted small mb-3">${p.brand || 'No Brand'} &bull; ${p.category}</p>
+                                
+                                <ul class="list-group list-group-flush mt-auto">
+                                    <li class="list-group-item d-flex justify-content-between border-secondary"><span>Barcode:</span> <strong>${p.barcode || 'N/A'}</strong></li>
+                                    <li class="list-group-item d-flex justify-content-between border-secondary">
+                                        <span>Quantity:</span> 
+                                        <strong class="${qty > 0 ? 'text-success' : 'text-danger'}">${qty} ${p.unit || 'Pcs'}</strong>
+                                    </li>
+                                    ${pricingHtml}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>`;
+                }
+
+                container.insertAdjacentHTML('beforeend', cardsHtml);
+                if (index < filteredProducts.length) renderTimeoutId = setTimeout(processChunk, 10);
+            }
+            processChunk();
+        }
+
+        window.editProduct = function(id) {
+            localStorage.setItem('editProductId', id);
+            window.location.href = 'add-product.html';
+        };
+        window.hardDeleteProd = async function(id) {
+            if(confirm("Are you sure you want to permanently delete this product? This action CANNOT be undone.")) {
+                try {
+                    await deleteDocument('products', id);
+                    
+                    // Cleanup from tracking table if it exists
+                    const deletedRes = await getCollection('deleted_products');
+                    const deletedDoc = deletedRes.docs.find(d => d.data().productId === id);
+                    if (deletedDoc) {
+                        await deleteDocument('deleted_products', deletedDoc.id);
+                    }
+                    
+                    allProducts = allProducts.filter(x => x.firestoreId !== id);
+                    filterAndSortProducts();
+                    showCustomAlert('Deleted Permanently', 'The product has been completely removed from the database.');
+                } catch(e) {
+                    showCustomAlert('Error', 'Failed to permanently delete product: ' + e.message, 'failed');
+                }
+            }
+        };
+
+        window.handleCardClick = function(event, id) {
+            // If they clicked a button inside the card, ignore
+            if (event.target.tagName === 'BUTTON' || event.target.closest('button')) {
+                return;
+            }
+
+            // If they clicked the checkbox directly, or clicked the card with Ctrl/Shift
+            const cb = document.getElementById('cb-' + id);
+            if (!cb) return;
+
+            if (event.target === cb) {
+                // Checkbox clicked
+                if (cb.checked) selectedProductIds.add(id);
+                else selectedProductIds.delete(id);
+            } else if (event.ctrlKey || event.metaKey) {
+                // Ctrl/Cmd + click anywhere on card
+                cb.checked = !cb.checked;
+                if (cb.checked) selectedProductIds.add(id);
+                else selectedProductIds.delete(id);
+            } else {
+                // Normal click without Ctrl - optionally do nothing or open details
+                return;
+            }
+            
+            // Visual highlight
+            const card = document.getElementById('card-' + id);
+            if (cb.checked) {
+                card.style.backgroundColor = 'rgba(0, 123, 255, 0.1)';
+            } else {
+                card.style.backgroundColor = '';
+            }
+
+            updateBulkActionsUI();
+        };
+
+        function updateBulkActionsUI() {
+            const bulkActions = document.getElementById('bulkActions');
+            const selectedCountSpan = document.getElementById('selectedCount');
+            const bulkRestoreBtn = document.getElementById('bulkRestoreBtn');
+            const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+
+            if (selectedProductIds.size > 0) {
+                bulkActions.style.setProperty('display', 'inline-block', 'important');
+                selectedCountSpan.textContent = selectedProductIds.size + ' selected';
+                
+                if (viewTrashMode) {
+                    bulkRestoreBtn.style.display = 'inline-block';
+                    bulkDeleteBtn.innerHTML = '<i class="bi bi-trash-fill"></i> Delete Permanently';
+                } else {
+                    bulkRestoreBtn.style.display = 'none';
+                    bulkDeleteBtn.innerHTML = '<i class="bi bi-trash-fill"></i> Move to Trash';
+                }
+            } else {
+                bulkActions.style.setProperty('display', 'none', 'important');
+            }
+        }
+
+        window.bulkDelete = async function() {
+            if (selectedProductIds.size === 0) return;
+            
+            const msg = viewTrashMode 
+                ? `Permanently delete ${selectedProductIds.size} selected products? CANNOT BE UNDONE.` 
+                : `Move ${selectedProductIds.size} products to the trash?`;
+                
+            if (!confirm(msg)) return;
+            
+            const ids = Array.from(selectedProductIds);
+            let successCount = 0;
+            
+            showCustomAlert('Processing', `Deleting ${ids.length} products... please wait.`, 'info');
+            
+            for (const id of ids) {
+                try {
+                    if (viewTrashMode) {
+                        await deleteDocument('products', id);
+                        const deletedRes = await getCollection('deleted_products');
+                        const deletedDoc = deletedRes.docs.find(d => d.data().productId === id);
+                        if (deletedDoc) await deleteDocument('deleted_products', deletedDoc.id);
+                        allProducts = allProducts.filter(x => x.firestoreId !== id);
+                    } else {
+                        const p = allProducts.find(x => x.firestoreId === id);
+                        if (p) {
+                            await addDocument('deleted_products', { 
+                                id: generateUUID(), productId: id, barcode: p.barcode || '', deletedAt: new Date().toISOString() 
+                            });
+                            await updateDocument('products', id, { deleteScheduledAt: new Date().toISOString() });
+                            p.isDeleted = true;
+                        }
+                    }
+                    successCount++;
+                } catch (e) {
+                    console.error("Failed to delete", id, e);
+                }
+            }
+            
+            selectedProductIds.clear();
+            updateBulkActionsUI();
+            filterAndSortProducts();
+            showCustomAlert('Completed', `Successfully deleted ${successCount} products.`);
+        };
+
+        window.bulkRestore = async function() {
+            if (selectedProductIds.size === 0 || !viewTrashMode) return;
+            if (!confirm(`Restore ${selectedProductIds.size} products to active inventory?`)) return;
+            
+            const ids = Array.from(selectedProductIds);
+            let successCount = 0;
+            
+            showCustomAlert('Processing', `Restoring ${ids.length} products... please wait.`, 'info');
+            
+            for (const id of ids) {
+                try {
+                    const p = allProducts.find(x => x.firestoreId === id);
+                    if (p) {
+                        const deletedRes = await getCollection('deleted_products');
+                        const deletedDoc = deletedRes.docs.find(d => d.data().productId === id);
+                        if (deletedDoc) await deleteDocument('deleted_products', deletedDoc.id);
+                        await updateDocument('products', id, { deleteScheduledAt: null });
+                        p.isDeleted = false;
+                        successCount++;
+                    }
+                } catch (e) {
+                    console.error("Failed to restore", id, e);
+                }
+            }
+            
+            selectedProductIds.clear();
+            updateBulkActionsUI();
+            filterAndSortProducts();
+            showCustomAlert('Completed', `Successfully restored ${successCount} products.`);
+        };
+
+        window.deleteProd = async function(id) {
+            if(confirm("Are you sure you want to move this product to the trash? It will be permanently deleted after 2 days.")) {
+                const p = allProducts.find(x => x.firestoreId === id);
+                if (p) p.isDeleted = true;
+                filterAndSortProducts();
+                showCustomAlert('Deleted', 'Product moved to the trash successfully.');
+                
+                try {
+                    await addDocument('deleted_products', { 
+                        id: generateUUID(),
+                        productId: id, 
+                        barcode: p ? p.barcode : '',
+                        deletedAt: new Date().toISOString() 
+                    });
+                    await updateDocument('products', id, { deleteScheduledAt: new Date().toISOString() });
+                } catch(e) { 
+                    if (p) p.isDeleted = false;
+                    filterAndSortProducts();
+                    showCustomAlert('Error', 'Failed to delete product: ' + e.message, 'failed');
+                }
+            }
+        };
+
+        window.restoreProd = async function(id) {
+            if(confirm("Restore this product from the trash?")) {
+                const p = allProducts.find(x => x.firestoreId === id);
+                if (p) p.isDeleted = false;
+                filterAndSortProducts();
+                showCustomAlert('Restored', 'Product successfully restored to active inventory.');
+                
+                try {
+                    const deletedRes = await getCollection('deleted_products');
+                    const deletedDoc = deletedRes.docs.find(d => d.data().productId === id);
+                    if (deletedDoc) {
+                        await deleteDocument('deleted_products', deletedDoc.id);
+                    }
+                    await updateDocument('products', id, { deleteScheduledAt: null });
+                } catch(e) { 
+                    if (p) p.isDeleted = true;
+                    filterAndSortProducts();
+                    showCustomAlert('Error', 'Failed to restore product: ' + e.message, 'failed');
+                }
+            }
+        };
+
+        window.toggleTrashMode = function() {
+            viewTrashMode = !viewTrashMode;
+            selectedProductIds.clear();
+            updateBulkActionsUI();
+            const btn = document.getElementById('trashToggleBtn');
+            const titleEl = document.querySelector('h2.fw-bold');
+            if (viewTrashMode) {
+                btn.innerHTML = '<i class="bi bi-arrow-left-circle me-2"></i> Exit Trash';
+                btn.classList.remove('btn-outline-danger');
+                btn.classList.add('btn-danger');
+                if (titleEl) titleEl.innerHTML = 'Deleted Products <span class="badge bg-danger fs-6 ms-2">Trash</span>';
+            } else {
+                btn.innerHTML = '<i class="bi bi-trash3 me-2"></i> View Trash';
+                btn.classList.remove('btn-danger');
+                btn.classList.add('btn-outline-danger');
+                if (titleEl) titleEl.innerHTML = 'Product List';
+            }
+            filterAndSortProducts();
+        };
+
+        window.openDetails = function(id) {
+            console.log("Opening details", id);
+            try {
+                const p = allProducts.find(x => x.firestoreId === id);
+                if(!p) return;
+                const formatCurrency = (amt) => `৳${Number(amt||0).toFixed(2)}`;
+
+                let pricingHtml = '';
+                let priceTiersObj = p.priceTiers;
+                if (typeof priceTiersObj === 'string') {
+                    try { priceTiersObj = JSON.parse(priceTiersObj); } catch(e) { priceTiersObj = null; }
+                }
+
+                if (priceTiersObj) {
+                    pricingHtml = '<h5 class="mt-4 border-bottom border-secondary pb-2">Pricing Details</h5><div class="row g-3">';
+                    const units = ['box', 'pack', 'pcs', 'kg', 'gram', 'liter', 'ml'];
+                    units.forEach(unit => {
+                        if (priceTiersObj[unit]) {
+                            const tier = priceTiersObj[unit];
+                            pricingHtml += `
+                                <div class="col-12">
+                                    <div class="card bg-dark border-secondary">
+                                        <div class="card-header py-1 small fw-bold text-uppercase bg-secondary text-white">${unit}</div>
+                                        <div class="card-body p-2">
+                                            <div class="d-flex justify-content-center mb-2 pb-2 border-bottom border-secondary">
+                                                <span class="badge bg-primary fs-6">Buy Price: ${formatCurrency(tier.buy)}</span>
+                                            </div>
+                                            <div class="row text-center">
+                                                <div class="col-6 border-end border-secondary">
+                                                    <div class="text-info small fw-bold mb-1">Normal Customer</div>
+                                                    <div class="d-flex justify-content-between px-3">
+                                                        <span class="small text-muted">Wholesale:</span><span class="small fw-bold">${formatCurrency(tier.wholesale)}</span>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between px-3">
+                                                        <span class="small text-muted">Retail:</span><span class="small fw-bold">${formatCurrency(tier.sell)}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="text-warning small fw-bold mb-1">Shop Customer</div>
+                                                    <div class="d-flex justify-content-between px-3">
+                                                        <span class="small text-muted">Wholesale:</span><span class="small fw-bold">${formatCurrency(tier.shop_wholesale)}</span>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between px-3">
+                                                        <span class="small text-muted">Retail:</span><span class="small fw-bold">${formatCurrency(tier.shop_sell)}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>`;
+                        }
+                    });
+                    pricingHtml += '</div>';
+                } else {
+                    pricingHtml = `
+                        <h5 class="mt-4 border-bottom border-secondary pb-2">Pricing</h5>
+                        <div class="row text-center">
+                            <div class="col-4"><div class="p-3 bg-danger-subtle text-danger-emphasis rounded-3 border border-danger"><h6>Buy Price</h6><p class="fs-4 mb-0 fw-bold">${formatCurrency(p.buyPrice)}</p></div></div>
+                            <div class="col-4"><div class="p-3 bg-primary-subtle text-primary-emphasis rounded-3 border border-primary"><h6>Wholesale</h6><p class="fs-4 mb-0 fw-bold">${formatCurrency(p.wholesalePrice)}</p></div></div>
+                            <div class="col-4"><div class="p-3 bg-success-subtle text-success-emphasis rounded-3 border border-success"><h6>Retail</h6><p class="fs-4 mb-0 fw-bold">${formatCurrency(p.sellPrice)}</p></div></div>
+                        </div>`;
+                }
+
+                let lotRows = '';
+                let lotsArr = p.lots;
+                if (typeof lotsArr === 'string') {
+                    try { lotsArr = JSON.parse(lotsArr); } catch(e) { lotsArr = []; }
+                }
+                if (!Array.isArray(lotsArr)) lotsArr = [];
+
+                if (lotsArr.length > 0) {
+                    lotRows = lotsArr.map(lot => `<tr><td>${lot.lotNumber}</td><td class="text-center">${lot.quantity}</td><td class="text-end">${formatCurrency(lot.buyPrice)}</td></tr>`).join('');
+                } else {
+                    lotRows = `<tr><td>Default Lot</td><td class="text-center">${p.quantity || 0}</td><td class="text-end">${formatCurrency(p.buyPrice)}</td></tr>`;
+                }
+
+            const lotInfoHtml = `
+                <h5 class="mt-4 border-bottom border-secondary pb-2">Lot Information</h5>
+                <div class="table-responsive" style="max-height: 200px;">
+                    <table class="table table-sm table-dark table-striped align-middle">
+                        <thead><tr><th>Lot #</th><th class="text-center">Quantity</th><th class="text-end">Buy Price</th></tr></thead>
+                        <tbody>${lotRows}</tbody>
+                    </table>
+                </div>`;
+
+            // Filter mocked history arrays
+            const pPurchases = allPurchases.filter(pur => pur.items && pur.items.some(i => i.productId === id));
+            const pProds = allProductions.filter(prod => prod.finishedProductId === id);
+
+            const purchaseHtml = pPurchases.length > 0 ? `
+                <h5 class="mt-4 border-bottom border-secondary pb-2">Purchase History</h5>
+                <div class="table-responsive">
+                    <table class="table table-sm table-dark table-striped">
+                        <thead><tr><th>Date</th><th>Supplier</th><th class="text-end">Cost</th></tr></thead>
+                        <tbody>${pPurchases.map(r => `<tr><td>${new Date(r.date).toLocaleDateString()}</td><td>${r.supplier}</td><td class="text-end">${formatCurrency(r.totalCost)}</td></tr>`).join('')}</tbody>
+                    </table>
+                </div>` : '<p class="text-muted mt-3">No purchase history found.</p>';
+
+            const prodHtml = pProds.length > 0 ? `
+                <h5 class="mt-4 border-bottom border-secondary pb-2">Production History</h5>
+                <div class="table-responsive">
+                    <table class="table table-sm table-dark table-striped">
+                        <thead><tr><th>Date</th><th>Batch</th><th class="text-center">Qty</th></tr></thead>
+                        <tbody>${pProds.map(r => `<tr><td>${new Date(r.date).toLocaleDateString()}</td><td>${r.batchNumber}</td><td class="text-center">${r.quantityProduced}</td></tr>`).join('')}</tbody>
+                    </table>
+                </div>` : '';
+
+            document.getElementById('productDetailsContainer').innerHTML = `
+                <div class="row">
+                    <div class="col-md-4 text-center">
+                        <div class="bg-dark rounded-4 p-4 d-flex align-items-center justify-content-center h-100 border border-secondary" style="overflow: hidden;">
+                            ${p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.name}" style="max-width: 100%; max-height: 250px; object-fit: contain;">` : `<i class="bi bi-box-seam" style="font-size: 6rem; color: rgba(255,255,255,0.2);"></i>`}
+                        </div>
+                    </div>
+                    <div class="col-md-8 mt-3 mt-md-0">
+                        <h3 class="fw-bold mb-1">${p.name}</h3>
+                        <p class="text-muted mb-4">${p.brand || 'No Brand'} &bull; ${p.category}</p>
+                        
+                        <div class="row g-3 mb-4">
+                            <div class="col-4">
+                                <div class="p-3 bg-dark rounded-3 border border-secondary text-center h-100 d-flex flex-column justify-content-center">
+                                    <h6 class="text-muted small text-uppercase mb-1">Current Stock</h6>
+                                    <h4 class="mb-0 ${p.quantity > 0 ? 'text-success' : 'text-danger'}">${p.quantity || 0} ${p.unit || 'Pcs'}</h4>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="p-3 bg-dark rounded-3 border border-secondary text-center h-100 d-flex flex-column justify-content-center">
+                                    <h6 class="text-muted small text-uppercase mb-1">Alert Qty</h6>
+                                    <h4 class="mb-0 text-warning">${p.alertQuantity || 0}</h4>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="p-3 bg-dark rounded-3 border border-secondary text-center h-100 d-flex flex-column justify-content-center">
+                                    <h6 class="text-muted small text-uppercase mb-1">Barcode</h6>
+                                    <h5 class="mb-0 text-info font-monospace text-truncate" title="${p.barcode || 'N/A'}">${p.barcode || 'N/A'}</h5>
+                                </div>
+                            </div>
+                        </div>
+
+                        ${p.description ? `<div class="mb-4"><h6 class="text-muted small text-uppercase mb-2">Description</h6><p class="text-light" style="font-size: 0.95rem;">${p.description}</p></div>` : ''}
+                        
+                        ${(p.packetPerBox || p.pcsPerBox || p.pcsPerPacket) ? `
+                        <div class="mb-4">
+                            <h6 class="text-muted small text-uppercase mb-2">Packaging Details</h6>
+                            <ul class="list-group list-group-flush border-top border-secondary">
+                                ${p.packetPerBox ? `<li class="list-group-item bg-transparent text-light border-secondary d-flex justify-content-between px-0"><span>Packets per Box:</span> <strong>${p.packetPerBox}</strong></li>` : ''}
+                                ${p.pcsPerBox ? `<li class="list-group-item bg-transparent text-light border-secondary d-flex justify-content-between px-0"><span>Pcs per Box:</span> <strong>${p.pcsPerBox}</strong></li>` : ''}
+                                ${p.pcsPerPacket ? `<li class="list-group-item bg-transparent text-light border-secondary d-flex justify-content-between px-0"><span>Pcs per Packet:</span> <strong>${p.pcsPerPacket}</strong></li>` : ''}
+                            </ul>
+                        </div>` : ''}
+                    </div>
+                </div>
+                ${pricingHtml}
+                ${lotInfoHtml}
+                ${purchaseHtml}
+                ${prodHtml}
+                ${p.lastEditedBy ? `<div class="mt-4 text-end text-muted small fst-italic">Last Edited By: <span class="fw-bold">${p.lastEditedBy}</span></div>` : ''}
+            `;
+            detailsModal.show();
+            } catch (err) {
+                console.error("Error in openDetails:", err);
+                alert("Failed to open details: " + err.message);
+            }
+        };
+
+        // Send to Admins (Mocked API call)
+        document.getElementById('sendToAdminsBtn').addEventListener('click', function() {
+            const btn = this;
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Sending...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                alert("Product Details sent to Admin successfully!");
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            }, 1000);
+        });
+
+        // Rubber Band Selection (Google Drive Style)
+        let isSelecting = false;
+        let startX = 0, startY = 0;
+        let initialSelectedIds = new Set();
+        
+        const selectionBox = document.createElement('div');
+        selectionBox.id = 'selection-box';
+        selectionBox.style.cssText = 'position: absolute; display: none; background: rgba(0, 123, 255, 0.2); border: 1px solid #007bff; pointer-events: none; z-index: 9999;';
+        document.body.appendChild(selectionBox);
+
+        document.addEventListener('mousedown', function(e) {
+            if (e.button !== 0) return;
+            if (e.target.closest('.card') || e.target.closest('button') || e.target.closest('input') || e.target.closest('select') || e.target.closest('.modal')) {
+                return;
+            }
+
+            isSelecting = true;
+            startX = e.pageX;
+            startY = e.pageY;
+            
+            initialSelectedIds = new Set(selectedProductIds);
+            if (!e.ctrlKey && !e.metaKey && !e.shiftKey) {
+                initialSelectedIds.clear();
+                selectedProductIds.clear();
+                document.querySelectorAll('.product-select-cb').forEach(cb => {
+                    cb.checked = false;
+                    document.getElementById('card-' + cb.value).style.backgroundColor = '';
+                });
+                updateBulkActionsUI();
+            }
+            
+            selectionBox.style.left = startX + 'px';
+            selectionBox.style.top = startY + 'px';
+            selectionBox.style.width = '0px';
+            selectionBox.style.height = '0px';
+            selectionBox.style.display = 'block';
+        });
+
+        document.addEventListener('mousemove', function(e) {
+            if (!isSelecting) return;
+            e.preventDefault();
+
+            const currentX = e.pageX;
+            const currentY = e.pageY;
+
+            const x = Math.min(startX, currentX);
+            const y = Math.min(startY, currentY);
+            const w = Math.abs(currentX - startX);
+            const h = Math.abs(currentY - startY);
+
+            selectionBox.style.left = x + 'px';
+            selectionBox.style.top = y + 'px';
+            selectionBox.style.width = w + 'px';
+            selectionBox.style.height = h + 'px';
+
+            const selectionRect = { left: x, top: y, right: x + w, bottom: y + h };
+
+            document.querySelectorAll('.product-card').forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const cardLeft = rect.left + window.scrollX;
+                const cardTop = rect.top + window.scrollY;
+                const cardRight = cardLeft + rect.width;
+                const cardBottom = cardTop + rect.height;
+
+                const intersects = !(selectionRect.right < cardLeft || 
+                                     selectionRect.left > cardRight || 
+                                     selectionRect.bottom < cardTop || 
+                                     selectionRect.top > cardBottom);
+
+                const id = card.id.replace('card-', '');
+                if (intersects) {
+                    selectedProductIds.add(id);
+                } else {
+                    if (initialSelectedIds.has(id)) {
+                        selectedProductIds.add(id);
+                    } else {
+                        selectedProductIds.delete(id);
+                    }
+                }
+                
+                const cb = document.getElementById('cb-' + id);
+                if (cb) cb.checked = selectedProductIds.has(id);
+                card.style.backgroundColor = selectedProductIds.has(id) ? 'rgba(0, 123, 255, 0.1)' : '';
+            });
+            updateBulkActionsUI();
+        });
+
+        document.addEventListener('mouseup', function(e) {
+            if (isSelecting) {
+                isSelecting = false;
+                selectionBox.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
+        

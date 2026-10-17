@@ -1,0 +1,75 @@
+{
+    "name": "bcs-enterprise-pos",
+    "version": "1.9.5",
+    "description": "BCS Enterprise POS PRO Max",
+    "author": "bcsdeveloper",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron .",
+        "build": "electron-builder --win",
+        "release": "electron-builder --win --publish always"
+    },
+    "dependencies": {
+        "acorn": "^8.19.0",
+        "electron-updater": "^6.8.9"
+    },
+    "devDependencies": {
+        "electron": "^31.3.1",
+        "electron-builder": "^26.15.3"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/barodacomputerandsales/pos"
+    },
+    "build": {
+        "appId": "com.bcsdeveloper.pos",
+        "productName": "BCS Enterprise POS PRO Max",
+        "copyright": "Copyright © 2026 bcsdeveloper. All rights reserved.",
+        "directories": {
+            "output": "dist",
+            "buildResources": "assets"
+        },
+        "files": [
+            "**/*",
+            "!backend/**",
+            "!*.md",
+            "!.github/**"
+        ],
+        "win": {
+            "target": [
+                {
+                    "target": "nsis",
+                    "arch": [
+                        "x64"
+                    ]
+                }
+            ],
+            "icon": "assets/icon.ico",
+            "legalTrademarks": "BCS Enterprise POS is a trademark of bcsdeveloper",
+            "requestedExecutionLevel": "asInvoker",
+            "verifyUpdateCodeSignature": false,
+            "signtoolOptions": {
+                "publisherName": "bcsdeveloper",
+                "rfc3161TimeStampServer": "http://timestamp.digicert.com"
+            }
+        },
+        "nsis": {
+            "oneClick": false,
+            "perMachine": false,
+            "allowToChangeInstallationDirectory": true,
+            "createDesktopShortcut": true,
+            "createStartMenuShortcut": true,
+            "shortcutName": "BCS Enterprise POS",
+            "uninstallDisplayName": "BCS Enterprise POS",
+            "runAfterFinish": true,
+            "differentialPackage": false
+        },
+        "publish": [
+            {
+                "provider": "github",
+                "owner": "barodacomputerandsales",
+                "repo": "pos"
+            }
+        ]
+    }
+}

@@ -1,0 +1,55 @@
+.topbar {
+    position: fixed;
+    top: 0;
+    left: 240px;
+    right: 0;
+    height: 72px;
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    z-index: 1000;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+}
+
+[data-bs-theme="dark"] .topbar {
+    background: rgba(30, 30, 30, 0.55);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.topbar .user-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 20px;
+    transition: background 0.2s;
+}
+
+.topbar .user-profile:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+[data-bs-theme="dark"] .topbar .user-profile:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.topbar .logout-btn {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border: 1px solid rgba(220, 53, 69, 0.2);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.topbar .logout-btn:hover {
+    background: #dc3545;
+    color: white;
+}

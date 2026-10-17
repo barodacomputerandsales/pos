@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <script>
+        if (localStorage.getItem('isAuthenticated') !== 'true' || !localStorage.getItem('sessionId') || !localStorage.getItem('sessionPort')) {
+            window.location.replace('index.html');
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Production Batch - BCS POS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bs-primary: #6366f1;
+            --bs-body-font-family: 'Inter', sans-serif;
+            --glass-bg: rgba(30, 30, 30, 0.55);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --glass-blur: blur(16px);
+            --page-bg: #0f172a;
+            --orb-1: rgba(99, 102, 241, 0.15);
+            --orb-2: rgba(168, 85, 247, 0.15);
+        }
+
+        body {
+            font-family: var(--bs-body-font-family);
+            background: var(--page-bg) !important;
+            background-attachment: fixed !important;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            position: relative;
+            z-index: 0;
+            overflow-x: hidden;
+            color: #f8fafc;
+        }
+
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            z-index: -1;
+            filter: blur(80px);
+            pointer-events: none;
+        }
+
+        body::before {
+            width: 500px;
+            height: 500px;
+            background: var(--orb-1);
+            top: -150px;
+            left: -100px;
+        }
+
+        body::after {
+            width: 400px;
+            height: 400px;
+            background: var(--orb-2);
+            bottom: -50px;
+            right: -50px;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 80px 30px 40px 30px;
+            flex-grow: 1;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg) !important;
+            backdrop-filter: var(--glass-blur);
+            border: var(--glass-border) !important;
+            box-shadow: var(--glass-shadow) !important;
+            border-radius: 16px;
+        }
+
+        .form-control, .form-select {
+            background-color: rgba(15, 23, 42, 0.6) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            color: #f8fafc !important;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #6366f1 !important;
+            box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25) !important;
+        }
+
+        /* Custom Alert Cards */
+        #custom-alert-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .custom-alert {
+            min-width: 320px;
+            padding: 14px 18px;
+            border-radius: 10px;
+            background: rgba(24, 24, 27, 0.95);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.3s ease-out forwards;
+            border-left: 4px solid;
+            color: #fff;
+        }
+
+        .custom-alert.success { border-left-color: #22c55e; }
+        .custom-alert.error { border-left-color: #ef4444; }
+        .custom-alert .title { font-weight: 600; font-size: 0.92rem; }
+        .custom-alert .message { font-size: 0.82rem; opacity: 0.85; }
+        .custom-alert .close-btn { background: none; border: none; color: inherit; cursor: pointer; padding: 0; opacity: 0.6; }
+
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { to { transform: translateX(100%); opacity: 0; } }
+    </style>
+</head>
+<body>
+    <script src="template/layout.js"></script>
+    <script>
+        renderTopbar();
+        renderSidebar('products', 'add-production');
+    </script>
+
+    <main class="main-content">
+        <div class="container-fluid px-2">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 pb-3 mb-4 border-bottom border-secondary border-opacity-25">
+                <div>
+                    <h2 class="fw-bold mb-1 d-flex align-items-center gap-2">
+                        <i class="bi bi-gear-wide-connected text-primary"></i> Record Production Batch
+                    </h2>
+                    <p class="text-muted mb-0 small">Manufacture finished goods, consume raw components, and calculate unit production costs.</p>
+                </div>
+                <a href="production-history.html" class="btn btn-outline-secondary d-flex align-items-center gap-2">
+                    <i class="bi bi-clock-history"></i> View Production History
+                </a>
+            </div>
+
+            <form id="productionForm">
+                <div class="row g-4">
+                    <!-- Left: Batch & Finished Product -->
+                    <div class="col-12 col-lg-7">
+                        <div class="glass-panel p-4 mb-4">
+                            <h5 class="fw-bold mb-3 text-primary d-flex align-items-center gap-2">
+                                <i class="bi bi-box-seam"></i> 1. Finished Product
+                            </h5>
+                            <div class="row g-3">
+                                <div class="col-md-12">
+                                    <label class="form-label small text-muted text-uppercase fw-semibold">Select Finished Product *</label>
+                                    <select class="form-select" id="finishedProductSelect" required>
+                                        <option value="">-- Choose Product to Produce --</option>
+                                    </select>
+                                </div>
+                                <div class="col-12" id="selectedProductCard" style="display: none;">
+                                    <div class="p-3 rounded bg-secondary bg-opacity-10 border border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="fw-bold text-white fs-6" id="cardProdName">-</div>
+                                            <div class="small text-muted" id="cardProdMeta">-</div>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="small text-muted">Current Stock</div>
+                                            <div class="fw-bold text-success fs-5" id="cardProdStock">0 Pcs</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="border-secondary border-opacity-25 my-4">
+
+                            <h5 class="fw-bold mb-3 text-primary d-flex align-items-center gap-2">
+                                <i class="bi bi-card-checklist"></i> 2. Batch Information
+                            </h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small text-muted text-uppercase fw-semibold">Batch Number *</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control font-monospace" id="batchNumber" required>
+                                        <button class="btn btn-outline-secondary" type="button" id="generateBatchBtn">Auto</button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small text-muted text-uppercase fw-semibold">Production Date *</label>
+                                    <input type="datetime-local" class="form-control" id="productionDate" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small text-muted text-uppercase fw-semibold">Quantity to Produce *</label>
+                                    <input type="number" class="form-control" id="quantityProduced" min="1" step="1" value="1" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small text-muted text-uppercase fw-semibold">Unit</label>
+                                    <input type="text" class="form-control" id="productionUnit" value="Pcs" readonly>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Raw Materials / Components Consumed -->
+                        <div class="glass-panel p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="fw-bold mb-0 text-primary d-flex align-items-center gap-2">
+                                    <i class="bi bi-boxes"></i> 3. Raw Materials / Components (BOM)
+                                </h5>
+                                <button type="button" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1" id="addMaterialRowBtn">
+                                    <i class="bi bi-plus-lg"></i> Add Component
+                                </button>
+                            </div>
+                            <p class="text-muted small mb-3">Add the components consumed to manufacture this batch. Their inventory will be deducted automatically.</p>
+
+                            <div class="table-responsive">
+                                <table class="table table-dark table-sm align-middle mb-0" id="materialsTable">
+                                    <thead>
+                                        <tr class="text-muted small">
+                                            <th style="width: 45%;">Component / Item</th>
+                                            <th style="width: 15%;" class="text-center">Stock</th>
+                                            <th style="width: 15%;" class="text-center">Qty Used</th>
+                                            <th style="width: 15%;" class="text-end">Subtotal</th>
+                                            <th style="width: 10%;" class="text-end">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="materialsTableBody">
+                                        <!-- Dynamic component rows -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Cost Summary & Final Submission -->
+                    <div class="col-12 col-lg-5">
+                        <div class="glass-panel p-4 mb-4">
+                            <h5 class="fw-bold mb-3 text-primary d-flex align-items-center gap-2">
+                                <i class="bi bi-calculator"></i> 4. Cost Breakdown & Overhead
+                            </h5>
+
+                            <div class="mb-3">
+                                <label class="form-label small text-muted text-uppercase fw-semibold">Labor / Packaging / Overhead (₹)</label>
+                                <input type="number" class="form-control" id="overheadCost" min="0" step="0.01" value="0.00">
+                                <div class="form-text text-muted small">Optional additional costs such as labor or packaging.</div>
+                            </div>
+
+                            <div class="p-3 rounded bg-secondary bg-opacity-10 border border-secondary border-opacity-25 mt-4">
+                                <div class="d-flex justify-content-between mb-2 small text-muted">
+                                    <span>Raw Materials Cost:</span>
+                                    <span class="text-white font-monospace" id="summaryMaterialsCost">₹0.00</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2 small text-muted">
+                                    <span>Overhead & Labor:</span>
+                                    <span class="text-white font-monospace" id="summaryOverheadCost">₹0.00</span>
+                                </div>
+                                <div class="d-flex justify-content-between fs-5 fw-bold text-info border-top border-secondary border-opacity-25 pt-2 mb-2">
+                                    <span>Total Batch Cost:</span>
+                                    <span id="summaryTotalCost">₹0.00</span>
+                                </div>
+                                <div class="d-flex justify-content-between small text-muted border-top border-secondary border-opacity-25 pt-2">
+                                    <span>Cost Per Produced Unit:</span>
+                                    <span class="text-success fw-bold font-monospace" id="summaryUnitCost">₹0.00</span>
+                                </div>
+                            </div>
+
+                            <div class="mt-4">
+                                <label class="form-label small text-muted text-uppercase fw-semibold">Production Notes / Remarks</label>
+                                <textarea class="form-control" id="productionNotes" rows="3" placeholder="Enter batch quality checks, technician notes, or instructions..."></textarea>
+                            </div>
+
+                            <div class="mt-4 d-grid gap-2">
+                                <button type="submit" class="btn btn-primary py-2 fw-semibold" id="submitBatchBtn">
+                                    <i class="bi bi-check2-circle me-1"></i> Record Production Batch
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary py-2" id="submitAndAnotherBtn">
+                                    Save &amp; Record Another
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <div id="custom-alert-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { getCollection, addDocument, updateDocument } from './script/api.js';
+
+        let allProducts = [];
+        let selectedProduct = null;
+        const formatCurrency = (amt) => '₹' + Number(amt || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+        window.showCustomAlert = function(title, message, type = 'success') {
+            const container = document.getElementById('custom-alert-container');
+            const alert = document.createElement('div');
+            alert.className = `custom-alert ${type === 'failed' ? 'error' : type}`;
+            const iconSvg = type === 'success' 
+                ? '<i class="bi bi-check-circle-fill text-success fs-5"></i>' 
+                : '<i class="bi bi-exclamation-octagon-fill text-danger fs-5"></i>';
+
+            alert.innerHTML = `
+                <div class="d-flex align-items-center gap-3 w-100">
+                    <div>${iconSvg}</div>
+                    <div class="flex-grow-1">
+                        <div class="title">${title}</div>
+                        <div class="message">${message}</div>
+                    </div>
+                    <button class="close-btn" onclick="this.closest('.custom-alert').remove()">&times;</button>
+                </div>`;
+
+            container.appendChild(alert);
+            setTimeout(() => {
+                alert.style.animation = 'slideOut 0.3s ease-in forwards';
+                alert.addEventListener('animationend', () => alert.remove());
+            }, 3500);
+        };
+
+        function generateBatchNumber() {
+            const now = new Date();
+            const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
+            const rand = Math.floor(100 + Math.random() * 900);
+            return `BATCH-${dateStr}-${rand}`;
+        }
+
+        async function initPage() {
+            // Set default date to now
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('productionDate').value = now.toISOString().slice(0, 16);
+            document.getElementById('batchNumber').value = generateBatchNumber();
+
+            try {
+                const res = await getCollection('products');
+                allProducts = (res.docs || []).map(d => ({ id: d.id, ...d.data() })).filter(p => !p.deleteScheduledAt);
+
+                // Populate finished product select
+                const select = document.getElementById('finishedProductSelect');
+                select.innerHTML = '<option value="">-- Choose Product to Produce --</option>' +
+                    allProducts.map(p => `<option value="${p.id}">${p.name} (${p.barcode || 'No SKU'}) - Stock: ${p.quantity || 0} ${p.unit || 'Pcs'}</option>`).join('');
+
+                // Add initial raw material row
+                addMaterialRow();
+            } catch (err) {
+                console.error("Failed to load products:", err);
+                showCustomAlert("Error", "Could not load inventory products.", "error");
+            }
+        }
+
+        document.getElementById('finishedProductSelect').addEventListener('change', function() {
+            const pId = this.value;
+            selectedProduct = allProducts.find(p => p.id === pId);
+            const card = document.getElementById('selectedProductCard');
+
+            if (selectedProduct) {
+                document.getElementById('cardProdName').textContent = selectedProduct.name;
+                document.getElementById('cardProdMeta').textContent = `${selectedProduct.brand || 'No Brand'} • ${selectedProduct.category || 'General'} • Barcode: ${selectedProduct.barcode || 'N/A'}`;
+                document.getElementById('cardProdStock').textContent = `${selectedProduct.quantity || 0} ${selectedProduct.unit || 'Pcs'}`;
+                document.getElementById('productionUnit').value = selectedProduct.unit || 'Pcs';
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+            recalcCosts();
+        });
+
+        document.getElementById('generateBatchBtn').addEventListener('click', () => {
+            document.getElementById('batchNumber').value = generateBatchNumber();
+        });
+
+        function addMaterialRow() {
+            const tbody = document.getElementById('materialsTableBody');
+            const rowId = 'mat_row_' + Date.now() + '_' + Math.floor(Math.random() * 100);
+
+            const row = document.createElement('tr');
+            row.id = rowId;
+            row.innerHTML = `
+                <td>
+                    <select class="form-select form-select-sm material-item-select" required>
+                        <option value="">-- Select Material --</option>
+                        ${allProducts.map(p => `<option value="${p.id}" data-stock="${p.quantity || 0}" data-price="${p.buyPrice || 0}" data-unit="${p.unit || 'Pcs'}">${p.name} (${p.barcode || 'No SKU'})</option>`).join('')}
+                    </select>
+                </td>
+                <td class="text-center small text-muted material-stock-display">0</td>
+                <td class="text-center">
+                    <input type="number" class="form-control form-control-sm text-center material-qty-input" min="0.01" step="any" value="1" required>
+                </td>
+                <td class="text-end font-monospace text-info material-subtotal-display">₹0.00</td>
+                <td class="text-end">
+                    <button type="button" class="btn btn-outline-danger btn-sm p-1 remove-mat-btn" title="Remove">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </td>
+            `;
+
+            tbody.appendChild(row);
+
+            const select = row.querySelector('.material-item-select');
+            const qtyInput = row.querySelector('.material-qty-input');
+            const removeBtn = row.querySelector('.remove-mat-btn');
+
+            select.addEventListener('change', () => updateRowData(row));
+            qtyInput.addEventListener('input', () => updateRowData(row));
+            removeBtn.addEventListener('click', () => {
+                row.remove();
+                recalcCosts();
+            });
+        }
+
+        function updateRowData(row) {
+            const select = row.querySelector('.material-item-select');
+            const qtyInput = row.querySelector('.material-qty-input');
+            const stockDisplay = row.querySelector('.material-stock-display');
+            const subtotalDisplay = row.querySelector('.material-subtotal-display');
+
+            const opt = select.options[select.selectedIndex];
+            if (!opt || !select.value) {
+                stockDisplay.textContent = '0';
+                subtotalDisplay.textContent = '₹0.00';
+                recalcCosts();
+                return;
+            }
+
+            const stock = parseFloat(opt.dataset.stock) || 0;
+            const price = parseFloat(opt.dataset.price) || 0;
+            const unit = opt.dataset.unit || 'Pcs';
+            const qty = parseFloat(qtyInput.value) || 0;
+
+            stockDisplay.textContent = `${stock} ${unit}`;
+            const subtotal = qty * price;
+            subtotalDisplay.textContent = formatCurrency(subtotal);
+
+            recalcCosts();
+        }
+
+        function recalcCosts() {
+            let totalMaterialCost = 0;
+            document.querySelectorAll('#materialsTableBody tr').forEach(row => {
+                const select = row.querySelector('.material-item-select');
+                const qtyInput = row.querySelector('.material-qty-input');
+                if (select && select.value) {
+                    const opt = select.options[select.selectedIndex];
+                    const price = parseFloat(opt.dataset.price) || 0;
+                    const qty = parseFloat(qtyInput.value) || 0;
+                    totalMaterialCost += (price * qty);
+                }
+            });
+
+            const overhead = parseFloat(document.getElementById('overheadCost').value) || 0;
+            const totalCost = totalMaterialCost + overhead;
+            const qtyProduced = parseFloat(document.getElementById('quantityProduced').value) || 1;
+            const unitCost = qtyProduced > 0 ? (totalCost / qtyProduced) : 0;
+
+            document.getElementById('summaryMaterialsCost').textContent = formatCurrency(totalMaterialCost);
+            document.getElementById('summaryOverheadCost').textContent = formatCurrency(overhead);
+            document.getElementById('summaryTotalCost').textContent = formatCurrency(totalCost);
+            document.getElementById('summaryUnitCost').textContent = formatCurrency(unitCost);
+        }
+
+        document.getElementById('addMaterialRowBtn').addEventListener('click', addMaterialRow);
+        document.getElementById('overheadCost').addEventListener('input', recalcCosts);
+        document.getElementById('quantityProduced').addEventListener('input', recalcCosts);
+
+        async function handleFormSubmit(e, isAnother = false) {
+            if (e) e.preventDefault();
+
+            if (!selectedProduct) {
+                showCustomAlert("Validation", "Please select a finished product to produce.", "error");
+                return;
+            }
+
+            const batchNumber = document.getElementById('batchNumber').value.trim();
+            const date = document.getElementById('productionDate').value;
+            const quantityProduced = parseFloat(document.getElementById('quantityProduced').value) || 0;
+
+            if (quantityProduced <= 0) {
+                showCustomAlert("Validation", "Quantity produced must be at least 1.", "error");
+                return;
+            }
+
+            // Gather consumed materials
+            const materialsUsed = [];
+            let totalMaterialCost = 0;
+
+            document.querySelectorAll('#materialsTableBody tr').forEach(row => {
+                const select = row.querySelector('.material-item-select');
+                const qtyInput = row.querySelector('.material-qty-input');
+                if (select && select.value) {
+                    const opt = select.options[select.selectedIndex];
+                    const prodId = select.value;
+                    const name = opt.text;
+                    const price = parseFloat(opt.dataset.price) || 0;
+                    const unit = opt.dataset.unit || 'Pcs';
+                    const qty = parseFloat(qtyInput.value) || 0;
+
+                    if (qty > 0) {
+                        materialsUsed.push({
+                            productId: prodId,
+                            name,
+                            unit,
+                            quantity: qty,
+                            cost: price,
+                            subtotal: qty * price
+                        });
+                        totalMaterialCost += (qty * price);
+                    }
+                }
+            });
+
+            const overheadCost = parseFloat(document.getElementById('overheadCost').value) || 0;
+            const totalCost = totalMaterialCost + overheadCost;
+            const costPerUnit = quantityProduced > 0 ? (totalCost / quantityProduced) : 0;
+            const notes = document.getElementById('productionNotes').value.trim();
+            const operator = localStorage.getItem('loggedInUserName') || 'Admin';
+
+            const submitBtn = document.getElementById('submitBatchBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Saving...`;
+
+            try {
+                // 1. Save production record
+                const productionRecord = {
+                    batchNumber,
+                    finishedProductId: selectedProduct.id,
+                    productName: selectedProduct.name,
+                    barcode: selectedProduct.barcode || '',
+                    category: selectedProduct.category || '',
+                    quantityProduced,
+                    unit: selectedProduct.unit || 'Pcs',
+                    materialsUsed: JSON.stringify(materialsUsed),
+                    materialCost: totalMaterialCost,
+                    overheadCost,
+                    totalCost,
+                    costPerUnit,
+                    date: new Date(date).toISOString(),
+                    producedBy: operator,
+                    notes,
+                    createdAt: new Date().toISOString()
+                };
+
+                await addDocument('productions', productionRecord);
+
+                // 2. Update stock for finished product
+                const currentFinishedStock = Number(selectedProduct.quantity || 0);
+                const updatedFinishedStock = currentFinishedStock + quantityProduced;
+                await updateDocument('products', selectedProduct.id, {
+                    quantity: updatedFinishedStock,
+                    updatedAt: new Date().toISOString()
+                });
+
+                // 3. Deduct stock for each consumed raw material
+                for (const mat of materialsUsed) {
+                    const compProduct = allProducts.find(p => p.id === mat.productId);
+                    if (compProduct) {
+                        const currentCompStock = Number(compProduct.quantity || 0);
+                        const updatedCompStock = Math.max(0, currentCompStock - mat.quantity);
+                        await updateDocument('products', mat.productId, {
+                            quantity: updatedCompStock,
+                            updatedAt: new Date().toISOString()
+                        });
+                    }
+                }
+
+                showCustomAlert("Success", `Batch ${batchNumber} recorded successfully!`, "success");
+
+                if (isAnother) {
+                    document.getElementById('productionForm').reset();
+                    document.getElementById('materialsTableBody').innerHTML = '';
+                    addMaterialRow();
+                    document.getElementById('batchNumber').value = generateBatchNumber();
+                    selectedProduct = null;
+                    document.getElementById('selectedProductCard').style.display = 'none';
+                    recalcCosts();
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `<i class="bi bi-check2-circle me-1"></i> Record Production Batch`;
+                } else {
+                    setTimeout(() => {
+                        window.location.href = 'production-history.html';
+                    }, 1000);
+                }
+
+            } catch (err) {
+                console.error("Failed to save batch:", err);
+                showCustomAlert("Error", "Could not save production batch: " + err.message, "error");
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<i class="bi bi-check2-circle me-1"></i> Record Production Batch`;
+            }
+        }
+
+        document.getElementById('productionForm').addEventListener('submit', (e) => handleFormSubmit(e, false));
+        document.getElementById('submitAndAnotherBtn').addEventListener('click', () => handleFormSubmit(null, true));
+
+        document.addEventListener('DOMContentLoaded', initPage);
+    </script>
+</body>
+</html>

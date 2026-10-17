@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <script>
+        if (localStorage.getItem('isAuthenticated') !== 'true' || !localStorage.getItem('sessionId') || !localStorage.getItem('sessionPort')) {
+            window.location.replace('index.html');
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production History - BCS POS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* macOS Sleek Glassmorphism Variables */
+        :root {
+            --bs-primary: #6366f1;
+            --bs-body-font-family: 'Inter', sans-serif;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-bg-hover: rgba(255, 255, 255, 0.85);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.8);
+            --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            --glass-shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.08);
+            --glass-blur: blur(16px);
+            --page-bg: #f3f4f6;
+            --orb-1: rgba(99, 102, 241, 0.3);
+            --orb-2: rgba(168, 85, 247, 0.25);
+        }
+
+        [data-bs-theme="dark"] {
+            --glass-bg: rgba(30, 30, 30, 0.55);
+            --glass-bg-hover: rgba(45, 45, 45, 0.65);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --glass-shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.4);
+            --page-bg: #0f172a;
+            --orb-1: rgba(99, 102, 241, 0.15);
+            --orb-2: rgba(168, 85, 247, 0.15);
+            color: #f8fafc;
+        }
+
+        body {
+            font-family: var(--bs-body-font-family);
+            background: var(--page-bg) !important;
+            background-attachment: fixed !important;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            position: relative;
+            z-index: 0;
+            overflow-x: hidden;
+        }
+
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            z-index: -1;
+            filter: blur(80px);
+            pointer-events: none;
+        }
+
+        body::before {
+            width: 500px;
+            height: 500px;
+            background: var(--orb-1);
+            top: -150px;
+            left: -100px;
+        }
+
+        body::after {
+            width: 400px;
+            height: 400px;
+            background: var(--orb-2);
+            bottom: -50px;
+            right: -50px;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 80px 30px 40px 30px;
+            flex-grow: 1;
+        }
+
+        .stat-card {
+            background: var(--glass-bg) !important;
+            backdrop-filter: var(--glass-blur);
+            border: var(--glass-border) !important;
+            border-radius: .75rem;
+            box-shadow: var(--glass-shadow) !important;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--glass-shadow-hover) !important;
+        }
+
+        .stat-card .card-body {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stat-card .icon-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--glass-bg);
+            border: var(--glass-border);
+            box-shadow: var(--glass-shadow) !important;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg) !important;
+            backdrop-filter: var(--glass-blur);
+            border: var(--glass-border) !important;
+            box-shadow: var(--glass-shadow) !important;
+            border-radius: 16px;
+        }
+
+        .glass-table {
+            --bs-table-bg: transparent;
+            --bs-table-color: inherit;
+        }
+
+        .glass-table th {
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #94a3b8;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 14px 16px;
+        }
+
+        .glass-table td {
+            padding: 14px 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .glass-table tr:hover td {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .batch-badge {
+            background: rgba(99, 102, 241, 0.15);
+            color: #818cf8;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            font-family: monospace;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        /* Custom Alert Cards */
+        #custom-alert-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .custom-alert {
+            min-width: 320px;
+            padding: 14px 18px;
+            border-radius: 10px;
+            background: rgba(24, 24, 27, 0.95);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.3s ease-out forwards;
+            border-left: 4px solid;
+            color: #fff;
+        }
+
+        .custom-alert.success { border-left-color: #22c55e; }
+        .custom-alert.error { border-left-color: #ef4444; }
+        .custom-alert .title { font-weight: 600; font-size: 0.92rem; }
+        .custom-alert .message { font-size: 0.82rem; opacity: 0.85; }
+        .custom-alert .close-btn { background: none; border: none; color: inherit; cursor: pointer; padding: 0; opacity: 0.6; }
+
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { to { transform: translateX(100%); opacity: 0; } }
+
+        @media print {
+            .sidebar, .topbar, #actionHeader, #filterPanel, .btn-action, .pagination-controls {
+                display: none !important;
+            }
+            .main-content {
+                margin-left: 0 !important;
+                padding: 0 !important;
+            }
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+            }
+            .glass-panel, .stat-card {
+                background: #ffffff !important;
+                border: 1px solid #ddd !important;
+                box-shadow: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <script src="template/layout.js"></script>
+    <script>
+        renderTopbar();
+        renderSidebar('products', 'production-history');
+    </script>
+
+    <main class="main-content">
+        <div class="container-fluid">
+            <!-- Header Section -->
+            <div id="actionHeader" class="d-flex justify-content-between align-items-center flex-wrap gap-3 pb-3 mb-4 border-bottom border-secondary border-opacity-25">
+                <div>
+                    <h2 class="fw-bold mb-1 d-flex align-items-center gap-2">
+                        <i class="bi bi-clock-history text-primary"></i> Production History
+                    </h2>
+                    <p class="text-muted mb-0 small">Track all manufacturing batches, raw materials consumed, unit costs, and output.</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-secondary d-flex align-items-center gap-2" id="refreshBtn">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
+                    <button class="btn btn-outline-info d-flex align-items-center gap-2" id="printReportBtn">
+                        <i class="bi bi-printer"></i> Print Report
+                    </button>
+                    <a href="add-production.html" class="btn btn-primary d-flex align-items-center gap-2">
+                        <i class="bi bi-plus-circle"></i> Record Production
+                    </a>
+                </div>
+            </div>
+
+            <!-- Stats Overview Cards -->
+            <div class="row g-3 mb-4">
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <div>
+                                <h6 class="text-muted mb-1 small text-uppercase fw-semibold">Total Batches</h6>
+                                <h3 class="fw-bold mb-0" id="totalBatchesCount">0</h3>
+                            </div>
+                            <div class="icon-circle text-primary">
+                                <i class="bi bi-layers-fill fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <div>
+                                <h6 class="text-muted mb-1 small text-uppercase fw-semibold">Units Produced</h6>
+                                <h3 class="fw-bold mb-0 text-success" id="totalUnitsCount">0</h3>
+                            </div>
+                            <div class="icon-circle text-success">
+                                <i class="bi bi-box-seam-fill fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <div>
+                                <h6 class="text-muted mb-1 small text-uppercase fw-semibold">Total Production Cost</h6>
+                                <h3 class="fw-bold mb-0 text-info" id="totalProductionCost">₹0.00</h3>
+                            </div>
+                            <div class="icon-circle text-info">
+                                <i class="bi bi-currency-rupee fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <div>
+                                <h6 class="text-muted mb-1 small text-uppercase fw-semibold">This Month's Batches</h6>
+                                <h3 class="fw-bold mb-0 text-warning" id="thisMonthBatchesCount">0</h3>
+                            </div>
+                            <div class="icon-circle text-warning">
+                                <i class="bi bi-calendar-check-fill fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter & Search Toolbar -->
+            <div id="filterPanel" class="glass-panel p-3 mb-4">
+                <div class="row g-3 align-items-center">
+                    <div class="col-12 col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-secondary border-opacity-25 text-muted">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" class="form-control bg-transparent border-secondary border-opacity-25" id="searchInput" placeholder="Search by batch #, product, or operator...">
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <select class="form-select bg-transparent border-secondary border-opacity-25" id="productFilter">
+                            <option value="">All Finished Products</option>
+                        </select>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <select class="form-select bg-transparent border-secondary border-opacity-25" id="dateFilter">
+                            <option value="all">All Dates</option>
+                            <option value="today">Today</option>
+                            <option value="week">Past 7 Days</option>
+                            <option value="month">This Month</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <select class="form-select bg-transparent border-secondary border-opacity-25" id="sortBy">
+                            <option value="date-desc">Date: Newest First</option>
+                            <option value="date-asc">Date: Oldest First</option>
+                            <option value="qty-desc">Quantity: High to Low</option>
+                            <option value="qty-asc">Quantity: Low to High</option>
+                            <option value="cost-desc">Cost: High to Low</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Production Table Panel -->
+            <div class="glass-panel p-0 overflow-hidden mb-4">
+                <div class="table-responsive">
+                    <table class="table glass-table mb-0 align-middle">
+                        <thead>
+                            <tr>
+                                <th>Batch Details</th>
+                                <th>Finished Product</th>
+                                <th class="text-center">Qty Produced</th>
+                                <th class="text-end">Unit Cost</th>
+                                <th class="text-end">Total Cost</th>
+                                <th class="text-center">Materials</th>
+                                <th>Operator</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productionTableBody">
+                            <tr>
+                                <td colspan="8" class="text-center py-5 text-muted">
+                                    <div class="spinner-border text-primary spinner-border-sm me-2" role="status"></div>
+                                    Loading production history...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Empty State Container -->
+            <div id="emptyState" class="glass-panel text-center py-5 d-none">
+                <i class="bi bi-gear-wide-connected text-secondary opacity-50 mb-3" style="font-size: 4rem;"></i>
+                <h4 class="fw-bold">No Production Records Found</h4>
+                <p class="text-muted small mx-auto" style="max-width: 450px;">
+                    There are no recorded manufacturing or production runs matching your search criteria. Record your first production batch to track costs and inventory updates.
+                </p>
+                <a href="add-production.html" class="btn btn-primary mt-2">
+                    <i class="bi bi-plus-circle me-1"></i> Record First Production
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Details Modal -->
+    <div class="modal fade" id="batchDetailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-secondary border-opacity-25 bg-dark">
+                <div class="modal-header border-secondary border-opacity-25">
+                    <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
+                        <i class="bi bi-file-earmark-text text-primary"></i> Production Batch Details
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4" id="batchDetailsContent">
+                    <!-- Populated dynamically via JavaScript -->
+                </div>
+                <div class="modal-footer border-secondary border-opacity-25">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-info text-white" id="modalPrintBtn">
+                        <i class="bi bi-printer me-1"></i> Print Batch Slip
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content border-danger border-opacity-50 bg-dark">
+                <div class="modal-body text-center p-4">
+                    <i class="bi bi-exclamation-triangle text-danger mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="fw-bold">Delete Batch Record?</h5>
+                    <p class="text-muted small mb-4">
+                        Are you sure you want to delete batch <span id="deleteBatchNum" class="text-white fw-semibold"></span>? This will permanently remove the record from production history.
+                    </p>
+                    <div class="d-flex justify-content-center gap-2">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-danger btn-sm" id="confirmDeleteBtn">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Container -->
+    <div id="custom-alert-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { getCollection, deleteDocument } from './script/api.js';
+
+        let allProductions = [];
+        let filteredProductions = [];
+        let batchToDeleteId = null;
+
+        const formatCurrency = (amt) => '₹' + Number(amt || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+        window.showCustomAlert = function(title, message, type = 'success') {
+            const container = document.getElementById('custom-alert-container');
+            const alert = document.createElement('div');
+            alert.className = `custom-alert ${type === 'failed' ? 'error' : type}`;
+            
+            const iconSvg = type === 'success' 
+                ? '<i class="bi bi-check-circle-fill text-success fs-5"></i>' 
+                : '<i class="bi bi-exclamation-octagon-fill text-danger fs-5"></i>';
+
+            alert.innerHTML = `
+                <div class="d-flex align-items-center gap-3 w-100">
+                    <div>${iconSvg}</div>
+                    <div class="flex-grow-1">
+                        <div class="title">${title}</div>
+                        <div class="message">${message}</div>
+                    </div>
+                    <button class="close-btn" onclick="this.closest('.custom-alert').remove()">&times;</button>
+                </div>`;
+
+            container.appendChild(alert);
+            setTimeout(() => {
+                alert.style.animation = 'slideOut 0.3s ease-in forwards';
+                alert.addEventListener('animationend', () => alert.remove());
+            }, 3500);
+        };
+
+        async function loadProductions() {
+            const tbody = document.getElementById('productionTableBody');
+            tbody.innerHTML = `<tr><td colspan="8" class="text-center py-5 text-muted"><div class="spinner-border text-primary spinner-border-sm me-2"></div>Fetching production history...</td></tr>`;
+
+            try {
+                const res = await getCollection('productions', true);
+                allProductions = (res.docs || []).map(doc => {
+                    const data = doc.data();
+                    let materials = [];
+                    if (data.materialsUsed) {
+                        try {
+                            materials = typeof data.materialsUsed === 'string' ? JSON.parse(data.materialsUsed) : data.materialsUsed;
+                        } catch(e) { materials = []; }
+                    }
+                    return {
+                        id: doc.id,
+                        ...data,
+                        materialsUsed: materials,
+                        quantityProduced: Number(data.quantityProduced || data.quantity || 0),
+                        totalCost: Number(data.totalCost || data.cost || 0),
+                        costPerUnit: Number(data.costPerUnit || (data.quantityProduced > 0 ? (data.totalCost / data.quantityProduced) : 0)),
+                        date: data.date || data.createdAt || new Date().toISOString()
+                    };
+                });
+
+                populateProductDropdown();
+                updateStats();
+                applyFilters();
+            } catch (err) {
+                console.error("Failed to load productions:", err);
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Failed to load production records: ${err.message}</td></tr>`;
+                showCustomAlert("Error", "Could not fetch production records.", "error");
+            }
+        }
+
+        function populateProductDropdown() {
+            const productFilter = document.getElementById('productFilter');
+            const uniqueProducts = [...new Set(allProductions.map(p => p.productName).filter(Boolean))].sort();
+            
+            productFilter.innerHTML = '<option value="">All Finished Products</option>' + 
+                uniqueProducts.map(prod => `<option value="${prod}">${prod}</option>`).join('');
+        }
+
+        function updateStats() {
+            const totalBatches = allProductions.length;
+            const totalUnits = allProductions.reduce((sum, item) => sum + (item.quantityProduced || 0), 0);
+            const totalCost = allProductions.reduce((sum, item) => sum + (item.totalCost || 0), 0);
+
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+
+            const thisMonthBatches = allProductions.filter(item => {
+                const itemDate = new Date(item.date);
+                return itemDate.getMonth() === currentMonth && itemDate.getFullYear() === currentYear;
+            }).length;
+
+            document.getElementById('totalBatchesCount').textContent = totalBatches;
+            document.getElementById('totalUnitsCount').textContent = totalUnits.toLocaleString();
+            document.getElementById('totalProductionCost').textContent = formatCurrency(totalCost);
+            document.getElementById('thisMonthBatchesCount').textContent = thisMonthBatches;
+        }
+
+        function applyFilters() {
+            const searchTerm = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+            const productVal = document.getElementById('productFilter').value;
+            const dateVal = document.getElementById('dateFilter').value;
+            const sortVal = document.getElementById('sortBy').value;
+
+            const now = new Date();
+
+            filteredProductions = allProductions.filter(item => {
+                // Search filter
+                if (searchTerm) {
+                    const batchMatch = (item.batchNumber || '').toLowerCase().includes(searchTerm);
+                    const prodMatch = (item.productName || '').toLowerCase().includes(searchTerm);
+                    const barcodeMatch = (item.barcode || '').toLowerCase().includes(searchTerm);
+                    const opMatch = (item.producedBy || item.addedBy || '').toLowerCase().includes(searchTerm);
+                    const notesMatch = (item.notes || '').toLowerCase().includes(searchTerm);
+                    if (!batchMatch && !prodMatch && !barcodeMatch && !opMatch && !notesMatch) return false;
+                }
+
+                // Product filter
+                if (productVal && item.productName !== productVal) {
+                    return false;
+                }
+
+                // Date filter
+                if (dateVal !== 'all') {
+                    const itemDate = new Date(item.date);
+                    if (dateVal === 'today') {
+                        if (itemDate.toDateString() !== now.toDateString()) return false;
+                    } else if (dateVal === 'week') {
+                        const sevenDaysAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
+                        if (itemDate < sevenDaysAgo) return false;
+                    } else if (dateVal === 'month') {
+                        if (itemDate.getMonth() !== now.getMonth() || itemDate.getFullYear() !== now.getFullYear()) return false;
+                    }
+                }
+
+                return true;
+            });
+
+            // Sorting
+            filteredProductions.sort((a, b) => {
+                const dateA = new Date(a.date).getTime();
+                const dateB = new Date(b.date).getTime();
+
+                if (sortVal === 'date-desc') return dateB - dateA;
+                if (sortVal === 'date-asc') return dateA - dateB;
+                if (sortVal === 'qty-desc') return (b.quantityProduced || 0) - (a.quantityProduced || 0);
+                if (sortVal === 'qty-asc') return (a.quantityProduced || 0) - (b.quantityProduced || 0);
+                if (sortVal === 'cost-desc') return (b.totalCost || 0) - (a.totalCost || 0);
+                return 0;
+            });
+
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('productionTableBody');
+            const emptyState = document.getElementById('emptyState');
+
+            if (filteredProductions.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('d-none');
+                return;
+            }
+
+            emptyState.classList.add('d-none');
+
+            tbody.innerHTML = filteredProductions.map(item => {
+                const formattedDate = new Date(item.date).toLocaleDateString('en-US', {
+                    year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                });
+
+                const materialsCount = Array.isArray(item.materialsUsed) ? item.materialsUsed.length : 0;
+
+                return `
+                    <tr>
+                        <td>
+                            <span class="batch-badge">${item.batchNumber || 'NO-BATCH'}</span>
+                            <div class="text-muted small mt-1"><i class="bi bi-clock me-1"></i>${formattedDate}</div>
+                        </td>
+                        <td>
+                            <div class="fw-semibold text-white">${item.productName || 'Unknown Product'}</div>
+                            <div class="text-muted small">${item.barcode ? `<i class="bi bi-upc me-1"></i>${item.barcode}` : (item.category || 'Standard')}</div>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-success-subtle text-success fs-6 fw-bold px-2 py-1">
+                                ${item.quantityProduced} ${item.unit || 'Pcs'}
+                            </span>
+                        </td>
+                        <td class="text-end font-monospace text-muted">
+                            ${formatCurrency(item.costPerUnit)}
+                        </td>
+                        <td class="text-end font-monospace fw-bold text-info">
+                            ${formatCurrency(item.totalCost)}
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-secondary bg-opacity-25 text-light border border-secondary border-opacity-25">
+                                <i class="bi bi-boxes me-1"></i>${materialsCount} ${materialsCount === 1 ? 'item' : 'items'}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge bg-dark border border-secondary text-light">
+                                <i class="bi bi-person me-1"></i>${item.producedBy || item.addedBy || 'Admin'}
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-info view-details-btn" data-id="${item.id}" title="View Breakdown">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-outline-danger delete-batch-btn" data-id="${item.id}" data-batch="${item.batchNumber || item.id}" title="Delete Record">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>`;
+            }).join('');
+
+            // Bind Actions
+            document.querySelectorAll('.view-details-btn').forEach(btn => {
+                btn.addEventListener('click', () => showDetailsModal(btn.dataset.id));
+            });
+
+            document.querySelectorAll('.delete-batch-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    batchToDeleteId = btn.dataset.id;
+                    document.getElementById('deleteBatchNum').textContent = btn.dataset.batch;
+                    const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+                    modal.show();
+                });
+            });
+        }
+
+        function showDetailsModal(id) {
+            const item = allProductions.find(p => p.id === id);
+            if (!item) return;
+
+            const formattedDate = new Date(item.date).toLocaleString('en-US', {
+                dateStyle: 'full', timeStyle: 'short'
+            });
+
+            const materials = Array.isArray(item.materialsUsed) ? item.materialsUsed : [];
+            const materialsHtml = materials.length > 0 ? `
+                <div class="table-responsive mt-3">
+                    <table class="table table-sm table-dark table-striped align-middle mb-0">
+                        <thead>
+                            <tr class="text-muted small">
+                                <th>Raw Material</th>
+                                <th class="text-center">Unit</th>
+                                <th class="text-center">Qty Used</th>
+                                <th class="text-end">Unit Cost</th>
+                                <th class="text-end">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${materials.map(m => `
+                                <tr>
+                                    <td>
+                                        <div class="fw-semibold">${m.name || m.productName || 'Material'}</div>
+                                        <div class="text-muted small">${m.barcode || ''}</div>
+                                    </td>
+                                    <td class="text-center">${m.unit || 'Pcs'}</td>
+                                    <td class="text-center fw-bold">${m.quantity || m.qty || 0}</td>
+                                    <td class="text-end font-monospace">${formatCurrency(m.cost || m.buyPrice || 0)}</td>
+                                    <td class="text-end font-monospace text-info">${formatCurrency((m.quantity || m.qty || 0) * (m.cost || m.buyPrice || 0))}</td>
+                                </tr>`).join('')}
+                        </tbody>
+                    </table>
+                </div>` : '<p class="text-muted small mt-2">No raw material breakdown specified for this batch.</p>';
+
+            const modalBody = document.getElementById('batchDetailsContent');
+            modalBody.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary border-opacity-25">
+                    <div>
+                        <span class="batch-badge fs-6">${item.batchNumber || 'NO-BATCH'}</span>
+                        <div class="text-muted small mt-1">${formattedDate}</div>
+                    </div>
+                    <span class="badge bg-success px-3 py-2"><i class="bi bi-check2-circle me-1"></i>Completed</span>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="p-3 bg-secondary bg-opacity-10 rounded border border-secondary border-opacity-25">
+                            <div class="text-muted small text-uppercase fw-semibold mb-1">Finished Product</div>
+                            <h5 class="fw-bold mb-1">${item.productName || 'Finished Product'}</h5>
+                            <div class="text-muted small">${item.barcode ? `Barcode: ${item.barcode}` : ''}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-secondary bg-opacity-10 rounded border border-secondary border-opacity-25">
+                            <div class="text-muted small text-uppercase fw-semibold mb-1">Production Output</div>
+                            <h5 class="fw-bold text-success mb-1">${item.quantityProduced} ${item.unit || 'Pcs'}</h5>
+                            <div class="text-muted small">Cost per unit: <strong class="text-info">${formatCurrency(item.costPerUnit)}</strong></div>
+                        </div>
+                    </div>
+                </div>
+
+                <h6 class="fw-bold text-light mb-2"><i class="bi bi-boxes me-2 text-primary"></i>Consumed Raw Materials (BOM)</h6>
+                ${materialsHtml}
+
+                <div class="row g-3 mt-3 pt-3 border-top border-secondary border-opacity-25">
+                    <div class="col-md-7">
+                        <div class="text-muted small text-uppercase fw-semibold mb-1">Production Notes</div>
+                        <p class="small text-light mb-0">${item.notes || 'No operator notes provided.'}</p>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="d-flex justify-content-between text-muted small mb-1">
+                            <span>Labor / Overhead:</span>
+                            <span class="text-light">${formatCurrency(item.overheadCost || 0)}</span>
+                        </div>
+                        <div class="d-flex justify-content-between fs-6 fw-bold border-top border-secondary border-opacity-25 pt-2">
+                            <span>Total Batch Cost:</span>
+                            <span class="text-info">${formatCurrency(item.totalCost)}</span>
+                        </div>
+                        <div class="text-end text-muted small mt-1">
+                            Recorded by: <strong>${item.producedBy || item.addedBy || 'Admin'}</strong>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const modal = new bootstrap.Modal(document.getElementById('batchDetailsModal'));
+            modal.show();
+        }
+
+        // Delete Batch Record
+        document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+            if (!batchToDeleteId) return;
+
+            const btn = document.getElementById('confirmDeleteBtn');
+            const origText = btn.innerHTML;
+            btn.innerHTML = 'Deleting...';
+            btn.disabled = true;
+
+            try {
+                await deleteDocument('productions', batchToDeleteId);
+                allProductions = allProductions.filter(p => p.id !== batchToDeleteId);
+                
+                const deleteModalEl = document.getElementById('deleteConfirmModal');
+                const modal = bootstrap.Modal.getInstance(deleteModalEl);
+                if (modal) modal.hide();
+
+                showCustomAlert("Deleted", "Production batch record removed successfully.", "success");
+                updateStats();
+                applyFilters();
+            } catch (err) {
+                console.error("Delete failed:", err);
+                showCustomAlert("Error", "Failed to delete batch: " + err.message, "error");
+            } finally {
+                btn.innerHTML = origText;
+                btn.disabled = false;
+                batchToDeleteId = null;
+            }
+        });
+
+        // Event Listeners
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+        document.getElementById('productFilter').addEventListener('change', applyFilters);
+        document.getElementById('dateFilter').addEventListener('change', applyFilters);
+        document.getElementById('sortBy').addEventListener('change', applyFilters);
+        document.getElementById('refreshBtn').addEventListener('click', loadProductions);
+        document.getElementById('printReportBtn').addEventListener('click', () => window.print());
+        document.getElementById('modalPrintBtn').addEventListener('click', () => window.print());
+
+        document.addEventListener('DOMContentLoaded', loadProductions);
+    </script>
+</body>
+</html>
