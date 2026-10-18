@@ -379,7 +379,7 @@
                                         </button>
 
                                         <button class="btn btn-outline-secondary d-inline-flex align-items-center gap-2 px-3 py-2 small ms-auto" id="openReleasesWebBtn">
-                                            <i class="bi bi-box-arrow-up-right"></i> View on GitHub
+                                            <i class="bi bi-cloud-arrow-down"></i> Edge API Status
                                         </button>
                                     </div>
                                 </div>
@@ -819,22 +819,20 @@
                 }, 1400);
             });
 
-            // Direct Download Button
+            // Direct Download Button (Proxied via Backend)
             directDownloadBtn.addEventListener('click', async () => {
-                if (!latestInstallerDownloadUrl) {
-                    showAlert('Download Info', 'Redirecting to official GitHub releases page...', 'info');
-                    latestInstallerDownloadUrl = 'https://github.com/barodacomputerandsales/pos/releases';
-                }
+                const targetUrl = latestInstallerDownloadUrl || 'https://backend.bcs.bcsdeveloper.com/api/updater/download';
+                showAlert('Download Starting', 'Requesting latest installer package from serverless edge...', 'info');
                 if (ipcRenderer) {
-                    await ipcRenderer.invoke('open_external', latestInstallerDownloadUrl);
+                    await ipcRenderer.invoke('open_external', targetUrl);
                 } else {
-                    window.open(latestInstallerDownloadUrl, '_blank');
+                    window.open(targetUrl, '_blank');
                 }
             });
 
-            // View on GitHub
+            // Edge API Status Button
             openReleasesWebBtn.addEventListener('click', async () => {
-                const target = 'https://github.com/barodacomputerandsales/pos/releases';
+                const target = 'https://backend.bcs.bcsdeveloper.com/api/updater/check';
                 if (ipcRenderer) {
                     await ipcRenderer.invoke('open_external', target);
                 } else {
