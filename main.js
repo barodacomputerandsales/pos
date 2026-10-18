@@ -1,5 +1,6 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, shell } = require('electron');
 const path = require('path');
+const os = require('os');
 const { autoUpdater } = require('electron-updater');
 
 let mainWindow;
@@ -88,14 +89,47 @@ ipcMain.handle('get_app_version', () => {
 
 // Get detailed system diagnostics
 ipcMain.handle('get_system_info', () => {
+  const totalMem = (os.totalmem() / (1024 * 1024 * 1024)).toFixed(1);
+  const freeMem = (os.freemem() / (1024 * 1024 * 1024)).toFixed(1);
+  const usedMem = (parseFloat(totalMem) - parseFloat(freeMem)).toFixed(1);
+  const cpus = os.cpus() || [];
+  const cpuModel = cpus.length > 0 ? cpus[0].model.trim() : 'Standard CPU';
+  const cpuCores = cpus.length;
+  const uptimeHours = (os.uptime() / 3600).toFixed(1);
+
   return {
     version: app.getVersion(),
     electron: process.versions.electron,
     chrome: process.versions.chrome,
     node: process.versions.node,
     platform: process.platform,
-    arch: process.arch
+    arch: process.arch,
+    osRelease: os.release(),
+    hostname: os.hostname(),
+    cpuModel,
+    cpuCores,
+    totalMem: `${totalMem} GB`,
+    freeMem: `${freeMem} GB`,
+    usedMem: `${usedMem} GB`,
+    memPercent: Math.round((parseFloat(usedMem) / parseFloat(totalMem)) * 100),
+    uptime: `${uptimeHours} hrs`
   };
+});
+
+// Explicit download update trigger
+ipcMain.on('download_update', () => {
+  autoUpdater.downloadUpdate().catch(err => {
+    if (mainWindow) mainWindow.webContents.send('update_error', err.message);
+  });
+});
+
+// Open external download links in system default browser
+ipcMain.handle('open_external', async (event, url) => {
+  if (url && (url.startsWith('https://') || url.startsWith('http://'))) {
+    await shell.openExternal(url);
+    return true;
+  }
+  return false;
 });
 
 // Restart app and install the downloaded update

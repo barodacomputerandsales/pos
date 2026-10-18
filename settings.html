@@ -8,117 +8,280 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Settings &amp; Updates - BCS POS</title>
+    <title>System Settings &amp; Software Updates | BCS POS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
     <style>
         :root {
             --bs-primary: #6366f1;
+            --bs-primary-rgb: 99, 102, 241;
             --bs-body-font-family: 'Inter', sans-serif;
-            --glass-bg: rgba(30, 30, 30, 0.55);
-            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
-            --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            --glass-blur: blur(16px);
-            --page-bg: #0f172a;
-            --orb-1: rgba(99, 102, 241, 0.15);
-            --orb-2: rgba(168, 85, 247, 0.15);
+            --glass-bg: rgba(22, 27, 34, 0.7);
+            --glass-bg-hover: rgba(30, 41, 59, 0.85);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+            --glass-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+            --glass-blur: blur(20px);
+            --page-bg: #0b0f19;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-purple: #8b5cf6;
         }
 
         body {
             font-family: var(--bs-body-font-family);
             background: var(--page-bg) !important;
             background-attachment: fixed !important;
-            display: flex;
-            flex-direction: column;
             min-height: 100vh;
-            position: relative;
-            z-index: 0;
+            color: #f1f5f9;
             overflow-x: hidden;
-            color: #f8fafc;
+            position: relative;
         }
 
+        /* Ambient Glowing Background Orbs */
         body::before, body::after {
             content: '';
             position: fixed;
             border-radius: 50%;
             z-index: -1;
-            filter: blur(80px);
+            filter: blur(120px);
             pointer-events: none;
+            opacity: 0.5;
         }
 
         body::before {
-            width: 500px;
-            height: 500px;
-            background: var(--orb-1);
-            top: -150px;
-            left: -100px;
+            width: 550px;
+            height: 550px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.25), transparent 70%);
+            top: -100px;
+            left: 180px;
         }
 
         body::after {
-            width: 400px;
-            height: 400px;
-            background: var(--orb-2);
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.2), transparent 70%);
             bottom: -50px;
-            right: -50px;
+            right: 0px;
         }
 
         .main-content {
             margin-left: 260px;
-            padding: 80px 30px 40px 30px;
-            flex-grow: 1;
+            padding: 85px 32px 50px 32px;
+            min-height: 100vh;
         }
 
-        .glass-panel {
-            background: var(--glass-bg) !important;
+        .glass-card {
+            background: var(--glass-bg);
             backdrop-filter: var(--glass-blur);
-            border: var(--glass-border) !important;
-            box-shadow: var(--glass-shadow) !important;
-            border-radius: 16px;
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: var(--glass-border);
+            border-radius: 18px;
+            box-shadow: var(--glass-shadow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .spin {
-            animation: spin 1s linear infinite;
+        .glass-card:hover {
+            border-color: rgba(255, 255, 255, 0.16);
         }
+
+        /* Modern Custom Pill Tabs */
+        .nav-settings {
+            display: inline-flex;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 5px;
+            gap: 6px;
+        }
+
+        .nav-settings .nav-link {
+            color: #94a3b8;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 9px 20px;
+            border-radius: 10px;
+            border: none;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-settings .nav-link:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-settings .nav-link.active {
+            color: #ffffff !important;
+            background: linear-gradient(135deg, #4f46e5, #06b6d4);
+            box-shadow: 0 4px 18px rgba(79, 70, 229, 0.4);
+        }
+
+        /* Radar Pulse Animation for Checking State */
+        .radar-box {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+
+        .radar-core {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #06b6d4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.6);
+            z-index: 2;
+        }
+
+        .radar-wave {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid rgba(6, 182, 212, 0.7);
+            animation: radarPulse 2s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
+            pointer-events: none;
+        }
+
+        .radar-wave:nth-child(2) {
+            animation-delay: 0.6s;
+        }
+        .radar-wave:nth-child(3) {
+            animation-delay: 1.2s;
+        }
+
+        @keyframes radarPulse {
+            0% { transform: scale(0.5); opacity: 1; }
+            100% { transform: scale(1.6); opacity: 0; }
+        }
+
+        /* Holographic Shimmer Progress Bar */
+        .holo-progress {
+            height: 14px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .holo-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #6366f1, #06b6d4, #10b981);
+            background-size: 200% 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            animation: shimmerMove 2s linear infinite;
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.5);
+        }
+
+        @keyframes shimmerMove {
+            0% { background-position: 100% 0; }
+            100% { background-position: -100% 0; }
+        }
+
+        /* Installation Modal Animation */
+        .install-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(11, 15, 25, 0.92);
+            backdrop-filter: blur(25px);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .install-box {
+            background: rgba(22, 27, 34, 0.9);
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            border-radius: 24px;
+            padding: 40px;
+            text-align: center;
+            max-width: 480px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(99, 102, 241, 0.3);
+            animation: zoomIn 0.3s ease-out;
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.85); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .install-spinner {
+            width: 72px;
+            height: 72px;
+            border: 4px solid rgba(255, 255, 255, 0.08);
+            border-top: 4px solid #06b6d4;
+            border-right: 4px solid #6366f1;
+            border-radius: 50%;
+            animation: spin 1s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+            margin: 0 auto 24px;
+        }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
 
-        /* Custom Alert Cards */
+        .badge-chip {
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Notification Toast Container */
         #custom-alert-container {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
+            top: 24px;
+            right: 24px;
+            z-index: 10000;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
         }
 
         .custom-alert {
-            min-width: 320px;
+            min-width: 340px;
             padding: 14px 18px;
-            border-radius: 10px;
-            background: rgba(24, 24, 27, 0.95);
-            backdrop-filter: blur(12px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            animation: slideIn 0.3s ease-out forwards;
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-left: 4px solid;
             color: #fff;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+            animation: slideIn 0.3s ease-out forwards;
         }
-
-        .custom-alert.success { border-left-color: #22c55e; }
+        .custom-alert.success { border-left-color: #10b981; }
         .custom-alert.error { border-left-color: #ef4444; }
-        .custom-alert .title { font-weight: 600; font-size: 0.92rem; }
-        .custom-alert .message { font-size: 0.82rem; opacity: 0.85; }
-        .custom-alert .close-btn { background: none; border: none; color: inherit; cursor: pointer; padding: 0; opacity: 0.6; }
+        .custom-alert.info { border-left-color: #06b6d4; }
 
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes slideOut { to { transform: translateX(100%); opacity: 0; } }
+        @keyframes slideIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { to { transform: translateX(110%); opacity: 0; } }
     </style>
 </head>
 <body>
@@ -129,369 +292,666 @@
     </script>
 
     <main class="main-content">
-        <div class="container-fluid px-2">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 pb-3 mb-4 border-bottom border-secondary border-opacity-25">
+        <div class="container-fluid px-0">
+            
+            <!-- Page Header & Tab Bar -->
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 pb-4 mb-4 border-bottom border-secondary border-opacity-25">
                 <div>
                     <h2 class="fw-bold mb-1 d-flex align-items-center gap-2">
-                        <i class="bi bi-gear-wide text-primary"></i> System Settings &amp; Updates
+                        <i class="bi bi-sliders2-vertical text-primary"></i> System Settings &amp; Updater
                     </h2>
-                    <p class="text-muted mb-0 small">Manage application updates, system diagnostics, cache, and backend connections.</p>
+                    <p class="text-muted mb-0 small">Manage automatic application updates, GitHub release tracking, system diagnostics, and Cloudflare backend health.</p>
                 </div>
+
+                <!-- Modern Segmented Tabs -->
+                <ul class="nav nav-settings" id="settingsTabs" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active" id="updates-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-updates" type="button" role="tab">
+                            <i class="bi bi-cloud-arrow-down-fill"></i> Software Updater
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" id="system-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-system" type="button" role="tab">
+                            <i class="bi bi-cpu-fill"></i> System Diagnostics
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" id="cloud-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-cloud" type="button" role="tab">
+                            <i class="bi bi-hdd-network-fill"></i> Cloud &amp; Cache
+                        </button>
+                    </li>
+                </ul>
             </div>
 
-            <div class="row g-4">
-                <!-- Left: Software Updates -->
-                <div class="col-12 col-lg-7">
-                    <div class="glass-panel p-4 mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="fw-bold mb-0 text-primary d-flex align-items-center gap-2">
-                                <i class="bi bi-cloud-arrow-down-fill"></i> Software Update
-                            </h5>
-                            <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25" id="updateStatusBadge">
-                                Ready
-                            </span>
-                        </div>
-                        <p class="text-muted small mb-4">
-                            BCS Enterprise POS automatically checks for new releases on startup via GitHub Releases. You can also trigger an update check manually.
-                        </p>
+            <!-- Tab Content -->
+            <div class="tab-content" id="settingsTabContent">
 
-                        <div class="p-3 rounded bg-secondary bg-opacity-10 border border-secondary border-opacity-25 mb-4">
-                            <div class="row g-3 align-items-center">
-                                <div class="col-md-7">
-                                    <div class="small text-muted text-uppercase fw-semibold mb-1">Current Version</div>
-                                    <h4 class="fw-bold mb-0 text-white d-flex align-items-center gap-2">
-                                        <span id="appCurrentVersion">v1.9.5</span>
-                                        <span class="badge bg-primary fs-6 fw-normal">Stable</span>
-                                    </h4>
-                                    <div class="small text-muted mt-1">Channel: GitHub Official Releases (x64)</div>
+                <!-- ==================== TAB 1: SOFTWARE UPDATER ==================== -->
+                <div class="tab-pane fade show active" id="tab-updates" role="tabpanel">
+                    <div class="row g-4">
+                        
+                        <!-- Left: Live Updater Card -->
+                        <div class="col-12 col-xl-8">
+                            <div class="glass-card p-4 mb-4">
+                                
+                                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                                    <div>
+                                        <h5 class="fw-bold mb-1 text-white d-flex align-items-center gap-2">
+                                            <i class="bi bi-stars text-primary"></i> Release &amp; Auto-Update Control Center
+                                        </h5>
+                                        <p class="text-muted small mb-0">Synchronized with GitHub Releases: <code class="text-info mono">barodacomputerandsales/pos</code></p>
+                                    </div>
+                                    <span class="badge-chip bg-success bg-opacity-20 text-success border border-success border-opacity-25" id="updaterHeaderBadge">
+                                        <i class="bi bi-shield-check"></i> System Stable
+                                    </span>
                                 </div>
-                                <div class="col-md-5 text-md-end">
-                                    <button class="btn btn-primary d-inline-flex align-items-center gap-2" id="manualCheckBtn">
-                                        <i class="bi bi-arrow-clockwise" id="checkBtnIcon"></i> Check for Updates
+
+                                <!-- Active Version vs Latest Release Card -->
+                                <div class="p-4 rounded-4 bg-dark bg-opacity-60 border border-secondary border-opacity-25 mb-4">
+                                    <div class="row g-4 align-items-center">
+                                        <div class="col-md-6 border-end border-secondary border-opacity-25">
+                                            <div class="small text-muted text-uppercase fw-semibold mb-1">Installed Version</div>
+                                            <div class="d-flex align-items-baseline gap-2">
+                                                <h2 class="fw-extrabold mb-0 text-white mono" id="installedVersionText">v1.9.5</h2>
+                                                <span class="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-25">Current</span>
+                                            </div>
+                                            <div class="small text-muted mt-2">Architecture: <span class="mono text-white">x64 (Windows NSIS)</span></div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="small text-muted text-uppercase fw-semibold mb-1">Latest Remote Version (GitHub)</div>
+                                            <div class="d-flex align-items-baseline gap-2">
+                                                <h2 class="fw-extrabold mb-0 text-info mono" id="latestRemoteVersionText">Checking...</h2>
+                                                <span class="badge bg-info bg-opacity-25 text-info border border-info border-opacity-25" id="remoteStatusTag">GitHub API</span>
+                                            </div>
+                                            <div class="small text-muted mt-2" id="remotePublishDate">Last checked: Just now</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Action Buttons -->
+                                    <div class="d-flex align-items-center flex-wrap gap-3 mt-4 pt-3 border-top border-secondary border-opacity-25">
+                                        <button class="btn btn-primary d-inline-flex align-items-center gap-2 px-4 py-2 fw-semibold" id="checkUpdatesBtn">
+                                            <i class="bi bi-arrow-clockwise" id="checkBtnIcon"></i> Check for Updates
+                                        </button>
+
+                                        <button class="btn btn-outline-info d-inline-flex align-items-center gap-2 px-3 py-2 fw-semibold" id="directDownloadBtn" disabled>
+                                            <i class="bi bi-download"></i> Direct Download (.exe)
+                                        </button>
+
+                                        <button class="btn btn-outline-secondary d-inline-flex align-items-center gap-2 px-3 py-2 small ms-auto" id="openReleasesWebBtn">
+                                            <i class="bi bi-box-arrow-up-right"></i> View on GitHub
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Animated Checking Indicator (Hidden by default) -->
+                                <div id="checkingAnimationBox" class="p-4 rounded-4 bg-primary bg-opacity-10 border border-primary border-opacity-25 mb-4 text-center d-none">
+                                    <div class="radar-box mb-3">
+                                        <div class="radar-wave"></div>
+                                        <div class="radar-wave"></div>
+                                        <div class="radar-wave"></div>
+                                        <div class="radar-core">
+                                            <i class="bi bi-cloud-arrow-down"></i>
+                                        </div>
+                                    </div>
+                                    <h6 class="fw-bold text-white mb-1">Scanning Release Repositories...</h6>
+                                    <p class="text-muted small mb-0">Querying GitHub API and Cloudflare Edge distribution for new binaries.</p>
+                                </div>
+
+                                <!-- Animated Download Progress Card -->
+                                <div id="downloadCard" class="p-4 rounded-4 bg-info bg-opacity-10 border border-info border-opacity-25 mb-4 d-none">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="spinner-grow spinner-grow-sm text-info" role="status"></div>
+                                            <span class="fw-bold text-info" id="downloadTitleText">Downloading Update Package...</span>
+                                        </div>
+                                        <span class="mono fw-bold fs-5 text-info" id="downloadPercentText">0%</span>
+                                    </div>
+
+                                    <!-- Holographic Shimmer Bar -->
+                                    <div class="holo-progress mb-3">
+                                        <div class="holo-progress-bar" id="holoProgressBar" style="width: 0%;"></div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between small text-muted mono">
+                                        <span id="downloadSpeedText"><i class="bi bi-speedometer2 me-1"></i>Speed: -- MB/s</span>
+                                        <span id="downloadSizeText"><i class="bi bi-hdd me-1"></i>Transferred: -- / --</span>
+                                    </div>
+                                </div>
+
+                                <!-- Ready to Install Card -->
+                                <div id="installReadyCard" class="p-4 rounded-4 bg-success bg-opacity-15 border border-success border-opacity-30 mb-4 d-none">
+                                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                                        <div>
+                                            <h5 class="fw-bold text-success mb-1 d-flex align-items-center gap-2">
+                                                <i class="bi bi-check-circle-fill"></i> New Version Downloaded &amp; Verified!
+                                            </h5>
+                                            <p class="text-muted small mb-0" id="installReadyDesc">
+                                                The update package has been downloaded and cryptographic checksum verified.
+                                            </p>
+                                        </div>
+                                        <button class="btn btn-success px-4 py-2 fw-bold d-inline-flex align-items-center gap-2" id="triggerRestartInstallBtn">
+                                            <i class="bi bi-arrow-repeat"></i> Restart &amp; Install Now
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Release Notes & Changelog Accordion -->
+                                <div>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <label class="small text-muted text-uppercase fw-semibold mb-0">Release Notes &amp; Changelog</label>
+                                        <span class="small text-muted" id="releaseNotesVersionTag">v1.9.5 Production</span>
+                                    </div>
+                                    <div class="p-3 rounded-3 bg-dark border border-secondary border-opacity-25 font-monospace small" style="max-height: 180px; overflow-y: auto;" id="releaseNotesContent">
+                                        <p class="text-muted mb-0">Click "Check for Updates" to pull the latest changelog directly from GitHub.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Update Channels & Policies -->
+                        <div class="col-12 col-xl-4">
+                            <!-- Update Policy Card -->
+                            <div class="glass-card p-4 mb-4">
+                                <h6 class="fw-bold text-white mb-3 d-flex align-items-center gap-2">
+                                    <i class="bi bi-shield-lock-fill text-primary"></i> Distribution Security
+                                </h6>
+                                <div class="mb-3">
+                                    <div class="small text-muted text-uppercase fw-semibold">UAC Execution Level</div>
+                                    <div class="fw-semibold text-white mono">asInvoker (Standard User)</div>
+                                    <div class="text-muted" style="font-size: 0.78rem;">Prevents invasive admin prompts; 100% Windows Defender compliant.</div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="small text-muted text-uppercase fw-semibold">Installation Scope</div>
+                                    <div class="fw-semibold text-white mono">%LOCALAPPDATA%\Programs</div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="small text-muted text-uppercase fw-semibold">Auto-Updater Daemon</div>
+                                    <div class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-25">
+                                        <i class="bi bi-toggle-on"></i> Background Silent Sync Active
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Backend Updater API Health -->
+                            <div class="glass-card p-4">
+                                <h6 class="fw-bold text-white mb-3 d-flex align-items-center gap-2">
+                                    <i class="bi bi-cloud-check-fill text-info"></i> Backend GitHub Relay
+                                </h6>
+                                <p class="text-muted small mb-3">
+                                    The Cloudflare backend microservice queries GitHub API securely to deliver updates even behind restricted firewalls.
+                                </p>
+                                <div class="p-2 rounded bg-dark border border-secondary border-opacity-25 small mono text-truncate mb-3 text-info">
+                                    /api/updater/check?current=1.9.5
+                                </div>
+                                <button class="btn btn-outline-info btn-sm w-100 d-flex align-items-center justify-content-center gap-2" id="testUpdaterApiBtn">
+                                    <i class="bi bi-broadcast"></i> Test Backend Updater Relay
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== TAB 2: SYSTEM DIAGNOSTICS ==================== -->
+                <div class="tab-pane fade" id="tab-system" role="tabpanel">
+                    <div class="row g-4">
+                        
+                        <!-- System Hardware & OS Card -->
+                        <div class="col-12 col-lg-6">
+                            <div class="glass-card p-4 h-100">
+                                <h5 class="fw-bold text-white mb-4 d-flex align-items-center gap-2">
+                                    <i class="bi bi-pc-display text-primary"></i> Host Hardware &amp; OS
+                                </h5>
+
+                                <div class="row g-3">
+                                    <div class="col-sm-6">
+                                        <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25">
+                                            <div class="text-muted small text-uppercase fw-semibold mb-1">Host Platform</div>
+                                            <div class="fw-bold fs-6 text-white mono" id="hostPlatformText">Windows (win32)</div>
+                                            <div class="small text-muted" id="hostOsReleaseText">OS Release: --</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25">
+                                            <div class="text-muted small text-uppercase fw-semibold mb-1">Architecture</div>
+                                            <div class="fw-bold fs-6 text-white mono" id="hostArchText">x64</div>
+                                            <div class="small text-muted" id="hostHostnameText">Host: --</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25">
+                                            <div class="text-muted small text-uppercase fw-semibold mb-1">Processor (CPU)</div>
+                                            <div class="fw-bold text-white mono" id="hostCpuModelText">Detecting processor...</div>
+                                            <div class="small text-muted mt-1">Cores: <span id="hostCpuCoresText" class="text-white mono">--</span> | System Uptime: <span id="hostUptimeText" class="text-white mono">--</span></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <span class="text-muted small text-uppercase fw-semibold">Physical RAM Usage</span>
+                                                <span class="mono small text-info fw-bold" id="ramUsageSummary">-- / -- GB</span>
+                                            </div>
+                                            <div class="progress mb-2" style="height: 8px;">
+                                                <div class="progress-bar bg-info" id="ramProgressBar" style="width: 0%;"></div>
+                                            </div>
+                                            <div class="d-flex justify-content-between small text-muted">
+                                                <span>Free: <strong id="ramFreeText" class="text-white">--</strong></span>
+                                                <span>Used: <strong id="ramUsedText" class="text-white">--</strong></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Runtime & Engines Card -->
+                        <div class="col-12 col-lg-6">
+                            <div class="glass-card p-4 h-100">
+                                <h5 class="fw-bold text-white mb-4 d-flex align-items-center gap-2">
+                                    <i class="bi bi-code-square text-cyan"></i> Application Runtime Stack
+                                </h5>
+
+                                <ul class="list-group list-group-flush bg-transparent">
+                                    <li class="list-group-item bg-transparent border-secondary border-opacity-25 d-flex justify-content-between align-items-center px-0 py-3">
+                                        <div>
+                                            <div class="fw-semibold text-white">Electron Framework</div>
+                                            <div class="small text-muted">Desktop Native Shell</div>
+                                        </div>
+                                        <span class="badge bg-primary bg-opacity-25 text-primary mono fs-6" id="runtimeElectron">31.3.1</span>
+                                    </li>
+                                    <li class="list-group-item bg-transparent border-secondary border-opacity-25 d-flex justify-content-between align-items-center px-0 py-3">
+                                        <div>
+                                            <div class="fw-semibold text-white">Chromium Web Engine</div>
+                                            <div class="small text-muted">Rendering &amp; UI Pipeline</div>
+                                        </div>
+                                        <span class="badge bg-info bg-opacity-25 text-info mono fs-6" id="runtimeChrome">126.x</span>
+                                    </li>
+                                    <li class="list-group-item bg-transparent border-secondary border-opacity-25 d-flex justify-content-between align-items-center px-0 py-3">
+                                        <div>
+                                            <div class="fw-semibold text-white">Node.js Runtime</div>
+                                            <div class="small text-muted">System &amp; IPC Coordination</div>
+                                        </div>
+                                        <span class="badge bg-success bg-opacity-25 text-success mono fs-6" id="runtimeNode">20.x</span>
+                                    </li>
+                                    <li class="list-group-item bg-transparent border-secondary border-opacity-25 d-flex justify-content-between align-items-center px-0 py-3">
+                                        <div>
+                                            <div class="fw-semibold text-white">Application ID</div>
+                                            <div class="small text-muted">Official Reverse Domain</div>
+                                        </div>
+                                        <span class="mono text-white small">com.bcsdeveloper.pos</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== TAB 3: CLOUD & CACHE ==================== -->
+                <div class="tab-pane fade" id="tab-cloud" role="tabpanel">
+                    <div class="row g-4">
+                        
+                        <!-- Cloud Endpoints & Latency -->
+                        <div class="col-12 col-lg-7">
+                            <div class="glass-card p-4 mb-4">
+                                <h5 class="fw-bold text-white mb-3 d-flex align-items-center gap-2">
+                                    <i class="bi bi-hdd-network text-primary"></i> Cloudflare Edge Network Status
+                                </h5>
+
+                                <div class="mb-3">
+                                    <div class="small text-muted text-uppercase fw-semibold mb-1">Serverless API Gateway</div>
+                                    <div class="d-flex align-items-center justify-content-between p-3 rounded bg-dark border border-secondary border-opacity-25">
+                                        <span class="mono text-info">https://backend.bcs.bcsdeveloper.com/api</span>
+                                        <span class="badge bg-success" id="apiStatusBadge">Operational</span>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="small text-muted text-uppercase fw-semibold mb-1">Database Engine</div>
+                                    <div class="d-flex align-items-center justify-content-between p-3 rounded bg-dark border border-secondary border-opacity-25">
+                                        <span class="mono text-white">Cloudflare D1 (Global SQLite Replica)</span>
+                                        <span class="badge bg-primary">Connected</span>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex align-items-center justify-content-between p-3 rounded bg-dark border border-secondary border-opacity-25">
+                                    <div>
+                                        <div class="fw-semibold text-white">Live Edge Latency</div>
+                                        <div class="small text-muted" id="edgeLatencyText">Last ping: -- ms</div>
+                                    </div>
+                                    <button class="btn btn-outline-primary btn-sm d-flex align-items-center gap-2" id="pingEdgeBtn">
+                                        <i class="bi bi-activity"></i> Ping Edge Server
                                     </button>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Update Progress Card (Hidden until downloading) -->
-                        <div id="updateDownloadCard" class="p-3 rounded bg-info bg-opacity-10 border border-info border-opacity-25 mb-4 d-none">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="fw-semibold text-info" id="downloadStatusText">Downloading Update...</span>
-                                <span class="font-monospace text-info fw-bold" id="downloadPercentText">0%</span>
-                            </div>
-                            <div class="progress mb-2" style="height: 8px;">
-                                <div id="settingsProgressFill" class="progress-bar progress-bar-striped progress-bar-animated bg-info" style="width: 0%;"></div>
-                            </div>
-                            <div class="d-flex justify-content-between small text-muted">
-                                <span id="downloadSpeedText">Speed: -- MB/s</span>
-                                <span id="downloadSizeText">Transferred: -- / --</span>
-                            </div>
-                        </div>
-
-                        <!-- Update Ready to Install Alert (Hidden until downloaded) -->
-                        <div id="updateReadyCard" class="p-3 rounded bg-success bg-opacity-10 border border-success border-opacity-25 mb-4 d-none">
-                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                <div>
-                                    <h6 class="fw-bold text-success mb-1 d-flex align-items-center gap-1">
-                                        <i class="bi bi-check-circle-fill"></i> Update Ready to Install!
-                                    </h6>
-                                    <div class="small text-muted" id="updateReadyVersionText">A new version has been downloaded and verified.</div>
+                        <!-- Storage & Maintenance -->
+                        <div class="col-12 col-lg-5">
+                            <div class="glass-card p-4">
+                                <h5 class="fw-bold text-white mb-3 d-flex align-items-center gap-2">
+                                    <i class="bi bi-database-check text-warning"></i> Local Storage &amp; Cache
+                                </h5>
+                                <p class="text-muted small mb-3">
+                                    The POS registers local product catalogues and session records in IndexedDB (<code class="text-white">bcs_api_cache</code>) for offline reliability.
+                                </p>
+                                
+                                <div class="p-3 rounded bg-dark border border-secondary border-opacity-25 mb-4">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="text-muted small">Database:</span>
+                                        <span class="mono text-white small">bcs_api_cache</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span class="text-muted small">Store:</span>
+                                        <span class="mono text-white small">collections</span>
+                                    </div>
                                 </div>
-                                <button class="btn btn-success fw-bold d-inline-flex align-items-center gap-2" id="settingsRestartBtn">
-                                    <i class="bi bi-arrow-clockwise"></i> Restart &amp; Install Now
+
+                                <button class="btn btn-outline-warning w-100 d-flex align-items-center justify-content-center gap-2 py-2" id="purgeCacheBtn">
+                                    <i class="bi bi-trash3"></i> Purge Local IndexedDB Cache
                                 </button>
                             </div>
                         </div>
-
-                        <!-- Update Log / Notes -->
-                        <div class="mt-3">
-                            <label class="form-label small text-muted text-uppercase fw-semibold">Release Changelog &amp; Notes</label>
-                            <div class="p-3 rounded bg-dark border border-secondary border-opacity-25 font-monospace small" style="max-height: 160px; overflow-y: auto;" id="releaseNotesBox">
-                                <span class="text-muted">No pending updates. Your application is up to date with the latest production line.</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Local Storage & Cache Management -->
-                    <div class="glass-panel p-4">
-                        <h5 class="fw-bold mb-3 text-primary d-flex align-items-center gap-2">
-                            <i class="bi bi-hdd-network"></i> Cache &amp; Storage Maintenance
-                        </h5>
-                        <p class="text-muted small mb-3">
-                            The application caches products and customers in local IndexedDB to ensure offline resilience and speed. You can purge the local cache if you need an instant live re-sync.
-                        </p>
-                        <div class="d-flex justify-content-between align-items-center p-3 rounded bg-secondary bg-opacity-10 border border-secondary border-opacity-25">
-                            <div>
-                                <div class="fw-semibold text-white">IndexedDB Collection Cache</div>
-                                <div class="small text-muted" id="cacheStatusText">Status: Active &amp; Synchronized</div>
-                            </div>
-                            <button class="btn btn-outline-warning btn-sm d-flex align-items-center gap-1" id="clearCacheBtn">
-                                <i class="bi bi-trash"></i> Clear Local Cache
-                            </button>
-                        </div>
                     </div>
                 </div>
 
-                <!-- Right: Diagnostics & Environment -->
-                <div class="col-12 col-lg-5">
-                    <!-- Environment Info -->
-                    <div class="glass-panel p-4 mb-4">
-                        <h5 class="fw-bold mb-3 text-primary d-flex align-items-center gap-2">
-                            <i class="bi bi-cpu"></i> System Diagnostic
-                        </h5>
-                        <ul class="list-group list-group-flush bg-transparent">
-                            <li class="list-group-item bg-transparent border-secondary border-opacity-25 d-flex justify-content-between text-muted px-0">
-                                <span>Platform:</span>
-                                <strong class="text-white font-monospace" id="diagPlatform">Windows (win32)</strong>
-                            </li>
-                            <li class="list-group-item bg-transparent border-secondary border-opacity-25 d-flex justify-content-between text-muted px-0">
-                                <span>Architecture:</span>
-                                <strong class="text-white font-monospace" id="diagArch">x64</strong>
-                            </li>
-                            <li class="list-group-item bg-transparent border-secondary border-opacity-25 d-flex justify-content-between text-muted px-0">
-                                <span>Electron Version:</span>
-                                <strong class="text-white font-monospace" id="diagElectron">31.3.1</strong>
-                            </li>
-                            <li class="list-group-item bg-transparent border-secondary border-opacity-25 d-flex justify-content-between text-muted px-0">
-                                <span>Chromium Engine:</span>
-                                <strong class="text-white font-monospace" id="diagChrome">126.x</strong>
-                            </li>
-                            <li class="list-group-item bg-transparent border-secondary border-opacity-25 d-flex justify-content-between text-muted px-0">
-                                <span>Node.js Runtime:</span>
-                                <strong class="text-white font-monospace" id="diagNode">20.x</strong>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <!-- Cloud Connection Status -->
-                    <div class="glass-panel p-4">
-                        <h5 class="fw-bold mb-3 text-primary d-flex align-items-center gap-2">
-                            <i class="bi bi-shield-check"></i> Cloud &amp; Security Status
-                        </h5>
-                        
-                        <div class="mb-3">
-                            <div class="small text-muted text-uppercase fw-semibold mb-1">Backend Serverless API</div>
-                            <div class="d-flex align-items-center justify-content-between p-2 rounded bg-secondary bg-opacity-10 border border-secondary border-opacity-25">
-                                <span class="small font-monospace text-truncate" style="max-width: 220px;">backend.bcs.bcsdeveloper.com</span>
-                                <span class="badge bg-success" id="backendPingBadge">Connected</span>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <div class="small text-muted text-uppercase fw-semibold mb-1">Cloudflare D1 Relational DB</div>
-                            <div class="d-flex align-items-center justify-content-between p-2 rounded bg-secondary bg-opacity-10 border border-secondary border-opacity-25">
-                                <span class="small text-muted">SQLite Distributed Edge</span>
-                                <span class="badge bg-info">Active</span>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <div class="small text-muted text-uppercase fw-semibold mb-1">Session Security Token</div>
-                            <div class="p-2 rounded bg-secondary bg-opacity-10 border border-secondary border-opacity-25 small font-monospace text-muted text-truncate" id="sessionIdPreview">
-                                Loading session token...
-                            </div>
-                        </div>
-
-                        <div class="d-grid mt-4">
-                            <button class="btn btn-outline-info btn-sm d-flex align-items-center justify-content-center gap-2" id="pingBackendBtn">
-                                <i class="bi bi-activity"></i> Test API Connectivity
-                            </button>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </main>
 
+    <!-- Fullscreen Installing Overlay Modal (Active during restart & install) -->
+    <div id="installingOverlay" class="install-overlay d-none">
+        <div class="install-box">
+            <div class="install-spinner"></div>
+            <h4 class="fw-bold text-white mb-2">Installing New Release...</h4>
+            <p class="text-muted mb-4 small">
+                Closing background services, verifying binaries, and launching the updated installer. The application will restart automatically.
+            </p>
+            <div class="progress mb-2" style="height: 6px;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" style="width: 100%;"></div>
+            </div>
+            <span class="small text-muted mono">BCS Enterprise POS PRO Max &bull; Safe Exit</span>
+        </div>
+    </div>
+
+    <!-- Alert Container -->
     <div id="custom-alert-container"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script type="module">
         import { fetchAPI } from './script/api.js';
 
-        window.showCustomAlert = function(title, message, type = 'success') {
+        let appCurrentVersion = '1.9.5';
+        let latestInstallerDownloadUrl = '';
+
+        window.showAlert = function(title, message, type = 'success') {
             const container = document.getElementById('custom-alert-container');
             const alert = document.createElement('div');
-            alert.className = `custom-alert ${type === 'failed' ? 'error' : type}`;
+            alert.className = `custom-alert ${type}`;
             const iconSvg = type === 'success' 
                 ? '<i class="bi bi-check-circle-fill text-success fs-5"></i>' 
-                : '<i class="bi bi-exclamation-octagon-fill text-danger fs-5"></i>';
+                : (type === 'error' ? '<i class="bi bi-exclamation-octagon-fill text-danger fs-5"></i>' : '<i class="bi bi-info-circle-fill text-info fs-5"></i>');
 
             alert.innerHTML = `
                 <div class="d-flex align-items-center gap-3 w-100">
                     <div>${iconSvg}</div>
                     <div class="flex-grow-1">
-                        <div class="title">${title}</div>
-                        <div class="message">${message}</div>
+                        <div class="fw-bold small mb-1">${title}</div>
+                        <div class="small opacity-75">${message}</div>
                     </div>
-                    <button class="close-btn" onclick="this.closest('.custom-alert').remove()">&times;</button>
+                    <button class="btn btn-sm text-muted p-0" onclick="this.closest('.custom-alert').remove()">&times;</button>
                 </div>`;
 
             container.appendChild(alert);
             setTimeout(() => {
                 alert.style.animation = 'slideOut 0.3s ease-in forwards';
                 alert.addEventListener('animationend', () => alert.remove());
-            }, 3500);
+            }, 4000);
         };
 
-        // Initialize Diagnostics and Session
-        document.addEventListener('DOMContentLoaded', async () => {
-            const sessionId = localStorage.getItem('sessionId') || 'N/A';
-            const sessionPort = localStorage.getItem('sessionPort') || 'N/A';
-            document.getElementById('sessionIdPreview').textContent = `ID: ${sessionId.slice(0, 18)}... | Port: ${sessionPort}`;
-
-            if (typeof require !== 'undefined') {
-                const { ipcRenderer } = require('electron');
-
-                // Get app version
-                ipcRenderer.invoke('get_app_version').then(ver => {
-                    if (ver) document.getElementById('appCurrentVersion').textContent = `v${ver}`;
-                }).catch(() => {});
-
-                // Get system info
-                ipcRenderer.invoke('get_system_info').then(info => {
-                    if (info) {
-                        document.getElementById('diagPlatform').textContent = `${info.platform} (${info.arch})`;
-                        document.getElementById('diagArch').textContent = info.arch;
-                        document.getElementById('diagElectron').textContent = info.electron;
-                        document.getElementById('diagChrome').textContent = info.chrome;
-                        document.getElementById('diagNode').textContent = info.node;
+        // Query Backend GitHub Updater Check
+        async function checkBackendUpdater(currentVer) {
+            try {
+                const data = await fetchAPI(`updater/check?current=${currentVer}`);
+                if (data && data.success) {
+                    document.getElementById('latestRemoteVersionText').textContent = `v${data.latestVersion}`;
+                    document.getElementById('remoteStatusTag').textContent = data.updateAvailable ? 'Update Available' : 'Latest Release';
+                    document.getElementById('remoteStatusTag').className = `badge ${data.updateAvailable ? 'bg-warning text-dark' : 'bg-success bg-opacity-25 text-success'}`;
+                    
+                    if (data.publishedAt) {
+                        const dateFormatted = new Date(data.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                        document.getElementById('remotePublishDate').textContent = `Published on GitHub: ${dateFormatted}`;
                     }
+
+                    if (data.installer && data.installer.downloadUrl) {
+                        latestInstallerDownloadUrl = data.installer.downloadUrl;
+                        document.getElementById('directDownloadBtn').disabled = false;
+                    }
+
+                    if (data.releaseNotes) {
+                        document.getElementById('releaseNotesContent').innerHTML = `<div class="text-white">${data.releaseNotes.replace(/\n/g, '<br>')}</div>`;
+                        document.getElementById('releaseNotesVersionTag').textContent = `v${data.latestVersion} Notes`;
+                    }
+
+                    return data;
+                }
+            } catch (e) {
+                console.warn('Backend updater check warning:', e);
+            }
+            return null;
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            let ipcRenderer = null;
+            if (typeof require !== 'undefined') {
+                try {
+                    const electron = require('electron');
+                    ipcRenderer = electron.ipcRenderer;
+                } catch(e) {}
+            }
+
+            // 1. Fetch App Version & Host Specs
+            if (ipcRenderer) {
+                ipcRenderer.invoke('get_app_version').then(ver => {
+                    if (ver) {
+                        appCurrentVersion = ver;
+                        document.getElementById('installedVersionText').textContent = `v${ver}`;
+                    }
+                    checkBackendUpdater(appCurrentVersion);
+                }).catch(() => checkBackendUpdater('1.9.5'));
+
+                ipcRenderer.invoke('get_system_info').then(info => {
+                    if (!info) return;
+                    document.getElementById('hostPlatformText').textContent = `${info.platform} (${info.arch})`;
+                    document.getElementById('hostArchText').textContent = info.arch;
+                    document.getElementById('hostOsReleaseText').textContent = `Build: ${info.osRelease || 'Windows'}`;
+                    document.getElementById('hostHostnameText').textContent = `Host: ${info.hostname || 'Localhost'}`;
+                    document.getElementById('hostCpuModelText').textContent = info.cpuModel || 'Standard Processor';
+                    document.getElementById('hostCpuCoresText').textContent = `${info.cpuCores || 1} Cores`;
+                    document.getElementById('hostUptimeText').textContent = info.uptime || '--';
+
+                    document.getElementById('ramUsageSummary').textContent = `${info.usedMem || 0} / ${info.totalMem || 0}`;
+                    document.getElementById('ramUsedText').textContent = info.usedMem || '--';
+                    document.getElementById('ramFreeText').textContent = info.freeMem || '--';
+                    document.getElementById('ramProgressBar').style.width = `${info.memPercent || 0}%`;
+
+                    document.getElementById('runtimeElectron').textContent = info.electron || '31.3.1';
+                    document.getElementById('runtimeChrome').textContent = info.chrome || '126.x';
+                    document.getElementById('runtimeNode').textContent = info.node || '20.x';
                 }).catch(() => {});
+            } else {
+                checkBackendUpdater('1.9.5');
+            }
 
-                // Setup Updater Event Listeners for Settings page
-                const manualBtn = document.getElementById('manualCheckBtn');
-                const checkIcon = document.getElementById('checkBtnIcon');
-                const statusBadge = document.getElementById('updateStatusBadge');
-                const downloadCard = document.getElementById('updateDownloadCard');
-                const readyCard = document.getElementById('updateReadyCard');
-                const progressFill = document.getElementById('settingsProgressFill');
-                const percentText = document.getElementById('downloadPercentText');
-                const notesBox = document.getElementById('releaseNotesBox');
+            // 2. Buttons & Event Handlers
+            const checkBtn = document.getElementById('checkUpdatesBtn');
+            const checkIcon = document.getElementById('checkBtnIcon');
+            const radarBox = document.getElementById('checkingAnimationBox');
+            const downloadCard = document.getElementById('downloadCard');
+            const installReadyCard = document.getElementById('installReadyCard');
+            const directDownloadBtn = document.getElementById('directDownloadBtn');
+            const openReleasesWebBtn = document.getElementById('openReleasesWebBtn');
+            const restartBtn = document.getElementById('triggerRestartInstallBtn');
 
-                manualBtn.addEventListener('click', () => {
-                    manualBtn.disabled = true;
-                    checkIcon.className = 'bi bi-arrow-clockwise spin';
-                    statusBadge.className = 'badge bg-warning text-dark';
-                    statusBadge.textContent = 'Checking...';
+            // Trigger Manual Check
+            checkBtn.addEventListener('click', async () => {
+                checkBtn.disabled = true;
+                checkIcon.className = 'bi bi-arrow-clockwise spin';
+                radarBox.classList.remove('d-none');
+                downloadCard.classList.add('d-none');
+                installReadyCard.classList.add('d-none');
+
+                if (ipcRenderer) {
                     ipcRenderer.send('check_for_updates');
-                });
+                }
 
+                const res = await checkBackendUpdater(appCurrentVersion);
+                setTimeout(() => {
+                    radarBox.classList.add('d-none');
+                    checkBtn.disabled = false;
+                    checkIcon.className = 'bi bi-arrow-clockwise';
+
+                    if (res && res.updateAvailable) {
+                        showAlert('Update Found!', `A newer version v${res.latestVersion} is available.`, 'info');
+                    } else {
+                        showAlert('Up to Date', `Your POS application is running the latest build v${appCurrentVersion}.`, 'success');
+                    }
+                }, 1400);
+            });
+
+            // Direct Download Button
+            directDownloadBtn.addEventListener('click', async () => {
+                if (!latestInstallerDownloadUrl) {
+                    showAlert('Download Info', 'Redirecting to official GitHub releases page...', 'info');
+                    latestInstallerDownloadUrl = 'https://github.com/barodacomputerandsales/pos/releases';
+                }
+                if (ipcRenderer) {
+                    await ipcRenderer.invoke('open_external', latestInstallerDownloadUrl);
+                } else {
+                    window.open(latestInstallerDownloadUrl, '_blank');
+                }
+            });
+
+            // View on GitHub
+            openReleasesWebBtn.addEventListener('click', async () => {
+                const target = 'https://github.com/barodacomputerandsales/pos/releases';
+                if (ipcRenderer) {
+                    await ipcRenderer.invoke('open_external', target);
+                } else {
+                    window.open(target, '_blank');
+                }
+            });
+
+            // Electron Updater IPC Listeners
+            if (ipcRenderer) {
                 ipcRenderer.on('checking_for_update', () => {
-                    statusBadge.className = 'badge bg-warning text-dark';
-                    statusBadge.textContent = 'Checking...';
+                    radarBox.classList.remove('d-none');
                 });
 
                 ipcRenderer.on('update_available', (event, info) => {
-                    manualBtn.disabled = true;
-                    checkIcon.className = 'bi bi-arrow-clockwise';
-                    statusBadge.className = 'badge bg-info text-white';
-                    statusBadge.textContent = 'Downloading';
+                    radarBox.classList.add('d-none');
                     downloadCard.classList.remove('d-none');
-                    readyCard.classList.add('d-none');
-
-                    if (info && info.releaseNotes) {
-                        notesBox.innerHTML = typeof info.releaseNotes === 'string' ? info.releaseNotes : JSON.stringify(info.releaseNotes);
-                    } else if (info && info.version) {
-                        notesBox.innerHTML = `<span class="text-success">Found release v${info.version}. Automatically downloading package installer...</span>`;
-                    }
+                    installReadyCard.classList.add('d-none');
+                    showAlert('Downloading Update', `A new release v${info.version || ''} is being downloaded automatically.`, 'info');
                 });
 
-                ipcRenderer.on('download_progress', (event, progressObj) => {
-                    const percent = Math.round(progressObj.percent || 0);
+                ipcRenderer.on('download_progress', (event, progress) => {
                     downloadCard.classList.remove('d-none');
-                    progressFill.style.width = `${percent}%`;
-                    percentText.textContent = `${percent}%`;
+                    radarBox.classList.add('d-none');
+                    const pct = Math.round(progress.percent || 0);
+                    document.getElementById('holoProgressBar').style.width = `${pct}%`;
+                    document.getElementById('downloadPercentText').textContent = `${pct}%`;
 
-                    const speedMB = ((progressObj.bytesPerSecond || 0) / (1024 * 1024)).toFixed(2);
-                    const transferredMB = ((progressObj.transferred || 0) / (1024 * 1024)).toFixed(2);
-                    const totalMB = ((progressObj.total || 0) / (1024 * 1024)).toFixed(2);
+                    const speedMB = ((progress.bytesPerSecond || 0) / (1024 * 1024)).toFixed(2);
+                    const transMB = ((progress.transferred || 0) / (1024 * 1024)).toFixed(2);
+                    const totalMB = ((progress.total || 0) / (1024 * 1024)).toFixed(2);
 
-                    document.getElementById('downloadSpeedText').textContent = `Speed: ${speedMB} MB/s`;
-                    document.getElementById('downloadSizeText').textContent = `Transferred: ${transferredMB} MB / ${totalMB} MB`;
+                    document.getElementById('downloadSpeedText').innerHTML = `<i class="bi bi-speedometer2 me-1"></i>Speed: ${speedMB} MB/s`;
+                    document.getElementById('downloadSizeText').innerHTML = `<i class="bi bi-hdd me-1"></i>Transferred: ${transMB} MB / ${totalMB} MB`;
                 });
 
                 ipcRenderer.on('update_downloaded', (event, info) => {
-                    manualBtn.disabled = false;
-                    checkIcon.className = 'bi bi-arrow-clockwise';
-                    statusBadge.className = 'badge bg-success';
-                    statusBadge.textContent = 'Ready to Install';
                     downloadCard.classList.add('d-none');
-                    readyCard.classList.remove('d-none');
-
-                    const verStr = (info && info.version) ? `Version v${info.version}` : 'Latest version';
-                    document.getElementById('updateReadyVersionText').textContent = `${verStr} downloaded successfully. Restart to apply immediately.`;
+                    installReadyCard.classList.remove('d-none');
+                    radarBox.classList.add('d-none');
+                    showAlert('Ready to Install', 'Update downloaded successfully. Restart to finish installation.', 'success');
                 });
 
                 ipcRenderer.on('update_not_available', () => {
-                    manualBtn.disabled = false;
-                    checkIcon.className = 'bi bi-arrow-clockwise';
-                    statusBadge.className = 'badge bg-success';
-                    statusBadge.textContent = 'Up to Date';
-                    showCustomAlert("Update Status", "You are already using the latest version of BCS Enterprise POS.", "success");
-                    notesBox.innerHTML = `<span class="text-success">No updates pending. Running official latest build.</span>`;
+                    radarBox.classList.add('d-none');
                 });
 
                 ipcRenderer.on('update_error', (event, err) => {
-                    manualBtn.disabled = false;
-                    checkIcon.className = 'bi bi-arrow-clockwise';
-                    statusBadge.className = 'badge bg-danger';
-                    statusBadge.textContent = 'Error';
-                    showCustomAlert("Update Error", "Could not check for updates: " + err, "error");
-                    notesBox.innerHTML = `<span class="text-danger">Update error: ${err}</span>`;
+                    radarBox.classList.add('d-none');
+                    showAlert('Updater Notice', err || 'Could not reach update server. Checking fallback channel.', 'info');
                 });
 
-                document.getElementById('settingsRestartBtn').addEventListener('click', () => {
-                    ipcRenderer.send('restart_app');
+                // Restart & Install with Animation
+                restartBtn.addEventListener('click', () => {
+                    document.getElementById('installingOverlay').classList.remove('d-none');
+                    setTimeout(() => {
+                        ipcRenderer.send('restart_app');
+                    }, 1200);
                 });
             }
-        });
 
-        // Clear Local IndexedDB Cache
-        document.getElementById('clearCacheBtn').addEventListener('click', async () => {
-            const btn = document.getElementById('clearCacheBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Clearing...';
+            // Test Backend Relay Button
+            document.getElementById('testUpdaterApiBtn').addEventListener('click', async () => {
+                const btn = document.getElementById('testUpdaterApiBtn');
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Querying...';
 
-            try {
-                indexedDB.deleteDatabase('bcs_api_cache');
-                showCustomAlert("Cache Purged", "Local cache cleared. Fresh data will be retrieved on next page view.", "success");
-                document.getElementById('cacheStatusText').textContent = "Status: Cleared & Resetting";
-            } catch (e) {
-                showCustomAlert("Error", "Could not purge cache: " + e.message, "error");
-            } finally {
-                setTimeout(() => {
+                try {
+                    const res = await fetchAPI('updater/check?current=1.9.5');
+                    showAlert('Backend Relay Healthy', `Received response from ${res.source}. Latest tag: ${res.latestVersion}`, 'success');
+                } catch(e) {
+                    showAlert('Relay Error', e.message, 'error');
+                } finally {
                     btn.disabled = false;
-                    btn.innerHTML = '<i class="bi bi-trash"></i> Clear Local Cache';
-                    document.getElementById('cacheStatusText').textContent = "Status: Active & Synchronized";
-                }, 1500);
-            }
-        });
+                    btn.innerHTML = '<i class="bi bi-broadcast"></i> Test Backend Updater Relay';
+                }
+            });
 
-        // Test API Connectivity
-        document.getElementById('pingBackendBtn').addEventListener('click', async () => {
-            const btn = document.getElementById('pingBackendBtn');
-            const badge = document.getElementById('backendPingBadge');
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Testing...';
-            badge.className = 'badge bg-warning text-dark';
-            badge.textContent = 'Pinging...';
+            // Ping Edge Server
+            document.getElementById('pingEdgeBtn').addEventListener('click', async () => {
+                const btn = document.getElementById('pingEdgeBtn');
+                const text = document.getElementById('edgeLatencyText');
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Pinging...';
 
-            const startTime = Date.now();
-            try {
-                const res = await fetchAPI('database/read?table=settings');
-                const latency = Date.now() - startTime;
-                badge.className = 'badge bg-success';
-                badge.textContent = `Online (${latency}ms)`;
-                showCustomAlert("Connectivity Test", `Backend responded in ${latency}ms. Connection healthy.`, "success");
-            } catch (err) {
-                badge.className = 'badge bg-danger';
-                badge.textContent = 'Unreachable';
-                showCustomAlert("Connection Failed", "Backend API check failed: " + err.message, "error");
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="bi bi-activity"></i> Test API Connectivity';
-            }
+                const start = Date.now();
+                try {
+                    await fetchAPI('database/read?table=users&limit=1');
+                    const latency = Date.now() - start;
+                    text.textContent = `Last ping: ${latency} ms`;
+                    showAlert('Ping Successful', `Cloudflare Edge responded in ${latency}ms`, 'success');
+                } catch (e) {
+                    text.textContent = `Ping failed: ${e.message}`;
+                    showAlert('Ping Failed', e.message, 'error');
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-activity"></i> Ping Edge Server';
+                }
+            });
+
+            // Purge Cache Button
+            document.getElementById('purgeCacheBtn').addEventListener('click', () => {
+                const btn = document.getElementById('purgeCacheBtn');
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Purging...';
+
+                try {
+                    indexedDB.deleteDatabase('bcs_api_cache');
+                    showAlert('Cache Cleared', 'Local IndexedDB cache has been purged. Fresh data will load on next query.', 'success');
+                } catch(e) {
+                    showAlert('Cache Error', e.message, 'error');
+                } finally {
+                    setTimeout(() => {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="bi bi-trash3"></i> Purge Local IndexedDB Cache';
+                    }, 1000);
+                }
+            });
         });
     </script>
 </body>

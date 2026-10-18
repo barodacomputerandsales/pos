@@ -21,7 +21,7 @@
 - **Type**: Logistics and delivery driver dispatch web application.
 - **Features**: Driver assignments, order route tracking, and OTP verification upon delivery.
 
-**Backend: Cloudflare Functions / Workers (D1 Database)**
+**4. Cloudflare D1 Serverless Backend (`backend/`)**
 - **Type**: Serverless API.
 - **Location**: `backend/functions/api/`
 - **Database**: SQLite using Cloudflare D1 (`context.env.DB`).
@@ -30,8 +30,19 @@
   - `auth/`: Handles session, login, and registration.
   - `database/`: Dynamic microservices (`add.js`, `read.js`, `update.js`, `delete.js`, `data-manager.js`).
   - `mail/`: Email logic queue.
-  - `cron/`: Scheduled tasks (e.g. 48h purge of soft-deleted products).
+  - `cron/`: Scheduled tasks (11:55 PM daily report, 48h purge of soft-deleted products).
 - **more details**: [see](backend/before-action-read-me.md)
+
+**5. Automated Cron & Event Caller (`automation/`)**
+- **Type**: Background cron worker & automation engine.
+- **Features**: 11:55 PM IST daily revenue & store report trigger, soft-delete cleanup, event-driven customer emails.
+- **Stack**: Node.js, GitHub Actions workflows.
+
+---
+---
+## SYSTEM mails
+-   **suport** = `support@bcs.bcsdeveloper.com`
+-  **sysrtem** = `no-reply@bcs.bcsdeveloper.com`
 ---
 ---
 ## Official GitHub Repositories (`barodacomputerandsales`)
@@ -39,6 +50,7 @@
 - **2. Customer Portal & E-Commerce (`customer+e-com/`)**: https://github.com/barodacomputerandsales/e-com-customer-portal
 - **3. Delivery Portal (`delivery/`)**: https://github.com/barodacomputerandsales/delivery
 - **4. Backend Serverless API (`backend/`)**: https://github.com/barodacomputerandsales/backend
+- **5. Automated Cron & Event Caller (`automation/`)**: https://github.com/barodacomputerandsales/automation
 - **Live Backend Serverless API**: https://backend.bcs.bcsdeveloper.com/api
 - **API Master Key**: `backend-bcs-pos` (`x-api-key` header)
 
@@ -106,17 +118,6 @@ When collaborating on this project, please adhere to the following rules:
   4. Installed client instances automatically download and prompt users to restart.
 
 ---
-
-### Custom Domain Email System (No @gmail.com)
-The backend email pipeline (`mail/queue.js` and `cron/daily-report.js`) uses your professional custom domain emails:
-
-- **Cloudflare Environment Variables**:
-  - `FROM_EMAIL`: Custom sender address (e.g. `support@bcsdeveloper.com`, `reports@bcs.bcsdeveloper.com`).
-  - `FROM_NAME`: Official sender display name (`Baroda Computers And Sales`).
-  - `ADMIN_EMAIL`: Custom domain administrator recipient for daily reports (e.g. `admin@bcsdeveloper.com`).
-  - `REPLY_TO`: Custom domain reply-to address (e.g. `support@bcsdeveloper.com`).
-  - `GMAIL_CLIENT_ID`, `GMAIL_CLIENT_SECRET`, `GMAIL_REFRESH_TOKEN`: Google Workspace OAuth credentials with custom domain alias permission.
-- **Rule**: All email headers (`From`, `Reply-To`, `To`) are sanitized and dynamically driven by environment variables. No `@gmail.com` addresses are hardcoded in application code.
 
 ---
 
