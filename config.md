@@ -15,10 +15,12 @@
 
 **2. Customer Portal & E-Commerce (`customer+e-com/`)**
 - **Type**: 2-in-1 Customer Account Portal + Online Storefront.
+- **Production Domain**: `https://bcs.bcsdeveloper.com`
 - **Security**: Public read-only catalog (`/api/ecommerce/products`), server-validated checkout (`/api/ecommerce/order`).
 
 **3. Delivery Portal (`delivery/`)**
 - **Type**: Logistics and delivery driver dispatch web application.
+- **Production Domain**: `https://delivery.bcs.bcsdeveloper.com`
 - **Features**: Driver assignments, order route tracking, and OTP verification upon delivery.
 
 **4. Cloudflare D1 Serverless Backend (`backend/`)**
@@ -53,6 +55,11 @@
 - **5. Automated Cron & Event Caller (`automation/`)**: https://github.com/barodacomputerandsales/automation
 - **Live Backend Serverless API**: https://backend.bcs.bcsdeveloper.com/api
 - **API Master Key**: `backend-bcs-pos` (`x-api-key` header)
+
+## Official Production Domains
+- **Customer Portal & E-Commerce**: `https://bcs.bcsdeveloper.com`
+- **Delivery & Logistics Portal**: `https://delivery.bcs.bcsdeveloper.com`
+- **Backend Serverless API**: `https://backend.bcs.bcsdeveloper.com/api`
 
 ## Rules for Editing Files
 
