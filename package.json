@@ -66,8 +66,9 @@
         },
         "publish": [
             {
-                "provider": "generic",
-                "url": "https://backend.bcs.bcsdeveloper.com/api/updater"
+                "provider": "github",
+                "owner": "barodacomputerandsales",
+                "repo": "pos"
             }
         ]
     }

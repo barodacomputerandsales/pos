@@ -43,6 +43,12 @@ app.on('window-all-closed', function () {
 autoUpdater.autoDownload = true;
 autoUpdater.autoInstallOnAppQuit = true;
 
+// Direct runtime autoUpdater to fetch updates through the serverless backend relay
+autoUpdater.setFeedURL({
+  provider: 'generic',
+  url: 'https://backend.bcs.bcsdeveloper.com/api/updater'
+});
+
 // 1. Checking for update
 autoUpdater.on('checking-for-update', () => {
   if (mainWindow) mainWindow.webContents.send('checking_for_update');
