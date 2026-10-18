@@ -276,10 +276,10 @@
                         <div class="card-body">
                             <div>
                                 <h6 class="text-muted mb-1 small text-uppercase fw-semibold">Total Production Cost</h6>
-                                <h3 class="fw-bold mb-0 text-info" id="totalProductionCost">₹0.00</h3>
+                                <h3 class="fw-bold mb-0 text-info" id="totalProductionCost">৳0.00</h3>
                             </div>
                             <div class="icon-circle text-info">
-                                <i class="bi bi-currency-rupee fs-4"></i>
+                                <span class="fs-4 fw-bold">৳</span>
                             </div>
                         </div>
                     </div>
@@ -430,7 +430,7 @@
         let filteredProductions = [];
         let batchToDeleteId = null;
 
-        const formatCurrency = (amt) => '₹' + Number(amt || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const formatCurrency = (amt) => '৳' + Number(amt || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
         window.showCustomAlert = function(title, message, type = 'success') {
             const container = document.getElementById('custom-alert-container');

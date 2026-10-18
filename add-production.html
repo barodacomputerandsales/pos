@@ -241,7 +241,7 @@
                             </h5>
 
                             <div class="mb-3">
-                                <label class="form-label small text-muted text-uppercase fw-semibold">Labor / Packaging / Overhead (₹)</label>
+                                <label class="form-label small text-muted text-uppercase fw-semibold">Labor / Packaging / Overhead (৳)</label>
                                 <input type="number" class="form-control" id="overheadCost" min="0" step="0.01" value="0.00">
                                 <div class="form-text text-muted small">Optional additional costs such as labor or packaging.</div>
                             </div>
@@ -249,19 +249,19 @@
                             <div class="p-3 rounded bg-secondary bg-opacity-10 border border-secondary border-opacity-25 mt-4">
                                 <div class="d-flex justify-content-between mb-2 small text-muted">
                                     <span>Raw Materials Cost:</span>
-                                    <span class="text-white font-monospace" id="summaryMaterialsCost">₹0.00</span>
+                                    <span class="text-white font-monospace" id="summaryMaterialsCost">৳0.00</span>
                                 </div>
                                 <div class="d-flex justify-content-between mb-2 small text-muted">
                                     <span>Overhead & Labor:</span>
-                                    <span class="text-white font-monospace" id="summaryOverheadCost">₹0.00</span>
+                                    <span class="text-white font-monospace" id="summaryOverheadCost">৳0.00</span>
                                 </div>
                                 <div class="d-flex justify-content-between fs-5 fw-bold text-info border-top border-secondary border-opacity-25 pt-2 mb-2">
                                     <span>Total Batch Cost:</span>
-                                    <span id="summaryTotalCost">₹0.00</span>
+                                    <span id="summaryTotalCost">৳0.00</span>
                                 </div>
                                 <div class="d-flex justify-content-between small text-muted border-top border-secondary border-opacity-25 pt-2">
                                     <span>Cost Per Produced Unit:</span>
-                                    <span class="text-success fw-bold font-monospace" id="summaryUnitCost">₹0.00</span>
+                                    <span class="text-success fw-bold font-monospace" id="summaryUnitCost">৳0.00</span>
                                 </div>
                             </div>
 
@@ -293,7 +293,7 @@
 
         let allProducts = [];
         let selectedProduct = null;
-        const formatCurrency = (amt) => '₹' + Number(amt || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const formatCurrency = (amt) => '৳' + Number(amt || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
         window.showCustomAlert = function(title, message, type = 'success') {
             const container = document.getElementById('custom-alert-container');
@@ -389,7 +389,7 @@
                 <td class="text-center">
                     <input type="number" class="form-control form-control-sm text-center material-qty-input" min="0.01" step="any" value="1" required>
                 </td>
-                <td class="text-end font-monospace text-info material-subtotal-display">₹0.00</td>
+                <td class="text-end font-monospace text-info material-subtotal-display">৳0.00</td>
                 <td class="text-end">
                     <button type="button" class="btn btn-outline-danger btn-sm p-1 remove-mat-btn" title="Remove">
                         <i class="bi bi-x-lg"></i>
@@ -420,7 +420,7 @@
             const opt = select.options[select.selectedIndex];
             if (!opt || !select.value) {
                 stockDisplay.textContent = '0';
-                subtotalDisplay.textContent = '₹0.00';
+                subtotalDisplay.textContent = '৳0.00';
                 recalcCosts();
                 return;
             }
