@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#0a1a3f" />
+      <stop offset="55%" stop-color="#03081d" />
+      <stop offset="100%" stop-color="#010410" />
+    </radialGradient>
+    <linearGradient id="cyanNeon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="45%" stop-color="#00f5ff" />
+      <stop offset="100%" stop-color="#0284c7" />
+    </linearGradient>
+    <filter id="neonGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="12" result="blurWide" />
+      <feGaussianBlur stdDeviation="4" result="blurSharp" />
+      <feMerge>
+        <feMergeNode in="blurWide" />
+        <feMergeNode in="blurSharp" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+  <rect x="18" y="18" width="476" height="476" rx="108" ry="108" fill="url(#bgGrad)" stroke="#1e3a8a" stroke-width="3.5" stroke-opacity="0.8" />
+  <rect x="22" y="22" width="468" height="468" rx="104" ry="104" fill="none" stroke="#00f5ff" stroke-width="2" stroke-opacity="0.35" />
+  <g transform="translate(14, 0)">
+    
+    <!-- Ambient Neon Bloom (if dark) -->
+    
+    <g filter="url(#neonGlow)" opacity="0.65">
+      <path d="M 166 126 L 308 126 C 354 126, 376 154, 376 190 C 376 226, 348 247, 312 250 C 356 253, 382 277, 382 316 C 382 356, 352 376, 308 376 L 166 376 Z" fill="none" stroke="#00f5ff" stroke-width="15" stroke-linejoin="round" />
+      <path d="M 212 170 L 294 170 C 322 170, 336 182, 336 196 C 336 210, 322 222, 294 222 L 212 222 Z" fill="none" stroke="#00f5ff" stroke-width="13" stroke-linejoin="round" />
+      <path d="M 212 280 L 294 280 C 324 280, 340 294, 340 312 C 340 330, 324 340, 294 340 L 212 340 Z" fill="none" stroke="#00f5ff" stroke-width="13" stroke-linejoin="round" />
+      <path d="M 180 366 L 248 250 L 308 250" fill="none" stroke="#00f5ff" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" />
+      <g stroke="#00f5ff" stroke-width="8" stroke-linecap="round" fill="none">
+        <line x1="208" y1="126" x2="208" y2="78" /><circle cx="208" cy="78" r="14" />
+        <line x1="256" y1="126" x2="256" y2="78" /><circle cx="256" cy="78" r="14" />
+        <line x1="304" y1="126" x2="304" y2="78" /><circle cx="304" cy="78" r="14" />
+        <line x1="208" y1="376" x2="208" y2="424" /><circle cx="208" cy="424" r="14" />
+        <line x1="256" y1="376" x2="256" y2="424" /><circle cx="256" cy="424" r="14" />
+        <line x1="304" y1="376" x2="304" y2="424" /><circle cx="304" cy="424" r="14" />
+        <line x1="166" y1="184" x2="114" y2="184" /><circle cx="114" cy="184" r="14" />
+        <line x1="166" y1="220" x2="136" y2="220" stroke-width="9" />
+        <line x1="166" y1="256" x2="114" y2="256" /><circle cx="114" cy="256" r="14" />
+        <line x1="166" y1="292" x2="136" y2="292" stroke-width="9" />
+        <line x1="166" y1="328" x2="114" y2="328" /><circle cx="114" cy="328" r="14" />
+        <path d="M 212 196 L 286 196" /><circle cx="286" cy="196" r="10" />
+        <path d="M 230 310 L 286 310" /><circle cx="286" cy="310" r="10" />
+      </g>
+    </g>
+    
+
+    <!-- Sharp Vector Core -->
+    <path d="M 166 126 L 308 126 C 354 126, 376 154, 376 190 C 376 226, 348 247, 312 250 C 356 253, 382 277, 382 316 C 382 356, 352 376, 308 376 L 166 376 Z" fill="#03081d" stroke="url(#cyanNeon)" stroke-width="13" stroke-linejoin="round" />
+    <path d="M 212 170 L 294 170 C 322 170, 336 182, 336 196 C 336 210, 322 222, 294 222 L 212 222 Z" fill="#03081d" stroke="url(#cyanNeon)" stroke-width="11" stroke-linejoin="round" />
+    <path d="M 212 280 L 294 280 C 324 280, 340 294, 340 312 C 340 330, 324 340, 294 340 L 212 340 Z" fill="#03081d" stroke="url(#cyanNeon)" stroke-width="11" stroke-linejoin="round" />
+    <path d="M 180 366 L 248 250 L 308 250" fill="none" stroke="url(#cyanNeon)" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" />
+
+    <g stroke="url(#cyanNeon)" stroke-width="7" stroke-linecap="round" fill="none">
+      <line x1="208" y1="126" x2="208" y2="78" /><circle cx="208" cy="78" r="14" fill="#03081d" stroke-width="7" /><circle cx="208" cy="78" r="4.5" fill="#00f5ff" stroke="none" />
+      <line x1="256" y1="126" x2="256" y2="78" /><circle cx="256" cy="78" r="14" fill="#03081d" stroke-width="7" /><circle cx="256" cy="78" r="4.5" fill="#00f5ff" stroke="none" />
+      <line x1="304" y1="126" x2="304" y2="78" /><circle cx="304" cy="78" r="14" fill="#03081d" stroke-width="7" /><circle cx="304" cy="78" r="4.5" fill="#00f5ff" stroke="none" />
+      <line x1="208" y1="376" x2="208" y2="424" /><circle cx="208" cy="424" r="14" fill="#03081d" stroke-width="7" /><circle cx="208" cy="424" r="4.5" fill="#00f5ff" stroke="none" />
+      <line x1="256" y1="376" x2="256" y2="424" /><circle cx="256" cy="424" r="14" fill="#03081d" stroke-width="7" /><circle cx="256" cy="424" r="4.5" fill="#00f5ff" stroke="none" />
+      <line x1="304" y1="376" x2="304" y2="424" /><circle cx="304" cy="424" r="14" fill="#03081d" stroke-width="7" /><circle cx="304" cy="424" r="4.5" fill="#00f5ff" stroke="none" />
+      <line x1="166" y1="184" x2="114" y2="184" /><circle cx="114" cy="184" r="14" fill="#03081d" stroke-width="7" /><circle cx="114" cy="184" r="4.5" fill="#00f5ff" stroke="none" />
+      <line x1="166" y1="220" x2="136" y2="220" stroke-width="8" stroke-linecap="square" />
+      <line x1="166" y1="256" x2="114" y2="256" /><circle cx="114" cy="256" r="14" fill="#03081d" stroke-width="7" /><circle cx="114" cy="256" r="4.5" fill="#00f5ff" stroke="none" />
+      <line x1="166" y1="292" x2="136" y2="292" stroke-width="8" stroke-linecap="square" />
+      <line x1="166" y1="328" x2="114" y2="328" /><circle cx="114" cy="328" r="14" fill="#03081d" stroke-width="7" /><circle cx="114" cy="328" r="4.5" fill="#00f5ff" stroke="none" />
+      <path d="M 212 196 L 286 196" stroke-width="7" /><circle cx="286" cy="196" r="9" fill="#00f5ff" stroke="url(#cyanNeon)" stroke-width="3" /><circle cx="286" cy="196" r="3.5" fill="#03081d" stroke="none" />
+      <path d="M 230 310 L 286 310" stroke-width="7" /><circle cx="286" cy="310" r="9" fill="#00f5ff" stroke="url(#cyanNeon)" stroke-width="3" /><circle cx="286" cy="310" r="3.5" fill="#03081d" stroke="none" />
+    </g>
+  
+  </g>
+</svg>
