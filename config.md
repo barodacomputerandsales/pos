@@ -2,16 +2,16 @@
 
 ## What We Have
 
-**1. Desktop POS App (`pos app/`)**
+**1. Desktop POS App (`app/`)**
 - **Type**: Desktop POS application (Windows).
 - **Core Technology**: Electron 31, HTML5, CSS3, Vanilla JavaScript, NSIS.
-- **Views**: `pos app/index.html` (Login/Entry), `pos app/dashboard.html`, `pos app/pos.html`, `pos app/all-product.html`, `pos app/add-product.html`, `pos app/add-production.html`, `pos app/production-history.html`, `pos app/add-production-product.html`, `pos app/settings.html`.
+- **Views**: `app/index.html` (Login/Entry), `app/dashboard.html`, `app/pos.html`, `app/all-product.html`, `app/add-product.html`, `app/add-production.html`, `app/production-history.html`, `app/add-production-product.html`, `app/settings.html`.
 - **Scripts**: 
-  - `pos app/main.js`: Main Electron process and auto-update IPC coordinator.
-  - `pos app/script/api.js`: Handles API calls to backend with IndexedDB caching and optimistic updates.
-  - `pos app/script/auth.js`: Handles user authentication and security.
-- **Templates**: Reusable UI components (`pos app/template/sidebar/`, `pos app/template/topbar/`) and layout manager (`pos app/template/layout.js`).
-- **Build/Release**: `npm run build:pos` or `npm --prefix "pos app" run build`.
+  - `app/main.js`: Main Electron process and auto-update IPC coordinator.
+  - `app/script/api.js`: Handles API calls to backend with IndexedDB caching and optimistic updates.
+  - `app/script/auth.js`: Handles user authentication and security.
+- **Templates**: Reusable UI components (`app/template/sidebar/`, `app/template/topbar/`) and layout manager (`app/template/layout.js`).
+- **Build/Release**: `npm run build` or `npm --prefix app run build`.
 
 **2. Customer Portal & E-Commerce (`customer+e-com/`)**
 - **Type**: 2-in-1 Customer Account Portal + Online Storefront.
@@ -48,7 +48,7 @@
 ---
 ---
 ## Official GitHub Repositories (`barodacomputerandsales`)
-- **1. Desktop POS App (`pos app/`)**: https://github.com/barodacomputerandsales/pos
+- **1. Desktop POS App (`app/`)**: https://github.com/barodacomputerandsales/pos
 - **2. Customer Portal & E-Commerce (`customer+e-com/`)**: https://github.com/barodacomputerandsales/e-com-customer-portal
 - **3. Delivery Portal (`delivery/`)**: https://github.com/barodacomputerandsales/delivery
 - **4. Backend Serverless API (`backend/`)**: https://github.com/barodacomputerandsales/backend
