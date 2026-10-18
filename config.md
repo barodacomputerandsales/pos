@@ -59,7 +59,7 @@
 ## Official Production Domains
 - **Customer Portal & E-Commerce**: `https://bcs.bcsdeveloper.com`
 - **Delivery & Logistics Portal**: `https://delivery.bcs.bcsdeveloper.com`
-- **Backend Serverless API**: `https://backend.bcs.bcsdeveloper.com/api`
+- **Backend Serverless API**: `https://backend.bcs.bcsdeveloper.com` (API Base: `https://backend.bcs.bcsdeveloper.com/api`)
 
 ## Rules for Editing Files
 
