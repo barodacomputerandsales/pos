@@ -1,4 +1,4 @@
-﻿function loadCss(name) {
+function loadCss(name) {
     if (!document.querySelector(`link[href*="template/${name}/${name}.css"]`)) {
         const link = document.createElement('link');
         link.rel = 'stylesheet';
@@ -16,6 +16,19 @@ function loadGlobalIcons() {
     }
 }
 
+function loadGlobalAnimations() {
+    if (!document.querySelector('link[href*="template/animations.css"]')) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'template/animations.css';
+        document.head.appendChild(link);
+    }
+}
+
+// Auto-inject global styling, icons, and professional animation engine immediately
+loadGlobalIcons();
+loadGlobalAnimations();
+
 function loadScript(name) {
     return new Promise((resolve, reject) => {
         if (document.querySelector(`script[src*="template/${name}/${name}.js"]`)) {
@@ -32,6 +45,7 @@ function loadScript(name) {
 
 window.renderTopbar = async function() {
     loadGlobalIcons();
+    loadGlobalAnimations();
     loadCss('topbar');
     await loadScript('topbar');
     if (window._renderTopbarImpl) window._renderTopbarImpl();
@@ -39,6 +53,7 @@ window.renderTopbar = async function() {
 
 window.renderSidebar = async function(activeMenu, activeSubMenu = null) {
     loadGlobalIcons();
+    loadGlobalAnimations();
     loadCss('sidebar');
     await loadScript('sidebar');
     if (window._renderSidebarImpl) window._renderSidebarImpl(activeMenu, activeSubMenu);

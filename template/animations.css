@@ -1,0 +1,637 @@
+/* ==========================================================================
+   Baroda Computers And Sales (BCS) - Professional Psychological Motion System
+   Architecture: High-performance GPU-composited CSS transitions & physics
+   Standards: Doherty Threshold (<150ms micro-response), Material & Apple Curves
+   ========================================================================== */
+
+:root {
+    /* --- Psychological Physics Curves --- */
+    /* Playful spring for tactile controls (checkboxes, badges, icon reactions) */
+    --bcs-ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* Snappy responsive spring for button clicks and micro-switches */
+    --bcs-ease-spring-snappy: cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* Ultra-smooth decelerated curve for entrances, modals, drawers & cards */
+    --bcs-ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    /* Natural gentle overshoot for notifications and alerts */
+    --bcs-ease-out-back: cubic-bezier(0.34, 1.3, 0.64, 1);
+    /* Standard smooth curve for colors, opacities, and borders */
+    --bcs-ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    /* Clean accelerated curve for exits */
+    --bcs-ease-in-expo: cubic-bezier(0.7, 0, 0.84, 0);
+
+    /* --- Standardized Psychological Durations --- */
+    --bcs-dur-instant: 120ms;  /* Instant feedback (active press, toggle click) */
+    --bcs-dur-fast: 180ms;     /* Micro-interactions (hover, focus ring, icons) */
+    --bcs-dur-normal: 260ms;   /* Component state transitions (dropdowns, cards) */
+    --bcs-dur-smooth: 360ms;   /* Structural reveals (page entrance, modals) */
+    --bcs-dur-ambient: 1800ms; /* Ambient continuous background loops */
+
+    /* --- Ambient Glow Shadows --- */
+    --bcs-glow-primary: 0 4px 20px rgba(99, 102, 241, 0.35);
+    --bcs-glow-success: 0 4px 20px rgba(16, 185, 129, 0.35);
+    --bcs-glow-info: 0 4px 20px rgba(6, 182, 212, 0.35);
+    --bcs-glow-danger: 0 4px 20px rgba(239, 68, 68, 0.35);
+    --bcs-glow-warning: 0 4px 20px rgba(245, 158, 11, 0.35);
+}
+
+/* ==========================================================================
+   1. Page & Layout Entrance (Choreographed Staggered Cascade)
+   ========================================================================== */
+
+.main-content {
+    animation: bcsViewEntrance var(--bcs-dur-smooth) var(--bcs-ease-out-expo) forwards;
+    will-change: transform, opacity;
+}
+
+@keyframes bcsViewEntrance {
+    0% {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Staggered entrance for cards & content sections */
+.main-content .row > div:nth-child(1) .stat-card,
+.main-content .row > div:nth-child(1) .product-card {
+    animation: bcsCardReveal var(--bcs-dur-smooth) var(--bcs-ease-out-expo) 40ms backwards;
+}
+.main-content .row > div:nth-child(2) .stat-card,
+.main-content .row > div:nth-child(2) .product-card {
+    animation: bcsCardReveal var(--bcs-dur-smooth) var(--bcs-ease-out-expo) 90ms backwards;
+}
+.main-content .row > div:nth-child(3) .stat-card,
+.main-content .row > div:nth-child(3) .product-card {
+    animation: bcsCardReveal var(--bcs-dur-smooth) var(--bcs-ease-out-expo) 140ms backwards;
+}
+.main-content .row > div:nth-child(4) .stat-card,
+.main-content .row > div:nth-child(4) .product-card {
+    animation: bcsCardReveal var(--bcs-dur-smooth) var(--bcs-ease-out-expo) 190ms backwards;
+}
+.main-content .row > div:nth-child(n+5) .stat-card,
+.main-content .row > div:nth-child(n+5) .product-card {
+    animation: bcsCardReveal var(--bcs-dur-smooth) var(--bcs-ease-out-expo) 240ms backwards;
+}
+
+@keyframes bcsCardReveal {
+    0% {
+        opacity: 0;
+        transform: translateY(16px) scale(0.98);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ==========================================================================
+   2. Tactile Button Micro-Interactions (Physics Feedback)
+   ========================================================================== */
+
+.btn,
+.logout-btn,
+button.btn-action {
+    position: relative;
+    overflow: hidden;
+    transition: transform var(--bcs-dur-fast) var(--bcs-ease-spring-snappy),
+                box-shadow var(--bcs-dur-fast) var(--bcs-ease-smooth),
+                background-color var(--bcs-dur-fast) var(--bcs-ease-smooth),
+                border-color var(--bcs-dur-fast) var(--bcs-ease-smooth),
+                color var(--bcs-dur-fast) var(--bcs-ease-smooth) !important;
+    will-change: transform, box-shadow;
+}
+
+/* Subtle elevation lift on hover */
+.btn:hover,
+.logout-btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn-primary:hover {
+    box-shadow: var(--bcs-glow-primary) !important;
+}
+
+.btn-success:hover {
+    box-shadow: var(--bcs-glow-success) !important;
+}
+
+.btn-info:hover {
+    box-shadow: var(--bcs-glow-info) !important;
+}
+
+.btn-danger:hover,
+.logout-btn:hover {
+    box-shadow: var(--bcs-glow-danger) !important;
+}
+
+.btn-warning:hover {
+    box-shadow: var(--bcs-glow-warning) !important;
+}
+
+/* Tactile physical depression on active click */
+.btn:active,
+.logout-btn:active {
+    transform: translateY(1px) scale(0.97) !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2) !important;
+    transition-duration: var(--bcs-dur-instant) !important;
+}
+
+/* Button Icon Micro-Physics */
+.btn i,
+.logout-btn i {
+    display: inline-block;
+    transition: transform var(--bcs-dur-fast) var(--bcs-ease-spring-snappy);
+    will-change: transform;
+}
+
+/* Add / Plus Icon: subtle 90deg spin */
+.btn:hover i.bi-plus,
+.btn:hover i.bi-plus-circle,
+.btn:hover i.bi-plus-lg,
+.btn:hover i.bi-person-plus,
+.btn:hover i.bi-cart-plus {
+    transform: rotate(90deg) scale(1.12);
+}
+
+/* Arrow Right: forward nudge */
+.btn:hover i.bi-arrow-right,
+.btn:hover i.bi-arrow-right-short,
+.btn:hover i.bi-chevron-right {
+    transform: translateX(3px);
+}
+
+/* Arrow Left: backward nudge */
+.btn:hover i.bi-arrow-left,
+.btn:hover i.bi-arrow-left-short,
+.btn:hover i.bi-chevron-left {
+    transform: translateX(-3px);
+}
+
+/* Refresh / Sync Icon: 180deg spin */
+.btn:hover i.bi-arrow-clockwise,
+.btn:hover i.bi-arrow-repeat,
+.btn:hover i.bi-arrow-counterclockwise {
+    transform: rotate(180deg);
+}
+
+/* Logout Icon: slight exit shift */
+.logout-btn:hover i.bi-box-arrow-right {
+    transform: translateX(3px);
+}
+
+/* Trash / Delete Icon: slight tilt */
+.btn-outline-danger:hover i.bi-trash,
+.btn-danger:hover i.bi-trash,
+.btn-outline-danger:hover i.bi-trash3,
+.btn-danger:hover i.bi-trash3 {
+    transform: rotate(-12deg) scale(1.1);
+}
+
+/* Print Icon: gentle bounce */
+.btn:hover i.bi-printer {
+    transform: translateY(-2px) scale(1.08);
+}
+
+/* Shimmer Sheen effect for primary CTA buttons */
+.btn-primary::after,
+.btn-success::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.18), transparent);
+    transform: skewX(-20deg);
+    transition: none;
+    pointer-events: none;
+}
+
+.btn-primary:hover::after,
+.btn-success:hover::after {
+    left: 140%;
+    transition: left 650ms var(--bcs-ease-out-expo);
+}
+
+/* ==========================================================================
+   3. Cards, Stat Cards & Glass Panels (Dynamic Elevation & Glow)
+   ========================================================================== */
+
+.stat-card,
+.product-card,
+.glass-panel,
+.card {
+    transition: transform var(--bcs-dur-normal) var(--bcs-ease-out-expo),
+                box-shadow var(--bcs-dur-normal) var(--bcs-ease-out-expo),
+                border-color var(--bcs-dur-normal) var(--bcs-ease-smooth),
+                background-color var(--bcs-dur-normal) var(--bcs-ease-smooth) !important;
+    will-change: transform, box-shadow;
+}
+
+.stat-card:hover,
+.glass-panel:hover {
+    transform: translateY(-4px) scale(1.005);
+    border-color: rgba(99, 102, 241, 0.25) !important;
+}
+
+.product-card:hover {
+    transform: translateY(-5px) scale(1.01);
+}
+
+/* Stat Icon Circle micro-animation */
+.stat-icon,
+.icon-circle {
+    transition: transform var(--bcs-dur-normal) var(--bcs-ease-spring),
+                box-shadow var(--bcs-dur-normal) var(--bcs-ease-smooth) !important;
+    will-change: transform;
+}
+
+.stat-card:hover .stat-icon,
+.stat-card:hover .icon-circle {
+    transform: scale(1.12) rotate(4deg);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+/* ==========================================================================
+   4. Interactive Tables & Data Lists (Fluid Row Transitions)
+   ========================================================================== */
+
+.table tbody tr {
+    transition: transform var(--bcs-dur-fast) var(--bcs-ease-out-expo),
+                background-color var(--bcs-dur-fast) var(--bcs-ease-smooth),
+                box-shadow var(--bcs-dur-fast) var(--bcs-ease-smooth);
+    will-change: transform;
+}
+
+.table tbody tr:hover {
+    transform: translateX(4px);
+    background-color: rgba(99, 102, 241, 0.08) !important;
+    box-shadow: inset 3px 0 0 #6366f1;
+}
+
+.table tbody td {
+    transition: color var(--bcs-dur-fast) var(--bcs-ease-smooth);
+}
+
+/* ==========================================================================
+   5. Form Controls & Interactive Inputs (Focus Ring & Error Shake)
+   ========================================================================== */
+
+.form-control,
+.form-select {
+    transition: border-color var(--bcs-dur-fast) var(--bcs-ease-smooth),
+                box-shadow var(--bcs-dur-fast) var(--bcs-ease-smooth),
+                transform var(--bcs-dur-fast) var(--bcs-ease-out-expo),
+                background-color var(--bcs-dur-fast) var(--bcs-ease-smooth) !important;
+    will-change: transform, box-shadow;
+}
+
+.form-control:focus,
+.form-select:focus {
+    transform: translateY(-1px);
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25), 0 4px 14px rgba(99, 102, 241, 0.15) !important;
+}
+
+/* Checkbox & Switch Spring Pop */
+.form-check-input {
+    transition: transform var(--bcs-dur-fast) var(--bcs-ease-spring),
+                background-color var(--bcs-dur-fast) var(--bcs-ease-smooth),
+                border-color var(--bcs-dur-fast) var(--bcs-ease-smooth) !important;
+    cursor: pointer;
+}
+
+.form-check-input:checked {
+    animation: bcsCheckBounce var(--bcs-dur-normal) var(--bcs-ease-spring) forwards;
+}
+
+@keyframes bcsCheckBounce {
+    0% { transform: scale(0.8); }
+    50% { transform: scale(1.22); }
+    100% { transform: scale(1); }
+}
+
+/* Validation Error Shake */
+.is-invalid,
+.bcs-shake {
+    animation: bcsShake 380ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes bcsShake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-3px, 0, 0); }
+    40%, 60% { transform: translate3d(3px, 0, 0); }
+}
+
+/* ==========================================================================
+   6. Modals & Dialogs (Physiological Spring & Blur)
+   ========================================================================== */
+
+.modal.fade .modal-dialog {
+    transform: scale(0.95) translateY(18px);
+    opacity: 0;
+    transition: transform var(--bcs-dur-normal) var(--bcs-ease-out-expo),
+                opacity var(--bcs-dur-normal) var(--bcs-ease-smooth) !important;
+}
+
+.modal.show .modal-dialog {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+
+.modal-backdrop.fade {
+    opacity: 0;
+    transition: opacity var(--bcs-dur-normal) var(--bcs-ease-smooth);
+}
+
+.modal-backdrop.show {
+    opacity: 0.65;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.modal-content {
+    border-radius: 18px !important;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45) !important;
+}
+
+/* Modal Close Button */
+.btn-close {
+    transition: transform var(--bcs-dur-fast) var(--bcs-ease-spring),
+                opacity var(--bcs-dur-fast) ease !important;
+}
+
+.btn-close:hover {
+    transform: rotate(90deg) scale(1.15);
+}
+
+/* ==========================================================================
+   7. Toast Notifications & Custom Alerts (Physics-Based Spring Curves)
+   ========================================================================== */
+
+#custom-alert-container {
+    perspective: 1000px;
+}
+
+.custom-alert {
+    animation: bcsAlertSlideIn var(--bcs-dur-smooth) var(--bcs-ease-out-back) forwards !important;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+    will-change: transform, opacity;
+}
+
+.custom-alert.fade-out {
+    animation: bcsAlertSlideOut var(--bcs-dur-normal) var(--bcs-ease-in-expo) forwards !important;
+}
+
+@keyframes bcsAlertSlideIn {
+    0% {
+        opacity: 0;
+        transform: translateX(115%) scale(0.92);
+    }
+    70% {
+        opacity: 1;
+        transform: translateX(-6px) scale(1.01);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes bcsAlertSlideOut {
+    0% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+        max-height: 120px;
+        margin-bottom: 10px;
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(115%) scale(0.9);
+        max-height: 0;
+        margin-bottom: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+}
+
+/* Universal override for inline slideIn & slideOut definitions across older templates */
+@keyframes slideIn {
+    0% {
+        opacity: 0;
+        transform: translateX(115%) scale(0.92);
+    }
+    70% {
+        opacity: 1;
+        transform: translateX(-6px) scale(1.01);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes slideOut {
+    0% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(115%) scale(0.9);
+    }
+}
+
+/* ==========================================================================
+   8. Badges, Chips & Live Status Indicators
+   ========================================================================== */
+
+.badge,
+.badge-chip,
+.batch-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: transform var(--bcs-dur-fast) var(--bcs-ease-spring),
+                box-shadow var(--bcs-dur-fast) ease !important;
+    animation: bcsBadgePop var(--bcs-dur-fast) var(--bcs-ease-spring) backwards;
+    will-change: transform;
+}
+
+.badge:hover,
+.badge-chip:hover,
+.batch-badge:hover {
+    transform: scale(1.08);
+}
+
+@keyframes bcsBadgePop {
+    0% {
+        opacity: 0;
+        transform: scale(0.82);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Pulsing Status Dot */
+.status-pulse,
+.live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    animation: bcsPulseGlow 1.8s ease-in-out infinite;
+}
+
+@keyframes bcsPulseGlow {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.15);
+        box-shadow: 0 0 0 6px rgba(34, 197, 94, 0);
+    }
+}
+
+/* ==========================================================================
+   9. Sidebar & Topbar Micro-Interactions
+   ========================================================================== */
+
+.sidebar .menu-item {
+    transition: transform var(--bcs-dur-fast) var(--bcs-ease-out-expo),
+                padding-left var(--bcs-dur-fast) var(--bcs-ease-out-expo),
+                background-color var(--bcs-dur-fast) var(--bcs-ease-smooth),
+                color var(--bcs-dur-fast) var(--bcs-ease-smooth) !important;
+}
+
+.sidebar .menu-item:hover {
+    padding-left: 1.65rem !important;
+    color: #ffffff !important;
+}
+
+.sidebar .menu-item i {
+    transition: transform var(--bcs-dur-fast) var(--bcs-ease-spring) !important;
+}
+
+.sidebar .menu-item:hover i {
+    transform: scale(1.18);
+}
+
+.sidebar .menu-item.active {
+    box-shadow: inset -4px 0 12px rgba(99, 102, 241, 0.4);
+}
+
+.sidebar .user-avatar {
+    transition: transform var(--bcs-dur-fast) var(--bcs-ease-spring),
+                box-shadow var(--bcs-dur-fast) ease !important;
+}
+
+.sidebar-user:hover .user-avatar {
+    transform: scale(1.08) rotate(2deg);
+    box-shadow: 0 0 16px rgba(99, 102, 241, 0.5);
+}
+
+.topbar .user-profile {
+    transition: transform var(--bcs-dur-fast) var(--bcs-ease-out-expo),
+                background var(--bcs-dur-fast) ease !important;
+}
+
+.topbar .user-profile:hover {
+    transform: translateY(-1px) scale(1.02);
+}
+
+/* ==========================================================================
+   10. High-Performance Shimmer Skeletons & Spinners
+   ========================================================================== */
+
+.skeleton {
+    background: linear-gradient(
+        105deg,
+        rgba(255, 255, 255, 0.04) 20%,
+        rgba(255, 255, 255, 0.12) 45%,
+        rgba(255, 255, 255, 0.04) 70%
+    ) !important;
+    background-size: 200% 100% !important;
+    animation: bcsShimmerSweep 1.6s ease-in-out infinite !important;
+    will-change: background-position;
+}
+
+@keyframes bcsShimmerSweep {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.spinner-border,
+.spinner-custom {
+    animation: bcsSpinSmooth 800ms linear infinite !important;
+    will-change: transform;
+}
+
+@keyframes bcsSpinSmooth {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ==========================================================================
+   11. Hypnotic Ambient Orbs (Login Page index.html)
+   ========================================================================== */
+
+@keyframes bcsFloatOrb {
+    0% {
+        transform: translateY(0px) scale(1) rotate(0deg);
+    }
+    50% {
+        transform: translateY(22px) scale(1.06) rotate(6deg);
+    }
+    100% {
+        transform: translateY(0px) scale(1) rotate(0deg);
+    }
+}
+
+body::before {
+    animation: bcsFloatOrb 14s ease-in-out infinite alternate !important;
+    will-change: transform;
+}
+
+body::after {
+    animation: bcsFloatOrb 18s ease-in-out 2s infinite alternate-reverse !important;
+    will-change: transform;
+}
+
+/* ==========================================================================
+   12. Accessibility & Reduced Motion (Professional Compliance)
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    body::before,
+    body::after {
+        animation: none !important;
+    }
+
+    .main-content,
+    .stat-card,
+    .btn,
+    .custom-alert {
+        transform: none !important;
+        animation: none !important;
+    }
+}
