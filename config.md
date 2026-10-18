@@ -97,7 +97,7 @@ When collaborating on this project, please adhere to the following rules:
 
 ### System Update System & Deployment Pipeline
 - **Auto-Updater Integration**:
-  - `electron-updater` monitors GitHub Releases for `Indranilsaha7/bcs.windows.app`.
+  - `electron-updater` queries the serverless backend relay which fetches releases from `barodacomputerandsales/pos`.
   - Background silent check executes on startup (`autoUpdater.checkForUpdatesAndNotify()`).
   - IPC lifecycle events bridge `main.js` with renderer views (`template/topbar/topbar.js` and `settings.html`):
     - `checking_for_update`: Displays spinner indicator.
