@@ -68,7 +68,8 @@
             {
                 "provider": "github",
                 "owner": "barodacomputerandsales",
-                "repo": "pos"
+                "repo": "pos",
+                "releaseType": "release"
             }
         ]
     }
