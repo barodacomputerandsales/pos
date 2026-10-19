@@ -9,15 +9,15 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BCS Enterprise POS | Terminal Authentication</title>
+    <title>Sign In | BCS Enterprise POS</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
     <link rel="apple-touch-icon" href="assets/icon.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="template/animations.css">
-    
+
     <!-- Prevent nodeIntegration from breaking UMD bundles -->
     <script>
         if (typeof module === "object") {
@@ -35,11 +35,8 @@
             --bs-primary: #6366f1;
             --brand-cyan: #00f0ff;
             --brand-indigo: #6366f1;
-            --brand-purple: #a855f7;
-            --bg-canvas: #07090e;
-            --pane-bg: rgba(13, 17, 28, 0.75);
-            --card-glass: rgba(18, 24, 38, 0.78);
-            --card-border: 1px solid rgba(255, 255, 255, 0.1);
+            --brand-violet: #a855f7;
+            --font-main: 'Plus Jakarta Sans', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
         }
 
@@ -49,418 +46,313 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-canvas) !important;
-            margin: 0;
-            padding: 0;
+            font-family: var(--font-main);
+            background: #06080f !important;
             min-height: 100vh;
             width: 100vw;
+            margin: 0;
+            padding: 0;
             display: flex;
+            align-items: center;
+            justify-content: center;
             overflow: hidden;
-            color: #f8fafc;
             position: relative;
+            color: #f8fafc;
         }
 
-        /* Ambient Glowing Vector Aurora Backdrop */
-        .ambient-aurora {
+        /* Interactive Particle & Star Canvas */
+        #bgCanvas {
             position: fixed;
             inset: 0;
-            pointer-events: none;
-            z-index: 0;
-            overflow: hidden;
-        }
-
-        .aurora-orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(120px);
-            opacity: 0.6;
-        }
-
-        .aurora-1 {
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(0, 240, 255, 0.22) 0%, rgba(99, 102, 241, 0.15) 50%, transparent 75%);
-            top: -150px;
-            left: -100px;
-            animation: orbFloat1 18s ease-in-out infinite alternate;
-        }
-
-        .aurora-2 {
-            width: 700px;
-            height: 700px;
-            background: radial-gradient(circle, rgba(168, 85, 247, 0.2) 0%, rgba(99, 102, 241, 0.12) 50%, transparent 75%);
-            bottom: -200px;
-            right: 15%;
-            animation: orbFloat2 22s ease-in-out infinite alternate;
-        }
-
-        .aurora-3 {
-            width: 450px;
-            height: 450px;
-            background: radial-gradient(circle, rgba(0, 240, 255, 0.15) 0%, transparent 70%);
-            top: 40%;
-            left: 35%;
-            animation: orbFloat3 14s ease-in-out infinite alternate;
-        }
-
-        @keyframes orbFloat1 {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(60px, 80px) scale(1.1); }
-        }
-
-        @keyframes orbFloat2 {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(-80px, -60px) scale(1.08); }
-        }
-
-        @keyframes orbFloat3 {
-            0% { transform: translate(0, 0) scale(0.9); }
-            100% { transform: translate(-40px, 50px) scale(1.15); }
-        }
-
-        /* Subtle Cyberpunk Grid Background Overlay */
-        .cyber-grid-overlay {
-            position: fixed;
-            inset: 0;
-            background-image: 
-                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-            background-size: 40px 40px;
+            width: 100%;
+            height: 100%;
             pointer-events: none;
             z-index: 1;
         }
 
-        /* Main Fullscreen Split Container */
-        .auth-split-wrapper {
-            position: relative;
-            z-index: 2;
-            width: 100vw;
-            height: 100vh;
-            display: flex;
+        /* Ambient Glowing Spotlights */
+        .ambient-spotlight {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(140px);
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.65;
         }
 
-        /* Left Showcase / Brand Deck */
-        .auth-brand-pane {
-            flex: 1.15;
-            background: linear-gradient(135deg, rgba(13, 17, 28, 0.85) 0%, rgba(8, 11, 20, 0.95) 100%);
-            backdrop-filter: blur(20px);
-            border-right: 1px solid rgba(255, 255, 255, 0.08);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 3.5rem 4rem;
+        .spotlight-top {
+            width: 650px;
+            height: 650px;
+            background: radial-gradient(circle, rgba(0, 240, 255, 0.22) 0%, rgba(99, 102, 241, 0.12) 50%, transparent 75%);
+            top: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .spotlight-bottom-left {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.2) 0%, transparent 70%);
+            bottom: -150px;
+            left: -100px;
+        }
+
+        .spotlight-bottom-right {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(0, 240, 255, 0.18) 0%, transparent 70%);
+            bottom: -150px;
+            right: -100px;
+        }
+
+        /* Glowing Hologram Card Container */
+        .login-hologram-wrapper {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 480px;
+            padding: 24px;
+        }
+
+        .login-hologram-card {
+            background: rgba(14, 18, 30, 0.72);
+            backdrop-filter: blur(32px);
+            -webkit-backdrop-filter: blur(32px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 28px;
+            padding: 3rem 2.6rem;
+            box-shadow: 
+                0 30px 90px rgba(0, 0, 0, 0.7),
+                0 0 50px rgba(0, 240, 255, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
             position: relative;
             overflow: hidden;
+            animation: cardAppear 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        .auth-brand-pane::after {
+        /* Top Border Laser Highlight */
+        .login-hologram-card::before {
             content: '';
             position: absolute;
             top: 0;
-            right: 0;
-            bottom: 0;
-            width: 1px;
-            background: linear-gradient(180deg, transparent, rgba(0, 240, 255, 0.4), rgba(99, 102, 241, 0.4), transparent);
+            left: 15%;
+            right: 15%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00f0ff, #6366f1, transparent);
+            box-shadow: 0 0 16px #00f0ff;
         }
 
-        .brand-hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 50px;
-            padding: 6px 18px 6px 10px;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        @keyframes cardAppear {
+            0% {
+                opacity: 0;
+                transform: translateY(24px) scale(0.97);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
-        .hero-logo-box {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            background: rgba(15, 23, 42, 0.8);
+        /* Logo Emblem Box */
+        .emblem-wrapper {
+            margin-bottom: 1.5rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .emblem-glow-ring {
+            position: absolute;
+            inset: -8px;
+            border-radius: 26px;
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.5), rgba(99, 102, 241, 0.5));
+            filter: blur(14px);
+            opacity: 0.6;
+            animation: pulseEmblem 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulseEmblem {
+            0% { opacity: 0.4; transform: scale(0.95); }
+            100% { opacity: 0.8; transform: scale(1.05); }
+        }
+
+        .emblem-box {
+            position: relative;
+            width: 82px;
+            height: 82px;
+            border-radius: 22px;
+            background: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.2);
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 0 16px rgba(0, 240, 255, 0.35);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .hero-logo-box img {
-            width: 34px;
-            height: 34px;
+        .emblem-box:hover {
+            transform: scale(1.08) rotate(-3deg);
+        }
+
+        .emblem-box img {
+            width: 62px;
+            height: 62px;
             object-fit: contain;
+            filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.4));
         }
 
-        .brand-headline {
-            font-size: 2.75rem;
+        /* Typography */
+        .brand-name {
+            font-size: 1.55rem;
             font-weight: 800;
-            line-height: 1.15;
-            letter-spacing: -0.03em;
-            margin-bottom: 1rem;
-        }
-
-        .gradient-text-hero {
-            background: linear-gradient(135deg, #ffffff 20%, #00f0ff 65%, #6366f1 100%);
+            letter-spacing: -0.02em;
+            margin-bottom: 4px;
+            background: linear-gradient(135deg, #ffffff 30%, #00f0ff 70%, #6366f1 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .brand-subtext {
+        .brand-subtitle {
             color: #94a3b8;
-            font-size: 1.1rem;
-            line-height: 1.6;
-            max-width: 520px;
-            margin-bottom: 2.5rem;
-        }
-
-        /* Feature Pillars */
-        .feature-pillars {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1.25rem;
-            max-width: 560px;
-            margin-bottom: 2.5rem;
-        }
-
-        .pillar-card {
-            background: rgba(20, 26, 43, 0.55);
-            border: 1px solid rgba(255, 255, 255, 0.07);
-            border-radius: 14px;
-            padding: 1.1rem 1.25rem;
-            backdrop-filter: blur(12px);
-            transition: all 0.25s ease;
-        }
-
-        .pillar-card:hover {
-            border-color: rgba(0, 240, 255, 0.35);
-            background: rgba(26, 34, 56, 0.75);
-            transform: translateY(-2px);
-        }
-
-        .pillar-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 0.75rem;
-            font-size: 1.15rem;
-        }
-
-        .pillar-title {
-            font-weight: 600;
-            font-size: 0.92rem;
-            color: #f1f5f9;
-            margin-bottom: 2px;
-        }
-
-        .pillar-desc {
-            color: #64748b;
-            font-size: 0.78rem;
-            line-height: 1.4;
-            margin: 0;
-        }
-
-        /* Telemetry Status Bar */
-        .brand-telemetry-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-top: 1.5rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
-            color: #64748b;
-        }
-
-        .status-node {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .live-dot {
-            width: 8px;
-            height: 8px;
-            background: #10b981;
-            border-radius: 50%;
-            box-shadow: 0 0 10px #10b981;
-            animation: pulseDot 2s infinite;
-        }
-
-        @keyframes pulseDot {
-            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-            70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-        }
-
-        /* Right Authentication Console Pane */
-        .auth-form-pane {
-            flex: 0.85;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 3rem;
-            position: relative;
-            background: rgba(7, 9, 14, 0.4);
-        }
-
-        .auth-card-console {
-            width: 100%;
-            max-width: 440px;
-            background: var(--card-glass);
-            backdrop-filter: blur(28px);
-            -webkit-backdrop-filter: blur(28px);
-            border: var(--card-border);
-            border-radius: 24px;
-            padding: 2.75rem 2.5rem;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.65), 0 0 50px rgba(99, 102, 241, 0.1);
-            position: relative;
-            animation: bcsCardReveal 450ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        .console-header-badge {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1.5rem;
-        }
-
-        .console-badge-pill {
-            font-family: var(--font-mono);
-            font-size: 0.72rem;
-            background: rgba(0, 240, 255, 0.08);
-            color: #00f0ff;
-            border: 1px solid rgba(0, 240, 255, 0.25);
-            border-radius: 20px;
-            padding: 4px 12px;
-            letter-spacing: 0.04em;
-        }
-
-        .console-title {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 0.35rem;
-            letter-spacing: -0.02em;
-        }
-
-        .console-subtitle {
             font-size: 0.88rem;
-            color: #94a3b8;
-            margin-bottom: 1.75rem;
-        }
-
-        /* Form Inputs */
-        .form-floating-custom {
-            position: relative;
             margin-bottom: 1.25rem;
         }
 
-        .form-floating-custom label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
+        .terminal-version-tag {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
             letter-spacing: 0.05em;
-            color: #94a3b8;
-            margin-bottom: 6px;
+            background: rgba(0, 240, 255, 0.08);
+            border: 1px solid rgba(0, 240, 255, 0.25);
+            color: #00f0ff;
+            padding: 4px 12px;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 2rem;
         }
 
-        .input-wrapper {
+        /* Form Controls */
+        .input-group-custom {
+            position: relative;
+            margin-bottom: 1.25rem;
+            text-align: left;
+        }
+
+        .input-group-custom label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #94a3b8;
+            margin-bottom: 7px;
+        }
+
+        .custom-input-box {
             position: relative;
             display: flex;
             align-items: center;
         }
 
-        .input-icon {
+        .custom-input-box i.input-icon {
             position: absolute;
-            left: 14px;
+            left: 16px;
             color: #64748b;
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             pointer-events: none;
-            transition: color 0.2s;
+            transition: color 0.25s ease;
         }
 
-        .form-control-console {
+        .custom-input-box input {
             width: 100%;
-            background: rgba(13, 18, 32, 0.75) !important;
+            background: rgba(10, 14, 26, 0.75) !important;
             border: 1px solid rgba(255, 255, 255, 0.12) !important;
-            border-radius: 12px;
-            padding: 13px 14px 13px 44px;
-            color: #ffffff !important;
+            border-radius: 14px;
+            padding: 13px 16px 13px 48px;
             font-size: 0.95rem;
+            color: #ffffff !important;
+            font-family: var(--font-main);
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
             user-select: text;
         }
 
-        .form-control-console:focus {
-            background: rgba(18, 25, 46, 0.95) !important;
+        .custom-input-box input:focus {
+            background: rgba(15, 22, 40, 0.95) !important;
             border-color: #00f0ff !important;
-            box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.2), 0 0 20px rgba(99, 102, 241, 0.25) !important;
+            box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.22), 0 0 25px rgba(99, 102, 241, 0.25) !important;
             outline: none;
         }
 
-        .form-control-console::placeholder {
+        .custom-input-box input::placeholder {
             color: rgba(148, 163, 184, 0.4);
             font-size: 0.9rem;
         }
 
-        .input-wrapper:focus-within .input-icon {
+        .custom-input-box:focus-within i.input-icon {
             color: #00f0ff;
         }
 
-        .field-action-btn {
+        .eye-toggle-btn {
             position: absolute;
             right: 12px;
             background: none;
             border: none;
             color: #64748b;
             cursor: pointer;
-            padding: 4px 6px;
-            border-radius: 6px;
-            transition: color 0.2s;
+            padding: 6px;
+            border-radius: 8px;
+            transition: all 0.2s;
         }
 
-        .field-action-btn:hover {
+        .eye-toggle-btn:hover {
             color: #00f0ff;
         }
 
+        /* Caps Lock Badge */
+        .caps-warning {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: #fbbf24;
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
         /* Sign In Button */
-        .btn-console-submit {
+        .btn-master-signin {
             width: 100%;
-            background: linear-gradient(135deg, #00f0ff 0%, #6366f1 55%, #a855f7 100%);
-            background-size: 200% auto;
+            background: linear-gradient(135deg, #00f0ff 0%, #6366f1 50%, #a855f7 100%);
+            background-size: 200% 200%;
             border: none;
-            border-radius: 12px;
+            border-radius: 14px;
             padding: 14px;
             font-size: 1rem;
             font-weight: 700;
             color: #ffffff;
-            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.35);
             cursor: pointer;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            margin-top: 0.5rem;
+            margin-top: 0.75rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
         }
 
-        .btn-console-submit:hover {
-            background-position: right center;
+        .btn-master-signin:hover {
+            background-position: 100% 100%;
             transform: translateY(-2px);
-            box-shadow: 0 14px 32px rgba(0, 240, 255, 0.45);
+            box-shadow: 0 14px 40px rgba(0, 240, 255, 0.5);
+            color: #ffffff;
         }
 
-        .btn-console-submit:active {
+        .btn-master-signin:active {
             transform: translateY(1px);
         }
 
-        .btn-console-submit:disabled {
+        .btn-master-signin:disabled {
             background: #334155 !important;
             color: #94a3b8 !important;
             transform: none !important;
@@ -468,40 +360,41 @@
             cursor: not-allowed;
         }
 
-        /* Demo Fill Chip */
-        .demo-fill-chip {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px dashed rgba(255, 255, 255, 0.15);
-            border-radius: 8px;
-            padding: 8px 12px;
+        /* 1-Click Demo Fill Badge */
+        .demo-fill-pill {
+            margin-top: 1.5rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px dashed rgba(255, 255, 255, 0.14);
+            border-radius: 10px;
+            padding: 8px 14px;
+            font-size: 0.8rem;
+            color: #94a3b8;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-top: 1.25rem;
             cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.78rem;
-            color: #94a3b8;
+            transition: all 0.2s ease;
         }
 
-        .demo-fill-chip:hover {
-            background: rgba(99, 102, 241, 0.12);
-            border-color: #6366f1;
-            color: #c7d2fe;
+        .demo-fill-pill:hover {
+            background: rgba(0, 240, 255, 0.08);
+            border-color: #00f0ff;
+            color: #e2e8f0;
         }
 
-        /* Error Banner */
-        .console-error-box {
+        /* Shake Alert */
+        .shake-alert-box {
             background: rgba(239, 68, 68, 0.15);
             border: 1px solid rgba(239, 68, 68, 0.35);
-            border-radius: 10px;
-            padding: 10px 14px;
-            font-size: 0.85rem;
+            border-radius: 12px;
+            padding: 11px 16px;
+            font-size: 0.86rem;
             color: #fca5a5;
             display: flex;
             align-items: center;
             gap: 10px;
             margin-bottom: 1.25rem;
+            text-align: left;
             animation: shakeAlert 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
         }
 
@@ -512,276 +405,260 @@
             40%, 60% { transform: translateX(4px); }
         }
 
-        /* Responsive Breakpoints */
-        @media (max-width: 1024px) {
-            .auth-split-wrapper {
-                flex-direction: column;
-                overflow-y: auto;
-            }
-            .auth-brand-pane {
-                flex: none;
-                padding: 2.5rem 2rem 2rem 2rem;
-                border-right: none;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            }
-            .feature-pillars {
-                display: none;
-            }
-            .brand-headline {
-                font-size: 2rem;
-            }
-            .brand-subtext {
-                margin-bottom: 1rem;
-            }
-            .auth-form-pane {
-                flex: none;
-                padding: 2.5rem 1.5rem;
-            }
-            body {
-                overflow-y: auto;
-            }
+        /* Footer Telemetry Row */
+        .footer-telemetry {
+            margin-top: 1.75rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: #64748b;
+        }
+
+        .pulse-live-dot {
+            width: 7px;
+            height: 7px;
+            background: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 10px #10b981;
+            animation: pulseGlowDot 2s infinite;
+        }
+
+        @keyframes pulseGlowDot {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
     </style>
 </head>
 <body>
-    <!-- Background Animated Visual Elements -->
-    <div class="ambient-aurora">
-        <div class="aurora-orb aurora-1"></div>
-        <div class="aurora-orb aurora-2"></div>
-        <div class="aurora-orb aurora-3"></div>
-    </div>
-    <div class="cyber-grid-overlay"></div>
+    <!-- Interactive Particle Background -->
+    <canvas id="bgCanvas"></canvas>
+
+    <!-- Ambient Glowing Spotlights -->
+    <div class="ambient-spotlight spotlight-top"></div>
+    <div class="ambient-spotlight spotlight-bottom-left"></div>
+    <div class="ambient-spotlight spotlight-bottom-right"></div>
 
     <!-- Layout Engine Scripts (Loads showBcsLoader / hideBcsLoader & Animations) -->
     <script src="template/layout.js"></script>
 
-    <!-- Main Fullscreen Split Container -->
-    <div class="auth-split-wrapper">
-        
-        <!-- Left Side: Cinematic Brand Deck -->
-        <aside class="auth-brand-pane">
-            <div>
-                <!-- Top Brand Badge -->
-                <div class="brand-hero-badge">
-                    <div class="hero-logo-box">
-                        <img src="assets/icon.png" onerror="this.src='template/bcs-logo.svg'" alt="BCS">
-                    </div>
-                    <div>
-                        <div class="fw-bold text-white small" style="line-height: 1.1;">BCS ENTERPRISE POS</div>
-                        <div style="font-size: 0.68rem; color: #00f0ff; font-family: var(--font-mono);">TERMINAL NODE ACTIVE</div>
-                    </div>
-                </div>
-
-                <!-- Primary Headline -->
-                <h1 class="brand-headline">
-                    Next-Generation <br>
-                    <span class="gradient-text-hero">POS &amp; Inventory Suite</span>
-                </h1>
-                <p class="brand-subtext">
-                    Engineered for high-volume computer, electronics, and multi-category retail businesses. Empowering fast billing, real-time Cloudflare D1 inventory sync, and hardware POS operations.
-                </p>
-
-                <!-- Capability Pillars -->
-                <div class="feature-pillars">
-                    <div class="pillar-card">
-                        <div class="pillar-icon bg-info bg-opacity-15 text-info">
-                            <i class="bi bi-lightning-charge-fill"></i>
-                        </div>
-                        <div class="pillar-title">Sub-Millisecond POS</div>
-                        <p class="pillar-desc">Offline-capable cached local engine with instant barcode scanning.</p>
-                    </div>
-
-                    <div class="pillar-card">
-                        <div class="pillar-icon bg-primary bg-opacity-15 text-primary">
-                            <i class="bi bi-cloud-check-fill"></i>
-                        </div>
-                        <div class="pillar-title">D1 Serverless Cloud</div>
-                        <p class="pillar-desc">Distributed edge SQL database with automatic replication &amp; live backup.</p>
-                    </div>
-
-                    <div class="pillar-card">
-                        <div class="pillar-icon bg-success bg-opacity-15 text-success">
-                            <i class="bi bi-shield-lock-fill"></i>
-                        </div>
-                        <div class="pillar-title">Argon2id Security</div>
-                        <p class="pillar-desc">Military-grade credential hashing with trusted terminal port registration.</p>
-                    </div>
-
-                    <div class="pillar-card">
-                        <div class="pillar-icon bg-purple bg-opacity-15 text-warning">
-                            <i class="bi bi-receipt-cutoff"></i>
-                        </div>
-                        <div class="pillar-title">Thermal Receipt Engine</div>
-                        <p class="pillar-desc">Direct 80mm ESC/POS hardware printer support and instant digital memos.</p>
-                    </div>
+    <!-- Centered Hologram Authentication Card -->
+    <div class="login-hologram-wrapper">
+        <div class="login-hologram-card text-center">
+            
+            <!-- 3D Squircle Logo Emblem -->
+            <div class="emblem-wrapper">
+                <div class="emblem-glow-ring"></div>
+                <div class="emblem-box">
+                    <img src="assets/icon.png" onerror="this.src='template/bcs-logo.svg'" alt="BCS">
                 </div>
             </div>
 
-            <!-- Bottom Telemetry & Realtime Clock -->
-            <div class="brand-telemetry-bar">
-                <div class="status-node">
-                    <span class="live-dot"></span>
-                    <span class="text-light">Cloudflare D1 Cluster:</span>
-                    <span class="text-success fw-bold">ONLINE</span>
+            <!-- Brand Header -->
+            <h1 class="brand-name">BCS Enterprise POS</h1>
+            <p class="brand-subtitle">Baroda Computers And Sales</p>
+
+            <div class="terminal-version-tag">
+                <span class="pulse-live-dot"></span>
+                <span>TERMINAL ACTIVE • v1.9.5</span>
+            </div>
+
+            <!-- Error Shake Alert Container -->
+            <div id="loginErrorBox" class="shake-alert-box d-none">
+                <i class="bi bi-exclamation-octagon-fill text-danger fs-5"></i>
+                <span id="loginErrorMessage">Invalid username or password.</span>
+            </div>
+
+            <!-- Authentication Form -->
+            <form id="hologramLoginForm" autocomplete="on">
+                <!-- Username / Operator -->
+                <div class="input-group-custom">
+                    <label for="inputUsername">Operator Identifier</label>
+                    <div class="custom-input-box">
+                        <i class="bi bi-person-circle input-icon"></i>
+                        <input type="text" id="inputUsername" placeholder="Enter operator username (e.g. admin)" required autocomplete="username" autofocus>
+                    </div>
                 </div>
-                <div class="text-muted d-none d-md-block" id="realtimeLiveClock">
-                    <!-- Updated by JS -->
+
+                <!-- Password with Show/Hide Toggle -->
+                <div class="input-group-custom">
+                    <label for="inputPassword">Terminal Password</label>
+                    <div class="custom-input-box">
+                        <i class="bi bi-shield-lock-fill input-icon"></i>
+                        <input type="password" id="inputPassword" placeholder="Enter password" required autocomplete="current-password" style="padding-right: 48px;">
+                        <button type="button" class="eye-toggle-btn" id="togglePasswordBtn" title="Show/Hide Password">
+                            <i class="bi bi-eye" id="eyeIcon"></i>
+                        </button>
+                    </div>
+                    <div id="capsLockIndicator" class="caps-warning d-none">
+                        <i class="bi bi-capslock-fill"></i> CAPS LOCK IS ON
+                    </div>
                 </div>
+
+                <!-- Security PIN (Optional) -->
+                <div class="input-group-custom">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label for="inputPin" class="mb-0">Security Token / PIN</label>
+                        <span class="text-muted" style="font-size: 0.72rem;">(Optional)</span>
+                    </div>
+                    <div class="custom-input-box">
+                        <i class="bi bi-key-fill input-icon"></i>
+                        <input type="password" id="inputPin" placeholder="Optional security PIN" autocomplete="off">
+                    </div>
+                </div>
+
+                <!-- Sign In Button -->
+                <button type="submit" class="btn-master-signin" id="btnSubmitLogin">
+                    <i class="bi bi-box-arrow-in-right fs-5" id="btnSubmitIcon"></i>
+                    <span id="btnSubmitText">Unlock Terminal</span>
+                </button>
+            </form>
+
+            <!-- 1-Click Demo Credential Auto-Fill -->
+            <div class="demo-fill-pill" id="demoFillPill" title="Click to fill default admin credentials">
+                <span>Default: <strong>admin / 123456</strong></span>
+                <span class="badge bg-secondary bg-opacity-25 text-info">1-Click Auto-Fill</span>
+            </div>
+
+            <!-- Footer Telemetry -->
+            <div class="footer-telemetry">
                 <div class="d-flex align-items-center gap-2">
-                    <i class="bi bi-cpu text-info"></i>
-                    <span>v1.9.5 Enterprise</span>
+                    <span class="pulse-live-dot"></span>
+                    <span>D1 Serverless Online</span>
                 </div>
+                <span>Argon2id TLS 1.3</span>
             </div>
-        </aside>
-
-        <!-- Right Side: Terminal Authentication Console -->
-        <main class="auth-form-pane">
-            <div class="auth-card-console">
-                <div class="console-header-badge">
-                    <span class="console-badge-pill">
-                        <i class="bi bi-shield-shaded me-1"></i> OPERATOR LOGIN
-                    </span>
-                    <span class="small text-muted font-monospace" style="font-size: 0.72rem;">
-                        PORT: AUTO-ASSIGN
-                    </span>
-                </div>
-
-                <h2 class="console-title">Operator Sign In</h2>
-                <p class="console-subtitle">Authenticate to unlock register, purchases &amp; sales records.</p>
-
-                <!-- Error Alert Box -->
-                <div id="consoleErrorBox" class="console-error-box d-none">
-                    <i class="bi bi-exclamation-triangle-fill text-danger fs-5"></i>
-                    <span id="consoleErrorMessage">Invalid authentication credentials.</span>
-                </div>
-
-                <!-- Auth Form -->
-                <form id="terminalAuthForm" autocomplete="on">
-                    <!-- Operator / Username -->
-                    <div class="form-floating-custom">
-                        <label for="terminalUser">Operator Identifier / Username</label>
-                        <div class="input-wrapper">
-                            <i class="bi bi-person-fill input-icon"></i>
-                            <input type="text" class="form-control-console" id="terminalUser" placeholder="Enter username (e.g. admin)" required autocomplete="username" autofocus>
-                        </div>
-                    </div>
-
-                    <!-- Password Input with Toggle -->
-                    <div class="form-floating-custom">
-                        <label for="terminalPass">Security Password</label>
-                        <div class="input-wrapper">
-                            <i class="bi bi-lock-fill input-icon"></i>
-                            <input type="password" class="form-control-console" id="terminalPass" placeholder="Enter password" required autocomplete="current-password" style="padding-right: 44px;">
-                            <button type="button" class="field-action-btn" id="togglePasswordVisibility" title="Toggle visibility">
-                                <i class="bi bi-eye" id="passwordEyeIcon"></i>
-                            </button>
-                        </div>
-                        <div id="capsLockWarning" class="text-warning small mt-1 d-none font-monospace" style="font-size: 0.72rem;">
-                            <i class="bi bi-capslock-fill me-1"></i> CAPS LOCK IS ACTIVE
-                        </div>
-                    </div>
-
-                    <!-- Security PIN (Optional) -->
-                    <div class="form-floating-custom">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <label for="terminalPin" class="mb-0">Security Code / PIN</label>
-                            <span class="small text-muted" style="font-size: 0.72rem;">Optional for Master Key</span>
-                        </div>
-                        <div class="input-wrapper">
-                            <i class="bi bi-shield-check input-icon"></i>
-                            <input type="password" class="form-control-console" id="terminalPin" placeholder="Optional security token" autocomplete="off">
-                        </div>
-                    </div>
-
-                    <!-- Master Submit Button -->
-                    <button type="submit" class="btn-console-submit" id="btnTerminalSubmit">
-                        <i class="bi bi-box-arrow-in-right" id="submitBtnIcon"></i>
-                        <span id="submitBtnText">Sign In to POS Console</span>
-                    </button>
-                </form>
-
-                <!-- Quick One-Click Demo Credential Auto-fill -->
-                <div class="demo-fill-chip" id="demoFillBtn" title="Click to auto-fill default admin credentials">
-                    <div class="d-flex align-items-center gap-2">
-                        <i class="bi bi-key-fill text-info"></i>
-                        <span>Default Terminal: <strong>admin</strong></span>
-                    </div>
-                    <span class="badge bg-secondary bg-opacity-25 text-info">1-Click Fill</span>
-                </div>
-
-                <!-- Footer Status Indicators -->
-                <div class="mt-4 pt-3 border-top border-secondary border-opacity-25 d-flex justify-content-between align-items-center small text-muted font-monospace" style="font-size: 0.72rem;">
-                    <span>TLS 1.3 SECURE</span>
-                    <span>BCS-D1-ROUTED</span>
-                </div>
-            </div>
-        </main>
+        </div>
     </div>
 
-    <!-- Login Authentication & Interactive Terminal Logic -->
+    <!-- Interactive Particle Background Canvas Script -->
+    <script>
+        (function() {
+            const canvas = document.getElementById('bgCanvas');
+            const ctx = canvas.getContext('2d');
+            let width, height;
+            let particles = [];
+
+            function resize() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            const PARTICLE_COUNT = 45;
+            for (let i = 0; i < PARTICLE_COUNT; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 0.4,
+                    vy: (Math.random() - 0.5) * 0.4,
+                    radius: Math.random() * 2 + 0.8,
+                    color: Math.random() > 0.5 ? 'rgba(0, 240, 255, ' : 'rgba(99, 102, 241, ',
+                    alpha: Math.random() * 0.4 + 0.15
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+
+                // Draw connecting micro-lines
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+
+                        if (dist < 130) {
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.strokeStyle = `rgba(0, 240, 255, ${0.12 * (1 - dist / 130)})`;
+                            ctx.lineWidth = 0.7;
+                            ctx.stroke();
+                        }
+                    }
+                }
+
+                // Draw and update particles
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    if (p.x < 0) p.x = width;
+                    if (p.x > width) p.x = 0;
+                    if (p.y < 0) p.y = height;
+                    if (p.y > height) p.y = 0;
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color + p.alpha + ')';
+                    ctx.fill();
+                });
+
+                requestAnimationFrame(animate);
+            }
+            animate();
+        })();
+    </script>
+
+    <!-- Terminal Authentication Logic -->
     <script type="module">
         import { loginUser } from "./script/auth.js";
 
-        // Live Telemetry Clock
-        function updateLiveClock() {
-            const clockEl = document.getElementById("realtimeLiveClock");
-            if (clockEl) {
-                const now = new Date();
-                const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
-                const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-                clockEl.textContent = `${dateStr} • ${timeStr} LOCAL`;
-            }
-        }
-        setInterval(updateLiveClock, 1000);
-        updateLiveClock();
+        // Password Show/Hide Toggle
+        const passwordInput = document.getElementById("inputPassword");
+        const toggleBtn = document.getElementById("togglePasswordBtn");
+        const eyeIcon = document.getElementById("eyeIcon");
 
-        // Caps Lock Warning Detection
-        const passInput = document.getElementById("terminalPass");
-        const capsWarning = document.getElementById("capsLockWarning");
-        passInput.addEventListener("keyup", (e) => {
-            if (e.getModifierState && e.getModifierState("CapsLock")) {
-                capsWarning.classList.remove("d-none");
-            } else {
-                capsWarning.classList.add("d-none");
-            }
-        });
-
-        // Toggle Password Visibility
-        const toggleBtn = document.getElementById("togglePasswordVisibility");
-        const eyeIcon = document.getElementById("passwordEyeIcon");
         toggleBtn.addEventListener("click", () => {
-            const isPassword = passInput.getAttribute("type") === "password";
-            passInput.setAttribute("type", isPassword ? "text" : "password");
+            const isPassword = passwordInput.getAttribute("type") === "password";
+            passwordInput.setAttribute("type", isPassword ? "text" : "password");
             eyeIcon.className = isPassword ? "bi bi-eye-slash text-info" : "bi bi-eye";
         });
 
-        // Demo Credential Auto-fill
-        document.getElementById("demoFillBtn").addEventListener("click", () => {
-            document.getElementById("terminalUser").value = "admin";
-            document.getElementById("terminalPass").value = "123456";
-            document.getElementById("terminalPass").focus();
+        // Caps Lock Indicator
+        const capsLockBadge = document.getElementById("capsLockIndicator");
+        passwordInput.addEventListener("keyup", (e) => {
+            if (e.getModifierState && e.getModifierState("CapsLock")) {
+                capsLockBadge.classList.remove("d-none");
+            } else {
+                capsLockBadge.classList.add("d-none");
+            }
         });
 
-        // Terminal Authentication Handler
-        document.getElementById("terminalAuthForm").addEventListener("submit", async (e) => {
+        // 1-Click Auto Fill
+        document.getElementById("demoFillPill").addEventListener("click", () => {
+            document.getElementById("inputUsername").value = "admin";
+            document.getElementById("inputPassword").value = "123456";
+            document.getElementById("inputPassword").focus();
+        });
+
+        // Form Submit Handler
+        document.getElementById("hologramLoginForm").addEventListener("submit", async (e) => {
             e.preventDefault();
 
-            const user = document.getElementById("terminalUser").value.trim();
-            const pass = document.getElementById("terminalPass").value;
-            const pin = document.getElementById("terminalPin").value.trim();
+            const user = document.getElementById("inputUsername").value.trim();
+            const pass = document.getElementById("inputPassword").value;
+            const pin = document.getElementById("inputPin").value.trim();
 
-            const btn = document.getElementById("btnTerminalSubmit");
-            const btnText = document.getElementById("submitBtnText");
-            const btnIcon = document.getElementById("submitBtnIcon");
-            const errBox = document.getElementById("consoleErrorBox");
-            const errMsg = document.getElementById("consoleErrorMessage");
+            const btn = document.getElementById("btnSubmitLogin");
+            const btnText = document.getElementById("btnSubmitText");
+            const btnIcon = document.getElementById("btnSubmitIcon");
+            const errorBox = document.getElementById("loginErrorBox");
+            const errorMsg = document.getElementById("loginErrorMessage");
 
             btn.disabled = true;
             btnText.textContent = "Verifying Handshake...";
             btnIcon.className = "spinner-border spinner-border-sm";
-            errBox.classList.add("d-none");
+            errorBox.classList.add("d-none");
 
-            // Trigger BCS Official Animated Neon Laser Loader
+            // Trigger Custom BCS Animated Neon Laser Loader
             if (window.showBcsLoader) {
                 window.showBcsLoader("Authenticating Credentials with Cloudflare D1...");
             }
@@ -791,7 +668,7 @@
                 localStorage.setItem("loggedInUserName", user);
 
                 if (window.showBcsLoader) {
-                    window.showBcsLoader("Handshake Verified! Initializing POS Dashboard...");
+                    window.showBcsLoader("Handshake Verified! Launching POS Dashboard...");
                 }
 
                 setTimeout(() => {
@@ -819,11 +696,11 @@
                     if (window.hideBcsLoader) {
                         window.hideBcsLoader();
                     }
-                    errMsg.textContent = error.message || "Invalid operator username or password.";
-                    errBox.classList.remove("d-none");
+                    errorMsg.textContent = error.message || "Invalid operator username or password.";
+                    errorBox.classList.remove("d-none");
                     btn.disabled = false;
-                    btnText.textContent = "Sign In to POS Console";
-                    btnIcon.className = "bi bi-box-arrow-in-right";
+                    btnText.textContent = "Unlock Terminal";
+                    btnIcon.className = "bi bi-box-arrow-in-right fs-5";
                 }
             }
         });
