@@ -3,7 +3,7 @@ window._renderSidebarImpl = function(activeMenu, activeSubMenu = null) {
     <aside class="sidebar">
         <div class="sidebar-header">
             <h5 class="mb-0 fw-bold text-white d-flex align-items-center gap-2" style="font-family: var(--bs-body-font-family); letter-spacing: 1px;">
-                <img src="template/bcs-logo.svg" alt="BCS" style="width: 26px; height: 26px; object-fit: contain; filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.5));"> BCS POS
+                <img src="template/bcs-logo.svg" alt="BCS" style="width: 38px; height: 38px; object-fit: contain; filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.55));"> BCS POS
             </h5>
         </div>
         <div class="sidebar-user">
