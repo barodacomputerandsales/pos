@@ -684,11 +684,11 @@ body::after {
     100% { transform: rotate(360deg); }
 }
 
-/* Official BCS Vector Animated Logo Loader Container */
+/* Official BCS Pure Neon Laser Loader Component */
 .bcs-logo-container {
     position: relative;
-    width: 88px;
-    height: 88px;
+    width: 92px;
+    height: 92px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -698,78 +698,120 @@ body::after {
     width: 100%;
     height: 100%;
     overflow: visible;
-    filter: drop-shadow(0 0 18px rgba(0, 240, 255, 0.4));
+    filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.6)) drop-shadow(0 0 25px rgba(0, 240, 255, 0.35));
 }
 
-/* Dynamic Laser Strokes */
-.bcs-logo-container .bcs-stroke-outer {
-    stroke-dasharray: 10060;
-    stroke-dashoffset: 10060;
-    animation: bcsLaserDrawOuter 3.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-}
-
-.bcs-logo-container .bcs-stroke-top {
-    stroke-dasharray: 1180;
-    stroke-dashoffset: 1180;
-    animation: bcsLaserDrawTop 3.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-}
-
-.bcs-logo-container .bcs-stroke-bottom {
-    stroke-dasharray: 1160;
-    stroke-dashoffset: 1160;
-    animation: bcsLaserDrawBottom 3.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-}
-
-/* Solid logo fill is 100% INVISIBLE while laser is tracing (0% to 55%) */
+/* The main solid logo is COMPLETELY HIDDEN as requested */
 .bcs-logo-container .bcs-fill-body {
-    opacity: 0;
-    animation: bcsLaserFillFade 3.6s ease-in-out infinite;
-}
-
-/* Pure Laser mode (optional class: .laser-only to permanently hide fill) */
-.bcs-logo-container.laser-only .bcs-fill-body {
     display: none !important;
 }
 
-@keyframes bcsLaserDrawOuter {
-    0% { stroke-dashoffset: 10060; opacity: 1; }
-    55% { stroke-dashoffset: 0; opacity: 1; }
-    75% { stroke-dashoffset: 0; opacity: 1; }
-    90% { stroke-dashoffset: 0; opacity: 0; }
-    100% { stroke-dashoffset: 10060; opacity: 0; }
+/* Subtle Wireframe Guide */
+.bcs-stroke-guide {
+    stroke: rgba(0, 240, 255, 0.14);
+    stroke-width: 2px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
-@keyframes bcsLaserDrawTop {
-    0%, 15% { stroke-dashoffset: 1180; opacity: 0; }
-    20% { opacity: 1; }
-    60% { stroke-dashoffset: 0; opacity: 1; }
-    75% { stroke-dashoffset: 0; opacity: 1; }
-    90% { stroke-dashoffset: 0; opacity: 0; }
-    100% { stroke-dashoffset: 1180; opacity: 0; }
+/* Pure Neon Laser Strokes */
+.bcs-logo-container .bcs-stroke-outer {
+    stroke: #00f0ff;
+    stroke-width: 5px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 10060;
+    stroke-dashoffset: 10060;
+    animation: bcsNeonLaserDrawOuter 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
-@keyframes bcsLaserDrawBottom {
-    0%, 25% { stroke-dashoffset: 1160; opacity: 0; }
-    30% { opacity: 1; }
-    70% { stroke-dashoffset: 0; opacity: 1; }
-    75% { stroke-dashoffset: 0; opacity: 1; }
-    90% { stroke-dashoffset: 0; opacity: 0; }
-    100% { stroke-dashoffset: 1160; opacity: 0; }
+.bcs-logo-container .bcs-stroke-top {
+    stroke: #00f0ff;
+    stroke-width: 4px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1180;
+    stroke-dashoffset: 1180;
+    animation: bcsNeonLaserDrawTop 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
-/* Fill ONLY reveals AFTER laser completes tracing (at 60%), holds, then fades out before restart */
-@keyframes bcsLaserFillFade {
-    0%, 55% { 
-        opacity: 0; 
-        filter: drop-shadow(0 0 0px transparent); 
+.bcs-logo-container .bcs-stroke-bottom {
+    stroke: #00f0ff;
+    stroke-width: 4px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1160;
+    stroke-dashoffset: 1160;
+    animation: bcsNeonLaserDrawBottom 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Seamless Continuous Draw & Erase Laser Loop */
+@keyframes bcsNeonLaserDrawOuter {
+    0% {
+        stroke-dashoffset: 10060;
+        opacity: 0.3;
     }
-    68%, 85% { 
-        opacity: 1; 
-        filter: drop-shadow(0 0 28px rgba(0, 240, 255, 0.7)); 
+    45% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+        filter: drop-shadow(0 0 8px #ffffff) drop-shadow(0 0 20px #00f0ff);
     }
-    96%, 100% { 
-        opacity: 0; 
-        filter: drop-shadow(0 0 0px transparent); 
+    62% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+        filter: drop-shadow(0 0 10px #ffffff) drop-shadow(0 0 25px #00f0ff);
+    }
+    95% {
+        stroke-dashoffset: -10060;
+        opacity: 0.3;
+    }
+    100% {
+        stroke-dashoffset: -10060;
+        opacity: 0;
+    }
+}
+
+@keyframes bcsNeonLaserDrawTop {
+    0%, 15% {
+        stroke-dashoffset: 1180;
+        opacity: 0;
+    }
+    20% {
+        opacity: 1;
+    }
+    50%, 65% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+    }
+    95% {
+        stroke-dashoffset: -1180;
+        opacity: 0.3;
+    }
+    100% {
+        stroke-dashoffset: -1180;
+        opacity: 0;
+    }
+}
+
+@keyframes bcsNeonLaserDrawBottom {
+    0%, 25% {
+        stroke-dashoffset: 1160;
+        opacity: 0;
+    }
+    30% {
+        opacity: 1;
+    }
+    55%, 70% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+    }
+    95% {
+        stroke-dashoffset: -1160;
+        opacity: 0.3;
+    }
+    100% {
+        stroke-dashoffset: -1160;
+        opacity: 0;
     }
 }
 
