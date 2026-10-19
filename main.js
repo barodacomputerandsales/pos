@@ -51,13 +51,18 @@ app.on('window-all-closed', function () {
 // --- AUTO UPDATER CONFIGURATION & EVENTS ---
 
 autoUpdater.autoDownload = true;
-autoUpdater.autoInstallOnAppQuit = true;
+autoUpdater.autoInstallOnAppQuit = false; // Never auto-install on quit or interrupt shop business hours!
 
 // Direct runtime autoUpdater to fetch updates through the serverless backend relay
 autoUpdater.setFeedURL({
   provider: 'generic',
   url: 'https://backend.bcs.bcsdeveloper.com/api/updater'
 });
+
+// Quiet background update check every 30 minutes
+setInterval(() => {
+  autoUpdater.checkForUpdates().catch(() => {});
+}, 30 * 60 * 1000);
 
 // 1. Checking for update
 autoUpdater.on('checking-for-update', () => {

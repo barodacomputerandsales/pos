@@ -59,3 +59,36 @@
 .topbar .logout-btn:active {
     transform: translateY(1px) scale(0.96);
 }
+
+/* Background Updater Floating Notification Banner */
+.bcs-update-float-banner {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: rgba(18, 22, 36, 0.96);
+    border: 1px solid rgba(16, 185, 129, 0.45);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 30px rgba(16, 185, 129, 0.22);
+    border-radius: 16px;
+    padding: 16px 18px;
+    max-width: 420px;
+    z-index: 10050;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    animation: slideInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideInUp {
+    from { transform: translateY(40px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pulseGlow {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 12px 3px rgba(16, 185, 129, 0.4);
+        transform: scale(1.02);
+    }
+}
