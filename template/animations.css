@@ -698,9 +698,10 @@ body::after {
     width: 100%;
     height: 100%;
     overflow: visible;
-    filter: drop-shadow(0 0 20px rgba(0, 240, 255, 0.4));
+    filter: drop-shadow(0 0 18px rgba(0, 240, 255, 0.4));
 }
 
+/* Dynamic Laser Strokes */
 .bcs-logo-container .bcs-stroke-outer {
     stroke-dasharray: 10060;
     stroke-dashoffset: 10060;
@@ -719,19 +720,22 @@ body::after {
     animation: bcsLaserDrawBottom 3.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
+/* Solid logo fill is 100% INVISIBLE while laser is tracing (0% to 55%) */
 .bcs-logo-container .bcs-fill-body {
+    opacity: 0;
     animation: bcsLaserFillFade 3.6s ease-in-out infinite;
 }
 
-.bcs-logo-container .bcs-bloom-body {
-    animation: bcsBloomPulse 3.6s ease-in-out infinite alternate;
+/* Pure Laser mode (optional class: .laser-only to permanently hide fill) */
+.bcs-logo-container.laser-only .bcs-fill-body {
+    display: none !important;
 }
 
 @keyframes bcsLaserDrawOuter {
     0% { stroke-dashoffset: 10060; opacity: 1; }
     55% { stroke-dashoffset: 0; opacity: 1; }
-    80% { stroke-dashoffset: 0; opacity: 0.85; }
-    92% { stroke-dashoffset: 0; opacity: 0; }
+    75% { stroke-dashoffset: 0; opacity: 1; }
+    90% { stroke-dashoffset: 0; opacity: 0; }
     100% { stroke-dashoffset: 10060; opacity: 0; }
 }
 
@@ -739,8 +743,8 @@ body::after {
     0%, 15% { stroke-dashoffset: 1180; opacity: 0; }
     20% { opacity: 1; }
     60% { stroke-dashoffset: 0; opacity: 1; }
-    80% { stroke-dashoffset: 0; opacity: 0.85; }
-    92% { stroke-dashoffset: 0; opacity: 0; }
+    75% { stroke-dashoffset: 0; opacity: 1; }
+    90% { stroke-dashoffset: 0; opacity: 0; }
     100% { stroke-dashoffset: 1180; opacity: 0; }
 }
 
@@ -748,21 +752,25 @@ body::after {
     0%, 25% { stroke-dashoffset: 1160; opacity: 0; }
     30% { opacity: 1; }
     70% { stroke-dashoffset: 0; opacity: 1; }
-    80% { stroke-dashoffset: 0; opacity: 0.85; }
-    92% { stroke-dashoffset: 0; opacity: 0; }
+    75% { stroke-dashoffset: 0; opacity: 1; }
+    90% { stroke-dashoffset: 0; opacity: 0; }
     100% { stroke-dashoffset: 1160; opacity: 0; }
 }
 
+/* Fill ONLY reveals AFTER laser completes tracing (at 60%), holds, then fades out before restart */
 @keyframes bcsLaserFillFade {
-    0%, 45% { opacity: 0.2; filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.25)); }
-    65%, 85% { opacity: 1; filter: drop-shadow(0 0 32px rgba(0, 240, 255, 0.7)); }
-    95%, 100% { opacity: 0.2; filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.25)); }
-}
-
-@keyframes bcsBloomPulse {
-    0%, 45% { opacity: 0.2; }
-    65%, 85% { opacity: 0.65; }
-    95%, 100% { opacity: 0.2; }
+    0%, 55% { 
+        opacity: 0; 
+        filter: drop-shadow(0 0 0px transparent); 
+    }
+    68%, 85% { 
+        opacity: 1; 
+        filter: drop-shadow(0 0 28px rgba(0, 240, 255, 0.7)); 
+    }
+    96%, 100% { 
+        opacity: 0; 
+        filter: drop-shadow(0 0 0px transparent); 
+    }
 }
 
 /* Floating & Glowing Logo Mark Fallback */
