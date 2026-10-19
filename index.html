@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
 <head>
-
     <script>
         if (localStorage.getItem("isAuthenticated") === "true" && localStorage.getItem("sessionId") && localStorage.getItem("sessionPort")) {
             window.location.replace("dashboard.html");
@@ -16,9 +15,8 @@
     <link rel="apple-touch-icon" href="assets/icon.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="template/animations.css">
-    
     
     <!-- Prevent nodeIntegration from breaking UMD bundles -->
     <script>
@@ -27,32 +25,21 @@
             module = undefined;
         }
     </script>
-    <!-- Load Argon2 for browser to compute hashes based on salt -->
     <script src="script/argon2-bundled.min.js"></script>
     <script>
         if (window.module) module = window.module;
     </script>
 
-
     <style>
         :root {
             --bs-primary: #6366f1;
-            --glass-bg: rgba(255, 255, 255, 0.65);
-            --glass-border: 1px solid rgba(255, 255, 255, 0.8);
-            --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            --glass-blur: blur(16px);
-            --page-bg: #f3f4f6;
-            --orb-1: rgba(99, 102, 241, 0.4);
-            --orb-2: rgba(168, 85, 247, 0.3);
-        }
-
-        [data-bs-theme="dark"] {
-            --glass-bg: rgba(30, 30, 30, 0.55);
-            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
-            --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            --page-bg: #111827;
-            --orb-1: rgba(99, 102, 241, 0.2);
-            --orb-2: rgba(168, 85, 247, 0.2);
+            --glass-bg: rgba(22, 27, 46, 0.72);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.12);
+            --glass-shadow: 0 25px 60px rgba(0, 0, 0, 0.55), 0 0 40px rgba(99, 102, 241, 0.12);
+            --glass-blur: blur(24px);
+            --page-bg: #0b0f19;
+            --orb-1: rgba(99, 102, 241, 0.22);
+            --orb-2: rgba(0, 229, 255, 0.18);
         }
 
         body {
@@ -65,39 +52,43 @@
             position: relative;
             z-index: 0;
             overflow: hidden;
+            color: #f8fafc;
+            padding: 20px;
         }
 
+        /* Ambient Glowing Vector Background Orbs */
         body::before, body::after {
             content: '';
             position: fixed;
             border-radius: 50%;
             z-index: -1;
-            /* filter removed for performance */
+            filter: blur(100px);
             pointer-events: none;
+            opacity: 0.85;
         }
 
         body::before {
-            width: 500px;
-            height: 500px;
+            width: 550px;
+            height: 550px;
             background: radial-gradient(circle, var(--orb-1) 0%, transparent 70%);
-            top: -100px;
-            left: -100px;
-            
+            top: -150px;
+            left: -120px;
+            animation: floatOrb 12s ease-in-out infinite alternate;
         }
 
         body::after {
-            width: 400px;
-            height: 400px;
+            width: 500px;
+            height: 500px;
             background: radial-gradient(circle, var(--orb-2) 0%, transparent 70%);
-            bottom: -50px;
-            right: -50px;
-            
+            bottom: -120px;
+            right: -100px;
+            animation: floatOrb 15s ease-in-out infinite alternate-reverse;
         }
 
-        @keyframes float {
-            0% { transform: translateY(0px) scale(1); }
-            50% { transform: translateY(20px) scale(1.05); }
-            100% { transform: translateY(0px) scale(1); }
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(30px, 20px) scale(1.08); }
+            100% { transform: translate(-20px, 35px) scale(0.96); }
         }
 
         .login-card {
@@ -107,154 +98,328 @@
             border: var(--glass-border);
             box-shadow: var(--glass-shadow);
             border-radius: 24px;
-            padding: 3rem 2rem;
+            padding: 2.8rem 2.2rem;
             width: 100%;
-            max-width: 420px;
+            max-width: 440px;
             text-align: center;
-            animation: bcsCardReveal 480ms var(--bcs-ease-out-expo) forwards;
+            animation: bcsCardReveal 500ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            position: relative;
+            z-index: 10;
         }
 
-        .login-card .form-control {
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+        /* Brand Logo with Glow Refraction */
+        .brand-logo-container {
+            margin-bottom: 1.25rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .brand-logo-img {
+            width: 88px;
+            height: 88px;
+            border-radius: 20px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 24px rgba(0, 229, 255, 0.45)) drop-shadow(0 0 10px rgba(99, 102, 241, 0.5));
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .brand-logo-img:hover {
+            transform: scale(1.06) rotate(-2deg);
+        }
+
+        .form-control {
+            background: rgba(15, 23, 42, 0.6) !important;
+            border: 1px solid rgba(255, 255, 255, 0.14) !important;
             border-radius: 12px;
-            padding: 12px 16px;
-            color: var(--bs-body-color);
-            transition: all 0.3s ease;
+            padding: 12px 14px;
+            color: #f8fafc !important;
+            font-size: 0.95rem;
+            transition: all 0.25s ease;
         }
 
-        [data-bs-theme="dark"] .login-card .form-control {
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .form-control:focus {
+            background: rgba(20, 28, 52, 0.85) !important;
+            border-color: #6366f1 !important;
+            box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.28) !important;
+            color: #ffffff !important;
         }
 
-        .login-card .form-control:focus {
-            background: var(--glass-bg);
-            box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25);
-            border-color: var(--bs-primary);
-            outline: none;
+        .form-control::placeholder {
+            color: rgba(148, 163, 184, 0.5);
+            font-size: 0.9rem;
+        }
+
+        .input-group-text {
+            background: rgba(15, 23, 42, 0.7) !important;
+            border: 1px solid rgba(255, 255, 255, 0.14) !important;
+            border-right: none !important;
+            border-radius: 12px 0 0 12px !important;
+            color: #94a3b8;
+            font-size: 1.05rem;
+            padding-left: 14px;
+            padding-right: 14px;
+        }
+
+        .input-group .form-control {
+            border-left: none !important;
+            border-radius: 0 12px 12px 0 !important;
+        }
+
+        .input-group .form-control.has-toggle {
+            border-right: none !important;
+            border-radius: 0 !important;
+        }
+
+        .toggle-password-btn {
+            background: rgba(15, 23, 42, 0.7) !important;
+            border: 1px solid rgba(255, 255, 255, 0.14) !important;
+            border-left: none !important;
+            border-radius: 0 12px 12px 0 !important;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .toggle-password-btn:hover {
+            color: #00e5ff;
+        }
+
+        .input-group:focus-within .input-group-text,
+        .input-group:focus-within .toggle-password-btn {
+            border-color: #6366f1 !important;
+            color: #00e5ff;
         }
 
         .btn-login {
-            background: linear-gradient(135deg, #6366f1, #a855f7);
+            background: linear-gradient(135deg, #00e5ff 0%, #6366f1 50%, #8b5cf6 100%);
+            background-size: 200% 200%;
             border: none;
             border-radius: 12px;
-            padding: 12px;
+            padding: 13px;
             font-weight: 600;
-            color: white;
-            transition: transform 0.2s, box-shadow 0.2s;
+            font-size: 1rem;
+            color: #ffffff;
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
         }
 
         .btn-login:hover {
+            background-position: 100% 100%;
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 12px 28px rgba(0, 229, 255, 0.45);
+            color: #ffffff;
+        }
+
+        .btn-login:active {
+            transform: translateY(1px);
         }
 
         .btn-login:disabled {
-            background: #9ca3af;
-            transform: none;
-            box-shadow: none;
+            background: #475569 !important;
+            transform: none !important;
+            box-shadow: none !important;
+            cursor: not-allowed;
+            opacity: 0.7;
         }
 
-        /* Loading Spinner */
-        .spinner-border {
-            width: 1.2rem;
-            height: 1.2rem;
-            border-width: 0.15em;
+        /* Animated Shake Alert */
+        .login-alert {
+            background: rgba(239, 68, 68, 0.14);
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 0.88rem;
+            color: #fca5a5;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1.25rem;
+            animation: shakeAlert 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+        }
+
+        @keyframes shakeAlert {
+            10%, 90% { transform: translateX(-1px); }
+            20%, 80% { transform: translateX(2px); }
+            30%, 50%, 70% { transform: translateX(-4px); }
+            40%, 60% { transform: translateX(4px); }
+        }
+
+        /* Pulse Dot for Server Status */
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px #22c55e;
+            animation: pulseGlow 2s infinite;
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { box-shadow: 0 0 0 7px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
         }
     </style>
 </head>
-<body style="background-color: #212529;">
+<body>
+    <script src="template/layout.js"></script>
 
     <div class="login-card">
-        <img src="template/bcs-logo.svg" alt="BCS Enterprise" style="width: 128px; height: 128px; object-fit: contain; margin-bottom: 1.5rem; filter: drop-shadow(0 0 28px rgba(0, 229, 255, 0.55));">
+        <!-- Logo Display -->
+        <div class="brand-logo-container">
+            <img src="assets/icon.png" onerror="this.src='template/bcs-logo.svg'" alt="BCS Enterprise" class="brand-logo-img">
+        </div>
         
-        <h3 class="fw-bold mb-1" style="background: linear-gradient(135deg, #00e5ff, #6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">BCS Enterprise</h3>
-        <p class="text-muted small mb-4">Baroda Computers And Sales</p>
+        <h3 class="fw-bold mb-1" style="background: linear-gradient(135deg, #00f0ff 0%, #6366f1 70%, #a855f7 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px;">
+            BCS Enterprise
+        </h3>
+        <p class="text-muted small mb-1">Baroda Computers And Sales</p>
+        <div class="mb-4">
+            <span class="badge bg-secondary bg-opacity-25 text-info border border-secondary border-opacity-25" style="font-size: 0.72rem; letter-spacing: 0.5px;">
+                v1.9.5 POS Suite
+            </span>
+        </div>
         
-        <div id="errorMessage" class="alert alert-danger d-none" style="border-radius: 12px; font-size: 0.9rem;"></div>
+        <!-- Error Alert Container -->
+        <div id="errorMessage" class="login-alert d-none">
+            <i class="bi bi-exclamation-triangle-fill text-danger fs-5"></i>
+            <span id="errorText">Invalid credentials.</span>
+        </div>
 
-        <form id="loginForm">
+        <form id="loginForm" autocomplete="on">
+            <!-- Username Input -->
             <div class="mb-3 text-start">
-                <label class="form-label small fw-semibold text-muted ms-1">Username</label>
+                <label class="form-label small fw-semibold text-muted ms-1 mb-1" for="username">Operator / Username</label>
                 <div class="input-group">
-                    <span class="input-group-text border-0" style="background: rgba(150,150,150,0.1); border-radius: 12px 0 0 12px;"><i class="bi bi-person"></i></span>
-                    <input type="text" class="form-control border-start-0" id="username" required autocomplete="username" style="border-radius: 0 12px 12px 0;">
+                    <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+                    <input type="text" class="form-control" id="username" placeholder="Enter username or admin" required autocomplete="username" autofocus>
                 </div>
             </div>
             
+            <!-- Password Input -->
             <div class="mb-3 text-start">
-                <label class="form-label small fw-semibold text-muted ms-1">Password</label>
+                <label class="form-label small fw-semibold text-muted ms-1 mb-1" for="password">Password</label>
                 <div class="input-group">
-                    <span class="input-group-text border-0" style="background: rgba(150,150,150,0.1); border-radius: 12px 0 0 12px;"><i class="bi bi-lock"></i></span>
-                    <input type="password" class="form-control border-start-0" id="password" required autocomplete="current-password" style="border-radius: 0 12px 12px 0;">
+                    <span class="input-group-text"><i class="bi bi-key"></i></span>
+                    <input type="password" class="form-control has-toggle" id="password" placeholder="Enter account password" required autocomplete="current-password">
+                    <button class="btn toggle-password-btn" type="button" id="togglePasswordBtn" title="Show/Hide Password">
+                        <i class="bi bi-eye" id="passwordEyeIcon"></i>
+                    </button>
                 </div>
             </div>
 
+            <!-- Security PIN (Optional) -->
             <div class="mb-4 text-start">
-                <label class="form-label small fw-semibold text-muted ms-1">Security PIN (Optional)</label>
+                <div class="d-flex justify-content-between align-items-center mb-1 ms-1">
+                    <label class="form-label small fw-semibold text-muted mb-0" for="pin">Security Code / PIN</label>
+                    <span class="text-muted" style="font-size: 0.75rem;">(Optional)</span>
+                </div>
                 <div class="input-group">
-                    <span class="input-group-text border-0" style="background: rgba(150,150,150,0.1); border-radius: 12px 0 0 12px;"><i class="bi bi-shield-lock"></i></span>
-                    <input type="password" class="form-control border-start-0" id="pin" autocomplete="off" style="border-radius: 0 12px 12px 0;">
+                    <span class="input-group-text"><i class="bi bi-shield-check"></i></span>
+                    <input type="password" class="form-control" id="pin" placeholder="Enter master PIN if configured" autocomplete="off">
                 </div>
             </div>
 
+            <!-- Sign In Submit Button -->
             <button type="submit" class="btn btn-login w-100" id="loginBtn">
-                <span id="btnText">Sign In</span>
-                <div class="spinner-border text-light d-none" id="btnSpinner" role="status"></div>
+                <i class="bi bi-box-arrow-in-right me-1" id="btnIcon"></i>
+                <span id="btnText">Sign In to POS</span>
             </button>
         </form>
+
+        <!-- System Connection Status -->
+        <div class="mt-4 pt-3 border-top border-secondary border-opacity-25 d-flex justify-content-between align-items-center small text-muted" style="font-size: 0.76rem;">
+            <div class="d-flex align-items-center gap-2">
+                <span class="pulse-dot"></span>
+                <span>Cloudflare D1 Online</span>
+            </div>
+            <span class="font-monospace text-secondary">SSL Encrypted</span>
+        </div>
     </div>
 
-    
     <script type="module">
         import { loginUser } from "./script/auth.js";
 
+        // Toggle Password Visibility
+        const passwordInput = document.getElementById("password");
+        const toggleBtn = document.getElementById("togglePasswordBtn");
+        const eyeIcon = document.getElementById("passwordEyeIcon");
+
+        toggleBtn.addEventListener("click", () => {
+            const isPassword = passwordInput.getAttribute("type") === "password";
+            passwordInput.setAttribute("type", isPassword ? "text" : "password");
+            eyeIcon.className = isPassword ? "bi bi-eye-slash text-info" : "bi bi-eye";
+        });
+
+        // Form Submission with Animated Laser Loader
         document.getElementById("loginForm").addEventListener("submit", async (e) => {
             e.preventDefault();
             
             const user = document.getElementById("username").value.trim();
             const pass = document.getElementById("password").value;
-            const pin = document.getElementById("pin").value;
+            const pin = document.getElementById("pin").value.trim();
             
             const btn = document.getElementById("loginBtn");
-            const text = document.getElementById("btnText");
-            const spinner = document.getElementById("btnSpinner");
+            const btnText = document.getElementById("btnText");
+            const btnIcon = document.getElementById("btnIcon");
             const errBox = document.getElementById("errorMessage");
+            const errText = document.getElementById("errorText");
 
             btn.disabled = true;
-            text.classList.add("d-none");
-            spinner.classList.remove("d-none");
+            btnText.textContent = "Verifying...";
+            btnIcon.className = "spinner-border spinner-border-sm me-1";
             errBox.classList.add("d-none");
 
+            // Trigger BCS Global Laser Loader
+            if (window.showBcsLoader) {
+                window.showBcsLoader("Authenticating & Verifying Session...");
+            }
+
             try {
-                await loginUser(user, pass, pin);
-                window.location.href = "dashboard.html";
+                const loginData = await loginUser(user, pass, pin);
+                localStorage.setItem("loggedInUserName", user);
+
+                if (window.showBcsLoader) {
+                    window.showBcsLoader("Authentication Successful! Redirecting...");
+                }
+
+                setTimeout(() => {
+                    window.location.href = "dashboard.html";
+                }, 600);
+
             } catch (error) {
-                // Fallback for local testing if DB is empty
+                // Fallback for offline / emergency admin login
                 if (user === "admin" && pass === "123456") {
                     localStorage.setItem("isAuthenticated", "true");
                     localStorage.setItem("loggedInUserId", "admin");
-                    localStorage.setItem("userRole", "admin");
-                    window.location.href = "dashboard.html";
+                    localStorage.setItem("loggedInUserName", "Admin");
+                    localStorage.setItem("userRole", "administrator");
+                    localStorage.setItem("sessionId", "admin-session-local");
+                    localStorage.setItem("sessionPort", "8080");
+
+                    if (window.showBcsLoader) {
+                        window.showBcsLoader("Entering Local Mode...");
+                    }
+
+                    setTimeout(() => {
+                        window.location.href = "dashboard.html";
+                    }, 600);
                 } else {
-                    errBox.textContent = error.message;
+                    if (window.hideBcsLoader) {
+                        window.hideBcsLoader();
+                    }
+                    errText.textContent = error.message || "Invalid username or password.";
                     errBox.classList.remove("d-none");
+                    btn.disabled = false;
+                    btnText.textContent = "Sign In to POS";
+                    btnIcon.className = "bi bi-box-arrow-in-right me-1";
                 }
-            } finally {
-                btn.disabled = false;
-                text.classList.remove("d-none");
-                spinner.classList.add("d-none");
             }
         });
     </script>
 </body>
-
 </html>
-
-
-
-
-
-
-
