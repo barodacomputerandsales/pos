@@ -5,7 +5,7 @@
 **1. Desktop POS App (`app/`)**
 - **Type**: Desktop POS application (Windows).
 - **Core Technology**: Electron 31, HTML5, CSS3, Vanilla JavaScript, NSIS.
-- **Views**: `app/index.html` (Login/Entry), `app/dashboard.html`, `app/pos.html`, `app/all-product.html`, `app/add-product.html`, `app/add-production.html`, `app/production-history.html`, `app/add-production-product.html`, `app/settings.html`.
+- **Views**: `app/index.html` (Login/Entry), `app/dashboard.html`, `app/all-product.html`, `app/add-product.html`, `app/add-purchase.html`, `app/purchase-history.html`, `app/add-production.html`, `app/production-history.html`, `app/add-production-product.html`, `app/settings.html`.
 - **Scripts**: 
   - `app/main.js`: Main Electron process and auto-update IPC coordinator.
   - `app/script/api.js`: Handles API calls to backend with IndexedDB caching and optimistic updates.

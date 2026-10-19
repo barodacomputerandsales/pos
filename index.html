@@ -1,26 +1,28 @@
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
 <head>
+    <!-- Authentication Session Pre-Check: Redirect if already logged in -->
     <script>
-        if (localStorage.getItem("isAuthenticated") === "true" && localStorage.getItem("sessionId") && localStorage.getItem("sessionPort")) {
-            window.location.replace("dashboard.html");
+        if (localStorage.getItem('isAuthenticated') === 'true' && localStorage.getItem('sessionId') && localStorage.getItem('sessionPort')) {
+            window.location.replace('dashboard.html');
         }
     </script>
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign In | Baroda Computer &amp; Sales</title>
+    <title>Baroda Computer &amp; Sales | Shop Dashboard Sign In</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
     <link rel="apple-touch-icon" href="assets/icon.png">
+    
+    <!-- Bootstrap 5 CSS & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="template/animations.css">
-
-    <!-- Prevent nodeIntegration from breaking UMD bundles -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Modern Web Polyfill for Electron Context -->
     <script>
-        if (typeof module === "object") {
+        if (typeof module === 'object') {
             window.module = module;
             module = undefined;
         }
@@ -32,25 +34,31 @@
 
     <style>
         :root {
-            --bs-primary: #7c3aed;
-            --page-bg: #0b0e17;
+            --page-bg: #0b0f19;
             --card-dark: #121624;
-            --gradient-hero: linear-gradient(145deg, #6366f1 0%, #7c3aed 50%, #9333ea 100%);
-            --input-bg: #181d2e;
-            --input-border: rgba(255, 255, 255, 0.1);
+            --card-dark-glass: rgba(18, 22, 36, 0.94);
+            --gradient-hero: linear-gradient(135deg, #4f46e5 0%, #7c3aed 45%, #9333ea 75%, #6366f1 100%);
+            --btn-purple: #7c3aed;
+            --btn-purple-hover: #6d28d9;
+            --btn-purple-glow: rgba(124, 58, 237, 0.55);
+            --input-bg: #161a29;
+            --input-border: #23293d;
             --input-focus: #8b5cf6;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --badge-label: #c4b5fd;
         }
 
         * {
             box-sizing: border-box;
-            user-select: none;
             margin: 0;
             padding: 0;
-            -webkit-font-smoothing: antialiased;
+            user-select: none;
+            -webkit-user-drag: none;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--page-bg) !important;
             min-height: 100vh;
             width: 100vw;
@@ -64,20 +72,72 @@
             padding: 20px;
         }
 
-        /* Subtle Ambient Glow behind the Card */
-        body::before {
-            content: '';
+        /* Animated Ambient Cyber Dot Grid */
+        .ambient-grid-canvas {
             position: fixed;
-            width: 650px;
-            height: 650px;
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 28px 28px;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.6;
+        }
+
+        /* Animated Floating Glowing Plasma Orbs */
+        .plasma-orb {
+            position: fixed;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, rgba(124, 58, 237, 0.12) 50%, transparent 70%);
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            filter: blur(120px);
+            filter: blur(100px);
             pointer-events: none;
             z-index: 0;
+            opacity: 0.55;
+            mix-blend-mode: screen;
+        }
+
+        .orb-1 {
+            width: 580px;
+            height: 580px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, rgba(124, 58, 237, 0.15) 60%, transparent 80%);
+            top: -100px;
+            left: -80px;
+            animation: floatOrb1 22s ease-in-out infinite alternate;
+        }
+
+        .orb-2 {
+            width: 520px;
+            height: 520px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, rgba(217, 70, 239, 0.12) 60%, transparent 80%);
+            bottom: -120px;
+            right: -80px;
+            animation: floatOrb2 26s ease-in-out infinite alternate;
+        }
+
+        .orb-3 {
+            width: 440px;
+            height: 440px;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.22) 0%, rgba(99, 102, 241, 0.1) 60%, transparent 80%);
+            top: 50%;
+            left: 55%;
+            transform: translate(-50%, -50%);
+            animation: floatOrb3 18s ease-in-out infinite alternate;
+        }
+
+        @keyframes floatOrb1 {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(120px, 80px) scale(1.12); }
+            100% { transform: translate(40px, 140px) scale(0.95); }
+        }
+
+        @keyframes floatOrb2 {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-100px, -60px) scale(1.1); }
+            100% { transform: translate(-50px, -120px) scale(0.92); }
+        }
+
+        @keyframes floatOrb3 {
+            0% { transform: translate(-50%, -50%) scale(0.95); }
+            50% { transform: translate(-42%, -58%) scale(1.15); }
+            100% { transform: translate(-58%, -45%) scale(1); }
         }
 
         /* Centered Dual-Pane Container */
@@ -85,24 +145,27 @@
             position: relative;
             z-index: 10;
             width: 100%;
-            max-width: 860px;
+            max-width: 880px;
         }
 
         .auth-split-card {
-            background: var(--card-dark);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 24px;
-            box-shadow: 0 30px 80px -15px rgba(0, 0, 0, 0.75), 0 0 40px rgba(99, 102, 241, 0.15);
+            background: var(--card-dark-glass);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 26px;
+            box-shadow: 0 25px 70px -15px rgba(0, 0, 0, 0.85), 0 0 50px rgba(124, 58, 237, 0.2);
             display: flex;
             overflow: hidden;
-            animation: cardFadeEntrance 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            min-height: 480px;
+            animation: cardEntrance 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards, borderGlowPulse 8s ease-in-out infinite;
+            min-height: 490px;
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            position: relative;
         }
 
-        @keyframes cardFadeEntrance {
+        @keyframes cardEntrance {
             0% {
                 opacity: 0;
-                transform: translateY(20px) scale(0.98);
+                transform: translateY(28px) scale(0.97);
             }
             100% {
                 opacity: 1;
@@ -110,91 +173,222 @@
             }
         }
 
-        /* Left Hero Banner Pane */
+        @keyframes borderGlowPulse {
+            0%, 100% {
+                box-shadow: 0 25px 70px -15px rgba(0, 0, 0, 0.85), 0 0 45px rgba(124, 58, 237, 0.18);
+                border-color: rgba(255, 255, 255, 0.09);
+            }
+            50% {
+                box-shadow: 0 30px 85px -15px rgba(0, 0, 0, 0.9), 0 0 65px rgba(168, 85, 247, 0.32);
+                border-color: rgba(168, 85, 247, 0.25);
+            }
+        }
+
+        /* Left Hero Banner Pane (Matches Reference Image with Animated Polish) */
         .hero-banner-pane {
             flex: 0.95;
             background: var(--gradient-hero);
-            padding: 3rem 2.5rem;
+            background-size: 260% 260%;
+            animation: gradientWave 10s ease infinite alternate;
+            padding: 3rem 2.6rem;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             color: #ffffff;
             position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes gradientWave {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Subtle Geometric Shimmer Overlay in Hero */
+        .hero-banner-pane::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.22) 0%, transparent 65%),
+                        linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, transparent 100%);
+            pointer-events: none;
         }
 
         .hero-banner-pane::after {
             content: '';
             position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.15), transparent 70%);
+            bottom: -60px;
+            right: -60px;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            filter: blur(40px);
             pointer-events: none;
         }
 
+        /* Enterprise Live Tag */
+        .hero-chip-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(255, 255, 255, 0.16);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .pulse-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #10b981;
+            box-shadow: 0 0 10px #10b981;
+            animation: pulseEmerald 1.8s infinite;
+        }
+
+        @keyframes pulseEmerald {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
+        }
+
+        /* App Squircle Logo Badge with Floating Animation */
         .hero-app-logo {
-            width: 60px;
-            height: 60px;
+            width: 62px;
+            height: 62px;
             border-radius: 18px;
             background: rgba(255, 255, 255, 0.22);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.35);
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-            margin-bottom: 2rem;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
+            margin-bottom: 1.8rem;
+            position: relative;
+            overflow: hidden;
+            animation: floatLogo 5s ease-in-out infinite alternate;
             transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
+        @keyframes floatLogo {
+            0% { transform: translateY(0px) rotate(0deg); }
+            100% { transform: translateY(-6px) rotate(-1.5deg); }
+        }
+
+        .hero-app-logo::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -120%;
+            width: 80%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transform: skewX(-25deg);
+            animation: logoShine 4.5s infinite;
+        }
+
+        @keyframes logoShine {
+            0%, 70% { left: -120%; }
+            100% { left: 200%; }
+        }
+
         .hero-app-logo:hover {
-            transform: scale(1.06);
+            transform: scale(1.08) translateY(-4px);
         }
 
         .hero-app-logo img {
-            width: 40px;
-            height: 40px;
+            width: 42px;
+            height: 42px;
             object-fit: contain;
-            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.35));
         }
 
         .hero-headline {
-            font-size: 2.2rem;
+            font-size: 2.25rem;
             font-weight: 800;
             line-height: 1.15;
-            letter-spacing: -0.02em;
+            letter-spacing: -0.025em;
             margin-bottom: 1.25rem;
             color: #ffffff;
+            text-shadow: 0 2px 14px rgba(0, 0, 0, 0.25);
         }
 
         .hero-subtext {
-            color: rgba(255, 255, 255, 0.85);
+            color: rgba(255, 255, 255, 0.88);
             font-size: 0.92rem;
-            line-height: 1.6;
-            margin-bottom: 2rem;
+            line-height: 1.62;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Hero Feature Highlights */
+        .hero-feature-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 1.75rem;
+        }
+
+        .feature-tag-chip {
+            background: rgba(255, 255, 255, 0.14);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s ease;
+        }
+
+        .feature-tag-chip:hover {
+            background: rgba(255, 255, 255, 0.24);
+            transform: translateY(-2px);
         }
 
         .hero-signature {
             font-size: 0.82rem;
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(255, 255, 255, 0.75);
+            position: relative;
+            z-index: 2;
         }
 
         .hero-signature strong {
             color: #ffffff;
+            text-decoration: underline;
+            text-decoration-color: rgba(255, 255, 255, 0.35);
+            text-underline-offset: 3px;
         }
 
-        /* Right Form Pane */
+        /* Right Authentication Form Pane */
         .auth-form-pane {
             flex: 1.05;
             padding: 3rem 2.8rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            background: var(--card-dark);
+            background: var(--card-dark-glass);
+            position: relative;
+            z-index: 2;
         }
 
         .form-heading {
-            font-size: 1.6rem;
+            font-size: 1.65rem;
             font-weight: 700;
-            letter-spacing: -0.02em;
+            letter-spacing: -0.025em;
             color: #ffffff;
             margin-bottom: 4px;
         }
@@ -202,10 +396,10 @@
         .form-subheading {
             color: #94a3b8;
             font-size: 0.88rem;
-            margin-bottom: 1.75rem;
+            margin-bottom: 1.65rem;
         }
 
-        /* Modern Floating Tag Input Fields */
+        /* Modern Floating Tag Input Fields with Neon Micro-Glow */
         .field-group {
             margin-bottom: 1.15rem;
             position: relative;
@@ -216,10 +410,15 @@
             display: block;
             font-size: 0.74rem;
             font-weight: 600;
-            color: #c4b5fd;
+            color: var(--badge-label);
             margin-bottom: 5px;
             margin-left: 2px;
             letter-spacing: 0.02em;
+            transition: color 0.2s ease;
+        }
+
+        .field-group:focus-within .field-badge-label {
+            color: #e9d5ff;
         }
 
         .field-input-box {
@@ -229,13 +428,18 @@
             background: var(--input-bg);
             border: 1px solid var(--input-border);
             border-radius: 12px;
-            transition: all 0.2s ease;
+            transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .field-input-box:hover {
+            border-color: rgba(168, 85, 247, 0.35);
         }
 
         .field-input-box:focus-within {
             border-color: var(--input-focus);
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
-            background: #1c2236;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25), 0 8px 24px -6px rgba(124, 58, 237, 0.22);
+            background: #191e30;
+            transform: translateY(-1px);
         }
 
         .field-input {
@@ -262,46 +466,75 @@
             color: #64748b;
             padding: 8px 12px;
             cursor: pointer;
-            transition: color 0.15s;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .field-toggle-btn:hover {
             color: #c4b5fd;
+            transform: scale(1.15);
         }
 
-        /* Solid Purple Master Sign In Button */
+        /* Solid Purple Master Sign In Button with Sweeping Shine Reflection */
         .btn-purple-signin {
             width: 100%;
-            background: #7c3aed;
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
             color: #ffffff;
             border: none;
             border-radius: 12px;
-            padding: 13px;
+            padding: 13.5px;
             font-size: 0.98rem;
             font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 8px 24px rgba(124, 58, 237, 0.4);
-            transition: all 0.2s ease;
-            margin-top: 0.5rem;
+            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.45);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            margin-top: 0.6rem;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Sweeping Animated Shine Bar */
+        .btn-purple-signin::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            transform: skewX(-20deg);
+            transition: none;
+        }
+
+        .btn-purple-signin:hover::after {
+            animation: btnShineSweep 1.1s ease-in-out;
+        }
+
+        @keyframes btnShineSweep {
+            0% { left: -100%; }
+            100% { left: 200%; }
         }
 
         .btn-purple-signin:hover {
-            background: #6d28d9;
-            transform: translateY(-1px);
-            box-shadow: 0 12px 28px rgba(124, 58, 237, 0.55);
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 14px 32px rgba(124, 58, 237, 0.65), 0 0 20px rgba(168, 85, 247, 0.35);
             color: #ffffff;
         }
 
         .btn-purple-signin:active {
-            transform: translateY(1px);
+            transform: translateY(1px) scale(0.99);
         }
 
         .btn-purple-signin:disabled {
-            background: #475569 !important;
+            background: #334155 !important;
+            color: #94a3b8 !important;
             cursor: not-allowed;
             transform: none !important;
             box-shadow: none !important;
@@ -329,16 +562,23 @@
 
         /* 1-Click Auto Fill Demo Chip */
         .demo-pill-link {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
             margin-top: 0.85rem;
             font-size: 0.74rem;
             color: #64748b;
             cursor: pointer;
-            transition: color 0.15s;
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
         }
 
         .demo-pill-link:hover {
-            color: #a78bfa;
+            color: #c4b5fd;
+            background: rgba(139, 92, 246, 0.1);
+            border-color: rgba(139, 92, 246, 0.25);
+            transform: translateY(-1px);
         }
 
         /* Error Shake Banner */
@@ -359,8 +599,8 @@
 
         @keyframes shakeAlert {
             0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-4px); }
-            40%, 80% { transform: translateX(4px); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
         }
 
         /* Bottom Fixed Brand Credits Footer */
@@ -371,7 +611,7 @@
             width: 100%;
             text-align: center;
             font-size: 0.75rem;
-            color: #475569;
+            color: #64748b;
             z-index: 10;
         }
 
@@ -408,8 +648,13 @@
     </style>
 </head>
 <body>
-    <!-- Silky Ambient Glow -->
-    <div class="ambient-aurora-mesh"></div>
+    <!-- Ambient Cyber Dot Grid Background -->
+    <div class="ambient-grid-canvas"></div>
+
+    <!-- Animated Glowing Plasma Orbs -->
+    <div class="plasma-orb orb-1"></div>
+    <div class="plasma-orb orb-2"></div>
+    <div class="plasma-orb orb-3"></div>
 
     <!-- Layout Engine Scripts (Loads showBcsLoader / hideBcsLoader & Animations) -->
     <script src="template/layout.js"></script>
@@ -418,10 +663,16 @@
     <div class="auth-wrapper">
         <div class="auth-split-card">
             
-            <!-- Left Hero Banner Pane (As seen in reference image) -->
+            <!-- Left Hero Banner Pane (As seen in reference image with animated polish) -->
             <div class="hero-banner-pane">
                 <div>
-                    <!-- App Squircle Logo Badge -->
+                    <!-- Top Enterprise Live Pill -->
+                    <div class="hero-chip-badge">
+                        <span class="pulse-dot"></span>
+                        <span>BCS ENTERPRISE POS PRO</span>
+                    </div>
+
+                    <!-- App Squircle Logo Badge with Floating Animation -->
                     <div class="hero-app-logo">
                         <img src="assets/icon.png" onerror="this.src='template/bcs-logo.svg'" alt="BCS">
                     </div>
@@ -437,6 +688,13 @@
                     <p class="hero-subtext">
                         Experience seamless management and optimized operations with our advanced point of sale ecosystem.
                     </p>
+
+                    <!-- Feature Highlight Chips -->
+                    <div class="hero-feature-tags">
+                        <span class="feature-tag-chip"><i class="bi bi-cloud-check-fill text-info"></i> Cloudflare D1</span>
+                        <span class="feature-tag-chip"><i class="bi bi-shield-check text-success"></i> RBAC Security</span>
+                        <span class="feature-tag-chip"><i class="bi bi-lightning-charge-fill text-warning"></i> Auto-Updater</span>
+                    </div>
                 </div>
 
                 <!-- Footer Signature -->
@@ -488,7 +746,7 @@
                         </div>
                     </div>
 
-                    <!-- Solid Purple Sign In Button -->
+                    <!-- Solid Purple Sign In Button with Sweeping Glow Effect -->
                     <button type="submit" class="btn-purple-signin" id="btnSignIn">
                         <span id="btnSignInText">Sign In</span>
                     </button>
@@ -509,24 +767,24 @@
         </div>
     </div>
 
-    <!-- Bottom Page Credit Footer (Exact matching reference image) -->
+    <!-- Bottom Page Credit Footer (Version 1.9.6) -->
     <footer class="fixed-page-footer">
-        Made with care in <strong>Bangladesh 🇧🇩</strong> | Developed by: <span class="highlight-purple">BCSdeveloper™</span> | Version: <strong>1.9.5</strong> | Powered by: <strong>Cloudflare D1</strong>.
+        Made with care in <strong>Bangladesh 🇧🇩</strong> | Developed by: <span class="highlight-purple">BCSdeveloper™</span> | Version: <strong>1.9.6</strong> | Powered by: <strong>Cloudflare D1</strong>.
     </footer>
 
     <!-- Login Authentication Handler -->
     <script type="module">
         import { loginUser } from "./script/auth.js";
 
-        // Password Show/Hide Toggle
+        // Password Visibility Toggle
+        const toggleBtn = document.getElementById("togglePasswordBtn");
         const passwordField = document.getElementById("loginPass");
-        const eyeBtn = document.getElementById("togglePasswordBtn");
         const eyeIcon = document.getElementById("passwordEyeIcon");
 
-        eyeBtn.addEventListener("click", () => {
-            const isPassword = passwordField.getAttribute("type") === "password";
-            passwordField.setAttribute("type", isPassword ? "text" : "password");
-            eyeIcon.className = isPassword ? "bi bi-eye-slash text-light" : "bi bi-eye";
+        toggleBtn.addEventListener("click", () => {
+            const isPassword = passwordField.type === "password";
+            passwordField.type = isPassword ? "text" : "password";
+            eyeIcon.className = isPassword ? "bi bi-eye-slash text-purple" : "bi bi-eye";
         });
 
         // Caps Lock Detection
@@ -539,10 +797,10 @@
             }
         });
 
-        // 1-Click Demo Fill
+        // Demo Autofill Helper
         document.getElementById("btnQuickDemo").addEventListener("click", () => {
             document.getElementById("loginUser").value = "admin";
-            document.getElementById("loginPass").value = "123456";
+            document.getElementById("loginPass").value = "admin";
             document.getElementById("loginPass").focus();
         });
 
@@ -569,39 +827,34 @@
             }
 
             try {
-                const loginData = await loginUser(user, pass, pin);
-                localStorage.setItem("loggedInUserName", user);
+                const res = await loginUser(user, pass, pin);
+                if (res && res.is_verified) {
+                    if (window.showBcsLoader) {
+                        window.showBcsLoader("Credentials Verified! Launching Dashboard...");
+                    }
+                    setTimeout(() => {
+                        window.location.replace("dashboard.html");
+                    }, 500);
+                }
+            } catch (err) {
+                if (window.hideBcsLoader) window.hideBcsLoader();
 
-                if (window.showBcsLoader) {
-                    window.showBcsLoader("Session Verified! Opening POS...");
+                let message = err.message || "Invalid operator credentials";
+                if (message.includes("401") || message.includes("User not found") || message.includes("Invalid")) {
+                    message = "Invalid username or password. Please verify and try again.";
+                } else if (message.includes("locked")) {
+                    message = err.message;
+                } else if (message.includes("Failed to fetch") || message.includes("NetworkError")) {
+                    message = "Cannot reach Cloudflare edge server. Check internet connection.";
                 }
 
-                setTimeout(() => {
-                    window.location.href = "dashboard.html";
-                }, 600);
-
-            } catch (error) {
-                // Emergency Offline / Local Administrator Fallback
-                if (user === "admin" && pass === "123456") {
-                    localStorage.setItem("isAuthenticated", "true");
-                    localStorage.setItem("loggedInUserId", "admin");
-                    localStorage.setItem("loggedInUserName", "Admin");
-                    localStorage.setItem("userRole", "administrator");
-                    localStorage.setItem("sessionId", "admin-session-local");
-                    localStorage.setItem("sessionPort", "8080");
-
-                    if (window.showBcsLoader) {
-                        window.showBcsLoader("Entering Offline Mode...");
-                    }
-
-                    setTimeout(() => {
-                        window.location.href = "dashboard.html";
-                    }, 600);
-                } else {
-                    if (window.hideBcsLoader) {
-                        window.hideBcsLoader();
-                    }
-                    errorMsg.textContent = error.message || "Invalid operator username or password.";
+                errorMsg.textContent = message;
+                errorBox.classList.remove("d-none");
+                btn.disabled = false;
+                btnText.textContent = "Sign In";
+            } finally {
+                if (btn.disabled && !errorBox.classList.contains("d-none")) {
+                    if (window.hideBcsLoader) window.hideBcsLoader();
                     errorBox.classList.remove("d-none");
                     btn.disabled = false;
                     btnText.textContent = "Sign In";

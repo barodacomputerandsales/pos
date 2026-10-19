@@ -25,11 +25,6 @@ window._renderSidebarImpl = function(activeMenu, activeSubMenu = null) {
                 <i class="bi bi-grid-1x2-fill"></i>
                 <span>Dashboard</span>
             </a>
-            
-            <a href="pos.html" class="menu-item ${activeMenu === 'pos' ? 'active' : ''}" data-permission="pos_access">
-                <i class="bi bi-calculator-fill"></i>
-                <span>POS System</span>
-            </a>
 
             <!-- Products Menu Group -->
             <div class="menu-group ${isProductsActive ? 'open' : ''}">
