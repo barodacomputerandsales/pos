@@ -684,7 +684,88 @@ body::after {
     100% { transform: rotate(360deg); }
 }
 
-/* Floating & Glowing Logo Mark */
+/* Official BCS Vector Animated Logo Loader Container */
+.bcs-logo-container {
+    position: relative;
+    width: 88px;
+    height: 88px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bcs-logo-container .bcs-logo-svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    filter: drop-shadow(0 0 20px rgba(0, 240, 255, 0.4));
+}
+
+.bcs-logo-container .bcs-stroke-outer {
+    stroke-dasharray: 10060;
+    stroke-dashoffset: 10060;
+    animation: bcsLaserDrawOuter 3.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.bcs-logo-container .bcs-stroke-top {
+    stroke-dasharray: 1180;
+    stroke-dashoffset: 1180;
+    animation: bcsLaserDrawTop 3.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.bcs-logo-container .bcs-stroke-bottom {
+    stroke-dasharray: 1160;
+    stroke-dashoffset: 1160;
+    animation: bcsLaserDrawBottom 3.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.bcs-logo-container .bcs-fill-body {
+    animation: bcsLaserFillFade 3.6s ease-in-out infinite;
+}
+
+.bcs-logo-container .bcs-bloom-body {
+    animation: bcsBloomPulse 3.6s ease-in-out infinite alternate;
+}
+
+@keyframes bcsLaserDrawOuter {
+    0% { stroke-dashoffset: 10060; opacity: 1; }
+    55% { stroke-dashoffset: 0; opacity: 1; }
+    80% { stroke-dashoffset: 0; opacity: 0.85; }
+    92% { stroke-dashoffset: 0; opacity: 0; }
+    100% { stroke-dashoffset: 10060; opacity: 0; }
+}
+
+@keyframes bcsLaserDrawTop {
+    0%, 15% { stroke-dashoffset: 1180; opacity: 0; }
+    20% { opacity: 1; }
+    60% { stroke-dashoffset: 0; opacity: 1; }
+    80% { stroke-dashoffset: 0; opacity: 0.85; }
+    92% { stroke-dashoffset: 0; opacity: 0; }
+    100% { stroke-dashoffset: 1180; opacity: 0; }
+}
+
+@keyframes bcsLaserDrawBottom {
+    0%, 25% { stroke-dashoffset: 1160; opacity: 0; }
+    30% { opacity: 1; }
+    70% { stroke-dashoffset: 0; opacity: 1; }
+    80% { stroke-dashoffset: 0; opacity: 0.85; }
+    92% { stroke-dashoffset: 0; opacity: 0; }
+    100% { stroke-dashoffset: 1160; opacity: 0; }
+}
+
+@keyframes bcsLaserFillFade {
+    0%, 45% { opacity: 0.2; filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.25)); }
+    65%, 85% { opacity: 1; filter: drop-shadow(0 0 32px rgba(0, 240, 255, 0.7)); }
+    95%, 100% { opacity: 0.2; filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.25)); }
+}
+
+@keyframes bcsBloomPulse {
+    0%, 45% { opacity: 0.2; }
+    65%, 85% { opacity: 0.65; }
+    95%, 100% { opacity: 0.2; }
+}
+
+/* Floating & Glowing Logo Mark Fallback */
 .bcs-loader-icon {
     width: 68px;
     height: 68px;
