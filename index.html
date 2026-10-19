@@ -9,13 +9,13 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign In | BCS Enterprise POS</title>
+    <title>BCS Quantum Terminal | Next-Gen POS Portal</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
     <link rel="apple-touch-icon" href="assets/icon.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="template/animations.css">
 
     <!-- Prevent nodeIntegration from breaking UMD bundles -->
@@ -32,36 +32,40 @@
 
     <style>
         :root {
-            --bs-primary: #6366f1;
             --brand-cyan: #00f0ff;
             --brand-indigo: #6366f1;
             --brand-violet: #a855f7;
-            --font-main: 'Plus Jakarta Sans', sans-serif;
+            --brand-emerald: #10b981;
+            --bg-deep-abyss: #03060d;
+            --cyber-card-bg: rgba(10, 15, 29, 0.76);
+            --cyber-border: 1px solid rgba(0, 240, 255, 0.18);
+            --font-display: 'Space Grotesk', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
+            --font-body: 'Inter', sans-serif;
         }
 
         * {
             box-sizing: border-box;
             user-select: none;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: var(--font-main);
-            background: #06080f !important;
-            min-height: 100vh;
+            font-family: var(--font-body);
+            background: var(--bg-deep-abyss) !important;
             width: 100vw;
-            margin: 0;
-            padding: 0;
+            height: 100vh;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
             position: relative;
             color: #f8fafc;
         }
 
-        /* Interactive Particle & Star Canvas */
-        #bgCanvas {
+        /* 1. Interactive Quantum Canvas & Scanner */
+        #cyberCanvas {
             position: fixed;
             inset: 0;
             width: 100%;
@@ -70,289 +74,497 @@
             z-index: 1;
         }
 
-        /* Ambient Glowing Spotlights */
-        .ambient-spotlight {
+        /* Ambient Cyber Radar Scan Sweep Line */
+        .cyber-radar-scan {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 2;
+            background: linear-gradient(180deg, 
+                transparent 0%, 
+                rgba(0, 240, 255, 0.04) 48%, 
+                rgba(0, 240, 255, 0.12) 50%, 
+                transparent 52%);
+            background-size: 100% 200%;
+            animation: radarSweep 8s linear infinite;
+        }
+
+        @keyframes radarSweep {
+            0% { background-position: 0 -100%; }
+            100% { background-position: 0 100%; }
+        }
+
+        /* Ambient Glowing Vector Spotlights */
+        .ambient-aurora-glow {
             position: fixed;
             border-radius: 50%;
             filter: blur(140px);
             pointer-events: none;
             z-index: 0;
-            opacity: 0.65;
+            opacity: 0.55;
         }
 
-        .spotlight-top {
-            width: 650px;
-            height: 650px;
-            background: radial-gradient(circle, rgba(0, 240, 255, 0.22) 0%, rgba(99, 102, 241, 0.12) 50%, transparent 75%);
+        .glow-cyan-top {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 240, 255, 0.28) 0%, rgba(99, 102, 241, 0.15) 50%, transparent 75%);
             top: -200px;
             left: 50%;
             transform: translateX(-50%);
         }
 
-        .spotlight-bottom-left {
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(168, 85, 247, 0.2) 0%, transparent 70%);
+        .glow-violet-left {
+            width: 550px;
+            height: 550px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.22) 0%, transparent 70%);
             bottom: -150px;
-            left: -100px;
+            left: -150px;
         }
 
-        .spotlight-bottom-right {
-            width: 500px;
-            height: 500px;
+        .glow-cyan-right {
+            width: 550px;
+            height: 550px;
             background: radial-gradient(circle, rgba(0, 240, 255, 0.18) 0%, transparent 70%);
             bottom: -150px;
-            right: -100px;
+            right: -150px;
         }
 
-        /* Glowing Hologram Card Container */
-        .login-hologram-wrapper {
+        /* 2. Quantum Cyber-Deck HUD Card */
+        .cyber-hud-container {
             position: relative;
             z-index: 10;
             width: 100%;
-            max-width: 480px;
-            padding: 24px;
+            max-width: 490px;
+            padding: 20px;
+            perspective: 1200px;
         }
 
-        .login-hologram-card {
-            background: rgba(14, 18, 30, 0.72);
-            backdrop-filter: blur(32px);
-            -webkit-backdrop-filter: blur(32px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+        .cyber-hud-card {
+            background: var(--cyber-card-bg);
+            backdrop-filter: blur(35px);
+            -webkit-backdrop-filter: blur(35px);
+            border: var(--cyber-border);
             border-radius: 28px;
-            padding: 3rem 2.6rem;
+            padding: 2.8rem 2.4rem;
             box-shadow: 
-                0 30px 90px rgba(0, 0, 0, 0.7),
-                0 0 50px rgba(0, 240, 255, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+                0 30px 100px rgba(0, 0, 0, 0.8),
+                0 0 50px rgba(0, 240, 255, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
             position: relative;
             overflow: hidden;
-            animation: cardAppear 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: hudEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        /* Top Border Laser Highlight */
-        .login-hologram-card::before {
-            content: '';
+        /* Corner Tech HUD Reticles */
+        .hud-corner {
             position: absolute;
-            top: 0;
-            left: 15%;
-            right: 15%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #00f0ff, #6366f1, transparent);
-            box-shadow: 0 0 16px #00f0ff;
+            width: 14px;
+            height: 14px;
+            pointer-events: none;
+            opacity: 0.85;
         }
 
-        @keyframes cardAppear {
+        .hud-corner-tl {
+            top: 14px;
+            left: 14px;
+            border-top: 2px solid var(--brand-cyan);
+            border-left: 2px solid var(--brand-cyan);
+            border-top-left-radius: 4px;
+        }
+
+        .hud-corner-tr {
+            top: 14px;
+            right: 14px;
+            border-top: 2px solid var(--brand-cyan);
+            border-right: 2px solid var(--brand-cyan);
+            border-top-right-radius: 4px;
+        }
+
+        .hud-corner-bl {
+            bottom: 14px;
+            left: 14px;
+            border-bottom: 2px solid var(--brand-cyan);
+            border-left: 2px solid var(--brand-cyan);
+            border-bottom-left-radius: 4px;
+        }
+
+        .hud-corner-br {
+            bottom: 14px;
+            right: 14px;
+            border-bottom: 2px solid var(--brand-cyan);
+            border-right: 2px solid var(--brand-cyan);
+            border-bottom-right-radius: 4px;
+        }
+
+        @keyframes hudEntrance {
             0% {
                 opacity: 0;
-                transform: translateY(24px) scale(0.97);
+                transform: translateY(35px) rotateX(8deg) scale(0.95);
             }
             100% {
                 opacity: 1;
-                transform: translateY(0) scale(1);
+                transform: translateY(0) rotateX(0deg) scale(1);
             }
         }
 
-        /* Logo Emblem Box */
-        .emblem-wrapper {
-            margin-bottom: 1.5rem;
+        /* 3. Rotating 3D Holographic Hex-Reactor Emblem */
+        .hex-reactor-stage {
             position: relative;
-            display: inline-block;
-        }
-
-        .emblem-glow-ring {
-            position: absolute;
-            inset: -8px;
-            border-radius: 26px;
-            background: linear-gradient(135deg, rgba(0, 240, 255, 0.5), rgba(99, 102, 241, 0.5));
-            filter: blur(14px);
-            opacity: 0.6;
-            animation: pulseEmblem 4s ease-in-out infinite alternate;
-        }
-
-        @keyframes pulseEmblem {
-            0% { opacity: 0.4; transform: scale(0.95); }
-            100% { opacity: 0.8; transform: scale(1.05); }
-        }
-
-        .emblem-box {
-            position: relative;
-            width: 82px;
-            height: 82px;
-            border-radius: 22px;
-            background: #0f172a;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 110px;
+            height: 110px;
+            margin: 0 auto 1.5rem auto;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .emblem-box:hover {
-            transform: scale(1.08) rotate(-3deg);
+        .reactor-laser-ring {
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 2px dashed rgba(0, 240, 255, 0.45);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.35);
+            animation: rotateClockwise 12s linear infinite;
         }
 
-        .emblem-box img {
-            width: 62px;
-            height: 62px;
+        .reactor-counter-ring {
+            position: absolute;
+            inset: 6px;
+            border-radius: 50%;
+            border: 1px dotted rgba(168, 85, 247, 0.6);
+            animation: rotateCounterClockwise 8s linear infinite;
+        }
+
+        @keyframes rotateClockwise {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes rotateCounterClockwise {
+            from { transform: rotate(360deg); }
+            to { transform: rotate(0deg); }
+        }
+
+        .reactor-core-squircle {
+            position: relative;
+            width: 76px;
+            height: 76px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(8, 12, 24, 0.98));
+            border: 1.5px solid rgba(0, 240, 255, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 
+                0 0 25px rgba(0, 240, 255, 0.35),
+                inset 0 0 15px rgba(99, 102, 241, 0.3);
+            z-index: 3;
+            transition: transform 0.3s ease;
+        }
+
+        .reactor-core-squircle:hover {
+            transform: scale(1.08);
+            border-color: #00f0ff;
+            box-shadow: 0 0 35px rgba(0, 240, 255, 0.6);
+        }
+
+        .reactor-core-squircle img {
+            width: 54px;
+            height: 54px;
             object-fit: contain;
-            filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.4));
+            filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.5));
         }
 
-        /* Typography */
-        .brand-name {
-            font-size: 1.55rem;
+        /* 4. Cyber Headings */
+        .cyber-brand-title {
+            font-family: var(--font-display);
+            font-size: 1.65rem;
             font-weight: 800;
             letter-spacing: -0.02em;
-            margin-bottom: 4px;
-            background: linear-gradient(135deg, #ffffff 30%, #00f0ff 70%, #6366f1 100%);
+            background: linear-gradient(135deg, #ffffff 25%, #00f0ff 65%, #6366f1 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            margin-bottom: 2px;
         }
 
-        .brand-subtitle {
+        .cyber-brand-sub {
             color: #94a3b8;
-            font-size: 0.88rem;
+            font-size: 0.85rem;
+            letter-spacing: 0.04em;
             margin-bottom: 1.25rem;
         }
 
-        .terminal-version-tag {
+        /* Telemetry Header Pill */
+        .cyber-telemetry-badge {
             font-family: var(--font-mono);
             font-size: 0.7rem;
-            letter-spacing: 0.05em;
             background: rgba(0, 240, 255, 0.08);
             border: 1px solid rgba(0, 240, 255, 0.25);
             color: #00f0ff;
-            padding: 4px 12px;
             border-radius: 50px;
+            padding: 5px 14px;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            margin-bottom: 2rem;
+            gap: 8px;
+            margin-bottom: 1.75rem;
         }
 
-        /* Form Controls */
-        .input-group-custom {
+        .pulse-live-beacon {
+            width: 7px;
+            height: 7px;
+            background: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #10b981;
+            animation: beaconPulse 2s infinite;
+        }
+
+        @keyframes beaconPulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 7px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* Mode Switcher Tabs */
+        .hud-tab-switcher {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: rgba(8, 12, 24, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 4px;
+            gap: 4px;
+            margin-bottom: 1.5rem;
+        }
+
+        .hud-tab-btn {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .hud-tab-btn.active {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(99, 102, 241, 0.3));
+            color: #ffffff;
+            border: 1px solid rgba(0, 240, 255, 0.35);
+            box-shadow: 0 0 12px rgba(0, 240, 255, 0.2);
+        }
+
+        /* 5. Cyber Input Fields with Laser Focus Comet */
+        .cyber-input-group {
             position: relative;
             margin-bottom: 1.25rem;
             text-align: left;
         }
 
-        .input-group-custom label {
+        .cyber-input-group label {
             display: block;
-            font-size: 0.78rem;
-            font-weight: 700;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.06em;
+            letter-spacing: 0.05em;
             color: #94a3b8;
-            margin-bottom: 7px;
+            margin-bottom: 6px;
         }
 
-        .custom-input-box {
+        .cyber-field-wrapper {
             position: relative;
             display: flex;
             align-items: center;
+            background: rgba(8, 12, 24, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 14px;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .custom-input-box i.input-icon {
-            position: absolute;
-            left: 16px;
+        .cyber-field-wrapper:focus-within {
+            border-color: var(--brand-cyan);
+            background: rgba(12, 18, 36, 0.95);
+            box-shadow: 
+                0 0 0 3px rgba(0, 240, 255, 0.2),
+                0 0 25px rgba(99, 102, 241, 0.3);
+        }
+
+        .cyber-field-icon {
+            padding-left: 16px;
+            padding-right: 8px;
             color: #64748b;
             font-size: 1.15rem;
             pointer-events: none;
-            transition: color 0.25s ease;
+            transition: color 0.2s;
         }
 
-        .custom-input-box input {
+        .cyber-field-wrapper:focus-within .cyber-field-icon {
+            color: var(--brand-cyan);
+        }
+
+        .cyber-field-input {
             width: 100%;
-            background: rgba(10, 14, 26, 0.75) !important;
-            border: 1px solid rgba(255, 255, 255, 0.12) !important;
-            border-radius: 14px;
-            padding: 13px 16px 13px 48px;
+            background: transparent !important;
+            border: none !important;
+            padding: 13px 14px 13px 4px;
+            font-family: var(--font-body);
             font-size: 0.95rem;
             color: #ffffff !important;
-            font-family: var(--font-main);
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            outline: none !important;
+            box-shadow: none !important;
             user-select: text;
         }
 
-        .custom-input-box input:focus {
-            background: rgba(15, 22, 40, 0.95) !important;
-            border-color: #00f0ff !important;
-            box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.22), 0 0 25px rgba(99, 102, 241, 0.25) !important;
-            outline: none;
+        .cyber-field-input::placeholder {
+            color: rgba(148, 163, 184, 0.35);
+            font-size: 0.88rem;
         }
 
-        .custom-input-box input::placeholder {
-            color: rgba(148, 163, 184, 0.4);
-            font-size: 0.9rem;
-        }
-
-        .custom-input-box:focus-within i.input-icon {
-            color: #00f0ff;
-        }
-
-        .eye-toggle-btn {
-            position: absolute;
-            right: 12px;
+        .cyber-field-action {
             background: none;
             border: none;
             color: #64748b;
+            padding: 8px 14px;
             cursor: pointer;
-            padding: 6px;
-            border-radius: 8px;
-            transition: all 0.2s;
+            transition: color 0.2s;
+            font-size: 1.1rem;
         }
 
-        .eye-toggle-btn:hover {
+        .cyber-field-action:hover {
+            color: var(--brand-cyan);
+        }
+
+        /* Dynamic Cryptographic Hash Stream Preview */
+        .crypto-entropy-stream {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .crypto-entropy-stream .hash-val {
             color: #00f0ff;
+            opacity: 0.85;
+            letter-spacing: 0.05em;
         }
 
-        /* Caps Lock Badge */
-        .caps-warning {
+        .caps-alert-tag {
             font-family: var(--font-mono);
             font-size: 0.72rem;
             color: #fbbf24;
-            margin-top: 6px;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
         }
 
-        /* Sign In Button */
-        .btn-master-signin {
+        /* 6. Biometric PIN Dial Pad Grid */
+        #pinDialContainer {
+            display: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .pin-dial-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-width: 280px;
+            margin: 0 auto;
+        }
+
+        .pin-dial-key {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 14px;
+            color: #ffffff;
+            font-family: var(--font-mono);
+            font-size: 1.25rem;
+            font-weight: 700;
+            padding: 12px 0;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .pin-dial-key:hover {
+            background: rgba(0, 240, 255, 0.15);
+            border-color: #00f0ff;
+            color: #00f0ff;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+        }
+
+        .pin-dial-key:active {
+            transform: scale(0.95);
+        }
+
+        .pin-display-dots {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .pin-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 240, 255, 0.4);
+            background: transparent;
+            transition: all 0.2s ease;
+        }
+
+        .pin-dot.filled {
+            background: #00f0ff;
+            box-shadow: 0 0 12px #00f0ff;
+        }
+
+        /* 7. Quantum Handshake Master Button */
+        .btn-quantum-submit {
             width: 100%;
-            background: linear-gradient(135deg, #00f0ff 0%, #6366f1 50%, #a855f7 100%);
-            background-size: 200% 200%;
+            background: linear-gradient(135deg, #00f0ff 0%, #4f46e5 50%, #9333ea 100%);
+            background-size: 200% auto;
             border: none;
             border-radius: 14px;
             padding: 14px;
-            font-size: 1rem;
+            font-family: var(--font-display);
+            font-size: 1.05rem;
             font-weight: 700;
             color: #ffffff;
             cursor: pointer;
-            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+            box-shadow: 
+                0 10px 30px rgba(79, 70, 229, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            margin-top: 0.75rem;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
+            letter-spacing: 0.02em;
         }
 
-        .btn-master-signin:hover {
-            background-position: 100% 100%;
+        .btn-quantum-submit:hover {
+            background-position: right center;
             transform: translateY(-2px);
-            box-shadow: 0 14px 40px rgba(0, 240, 255, 0.5);
+            box-shadow: 0 14px 45px rgba(0, 240, 255, 0.55);
             color: #ffffff;
         }
 
-        .btn-master-signin:active {
+        .btn-quantum-submit:active {
             transform: translateY(1px);
         }
 
-        .btn-master-signin:disabled {
+        .btn-quantum-submit:disabled {
             background: #334155 !important;
             color: #94a3b8 !important;
             transform: none !important;
@@ -360,35 +572,36 @@
             cursor: not-allowed;
         }
 
-        /* 1-Click Demo Fill Badge */
-        .demo-fill-pill {
-            margin-top: 1.5rem;
-            background: rgba(255, 255, 255, 0.04);
+        /* 8. 1-Click Cyberpunk Auto-Fill Chip */
+        .cyber-auto-chip {
+            background: rgba(255, 255, 255, 0.03);
             border: 1px dashed rgba(255, 255, 255, 0.14);
             border-radius: 10px;
             padding: 8px 14px;
-            font-size: 0.8rem;
+            font-family: var(--font-mono);
+            font-size: 0.76rem;
             color: #94a3b8;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            margin-top: 1.25rem;
             cursor: pointer;
             transition: all 0.2s ease;
         }
 
-        .demo-fill-pill:hover {
+        .cyber-auto-chip:hover {
             background: rgba(0, 240, 255, 0.08);
             border-color: #00f0ff;
-            color: #e2e8f0;
+            color: #c7d2fe;
         }
 
-        /* Shake Alert */
-        .shake-alert-box {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.35);
+        /* 9. Shake Error HUD Alert */
+        .hud-error-banner {
+            background: rgba(239, 68, 68, 0.16);
+            border: 1px solid rgba(239, 68, 68, 0.4);
             border-radius: 12px;
-            padding: 11px 16px;
-            font-size: 0.86rem;
+            padding: 10px 14px;
+            font-size: 0.85rem;
             color: #fca5a5;
             display: flex;
             align-items: center;
@@ -405,9 +618,9 @@
             40%, 60% { transform: translateX(4px); }
         }
 
-        /* Footer Telemetry Row */
-        .footer-telemetry {
-            margin-top: 1.75rem;
+        /* 10. Footer Status Row */
+        .hud-footer-metrics {
+            margin-top: 1.5rem;
             padding-top: 1.25rem;
             border-top: 1px solid rgba(255, 255, 255, 0.08);
             display: flex;
@@ -417,121 +630,152 @@
             font-size: 0.72rem;
             color: #64748b;
         }
-
-        .pulse-live-dot {
-            width: 7px;
-            height: 7px;
-            background: #10b981;
-            border-radius: 50%;
-            display: inline-block;
-            box-shadow: 0 0 10px #10b981;
-            animation: pulseGlowDot 2s infinite;
-        }
-
-        @keyframes pulseGlowDot {
-            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-            70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-        }
     </style>
 </head>
 <body>
-    <!-- Interactive Particle Background -->
-    <canvas id="bgCanvas"></canvas>
-
-    <!-- Ambient Glowing Spotlights -->
-    <div class="ambient-spotlight spotlight-top"></div>
-    <div class="ambient-spotlight spotlight-bottom-left"></div>
-    <div class="ambient-spotlight spotlight-bottom-right"></div>
+    <!-- Interactive Background Canvas & Ambient Aura -->
+    <canvas id="cyberCanvas"></canvas>
+    <div class="cyber-radar-scan"></div>
+    <div class="ambient-aurora-glow glow-cyan-top"></div>
+    <div class="ambient-aurora-glow glow-violet-left"></div>
+    <div class="ambient-aurora-glow glow-cyan-right"></div>
 
     <!-- Layout Engine Scripts (Loads showBcsLoader / hideBcsLoader & Animations) -->
     <script src="template/layout.js"></script>
 
-    <!-- Centered Hologram Authentication Card -->
-    <div class="login-hologram-wrapper">
-        <div class="login-hologram-card text-center">
-            
-            <!-- 3D Squircle Logo Emblem -->
-            <div class="emblem-wrapper">
-                <div class="emblem-glow-ring"></div>
-                <div class="emblem-box">
+    <!-- Main Centered Cyber HUD Vault Card -->
+    <div class="cyber-hud-container">
+        <div class="cyber-hud-card text-center" id="hudCardElement">
+            <!-- Tech Corner Reticles -->
+            <div class="hud-corner hud-corner-tl"></div>
+            <div class="hud-corner hud-corner-tr"></div>
+            <div class="hud-corner hud-corner-bl"></div>
+            <div class="hud-corner hud-corner-br"></div>
+
+            <!-- Rotating 3D Holographic Hex-Reactor Emblem -->
+            <div class="hex-reactor-stage">
+                <div class="reactor-laser-ring"></div>
+                <div class="reactor-counter-ring"></div>
+                <div class="reactor-core-squircle">
                     <img src="assets/icon.png" onerror="this.src='template/bcs-logo.svg'" alt="BCS">
                 </div>
             </div>
 
-            <!-- Brand Header -->
-            <h1 class="brand-name">BCS Enterprise POS</h1>
-            <p class="brand-subtitle">Baroda Computers And Sales</p>
+            <!-- Brand Heading -->
+            <h1 class="cyber-brand-title">BCS ENTERPRISE POS</h1>
+            <p class="cyber-brand-sub">Baroda Computers And Sales • Terminal Access</p>
 
-            <div class="terminal-version-tag">
-                <span class="pulse-live-dot"></span>
-                <span>TERMINAL ACTIVE • v1.9.5</span>
+            <div class="cyber-telemetry-badge">
+                <span class="pulse-live-beacon"></span>
+                <span>SECURE EDGE ENCLAVE • D1 ACTIVE</span>
             </div>
 
             <!-- Error Shake Alert Container -->
-            <div id="loginErrorBox" class="shake-alert-box d-none">
-                <i class="bi bi-exclamation-octagon-fill text-danger fs-5"></i>
-                <span id="loginErrorMessage">Invalid username or password.</span>
+            <div id="hudErrorBanner" class="hud-error-banner d-none">
+                <i class="bi bi-shield-x text-danger fs-5"></i>
+                <span id="hudErrorMessage">Invalid operator credentials.</span>
             </div>
 
-            <!-- Authentication Form -->
-            <form id="hologramLoginForm" autocomplete="on">
-                <!-- Username / Operator -->
-                <div class="input-group-custom">
-                    <label for="inputUsername">Operator Identifier</label>
-                    <div class="custom-input-box">
-                        <i class="bi bi-person-circle input-icon"></i>
-                        <input type="text" id="inputUsername" placeholder="Enter operator username (e.g. admin)" required autocomplete="username" autofocus>
+            <!-- Interface Mode Switcher -->
+            <div class="hud-tab-switcher">
+                <button type="button" class="hud-tab-btn active" id="tabOperatorMode">
+                    <i class="bi bi-person-badge"></i> OPERATOR KEY
+                </button>
+                <button type="button" class="hud-tab-btn" id="tabPinDialMode">
+                    <i class="bi bi-grid-3x3-gap"></i> PIN MATRIX
+                </button>
+            </div>
+
+            <!-- Mode 1: Operator Form Mode -->
+            <form id="cyberAuthForm" autocomplete="on">
+                <!-- Username -->
+                <div class="cyber-input-group">
+                    <label for="cyberUserInput">Operator ID / Username</label>
+                    <div class="cyber-field-wrapper">
+                        <i class="bi bi-person-fill cyber-field-icon"></i>
+                        <input type="text" class="cyber-field-input" id="cyberUserInput" placeholder="Enter operator ID (e.g. admin)" required autocomplete="username" autofocus>
                     </div>
                 </div>
 
-                <!-- Password with Show/Hide Toggle -->
-                <div class="input-group-custom">
-                    <label for="inputPassword">Terminal Password</label>
-                    <div class="custom-input-box">
-                        <i class="bi bi-shield-lock-fill input-icon"></i>
-                        <input type="password" id="inputPassword" placeholder="Enter password" required autocomplete="current-password" style="padding-right: 48px;">
-                        <button type="button" class="eye-toggle-btn" id="togglePasswordBtn" title="Show/Hide Password">
-                            <i class="bi bi-eye" id="eyeIcon"></i>
+                <!-- Password with Entropy Scrambler -->
+                <div class="cyber-input-group">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label for="cyberPassInput" class="mb-0">Access Password</label>
+                        <div id="capsWarningTag" class="caps-alert-tag d-none">
+                            <i class="bi bi-capslock-fill"></i> CAPS ACTIVE
+                        </div>
+                    </div>
+                    <div class="cyber-field-wrapper">
+                        <i class="bi bi-lock-fill cyber-field-icon"></i>
+                        <input type="password" class="cyber-field-input" id="cyberPassInput" placeholder="Enter password" required autocomplete="current-password">
+                        <button type="button" class="cyber-field-action" id="togglePassEye" title="Reveal / Hide Password">
+                            <i class="bi bi-eye-fill" id="passEyeIcon"></i>
                         </button>
                     </div>
-                    <div id="capsLockIndicator" class="caps-warning d-none">
-                        <i class="bi bi-capslock-fill"></i> CAPS LOCK IS ON
+                    <div class="crypto-entropy-stream">
+                        <span>ARGON2ID HANDSHAKE</span>
+                        <span class="hash-val" id="entropyHashStream">0x0000...IDLE</span>
                     </div>
                 </div>
 
-                <!-- Security PIN (Optional) -->
-                <div class="input-group-custom">
+                <!-- Optional Master PIN -->
+                <div class="cyber-input-group" id="optionalPinRow">
                     <div class="d-flex justify-content-between align-items-center mb-1">
-                        <label for="inputPin" class="mb-0">Security Token / PIN</label>
-                        <span class="text-muted" style="font-size: 0.72rem;">(Optional)</span>
+                        <label for="cyberPinInput" class="mb-0">Master Token / PIN</label>
+                        <span class="text-muted" style="font-size: 0.72rem; font-family: var(--font-mono);">(OPTIONAL)</span>
                     </div>
-                    <div class="custom-input-box">
-                        <i class="bi bi-key-fill input-icon"></i>
-                        <input type="password" id="inputPin" placeholder="Optional security PIN" autocomplete="off">
+                    <div class="cyber-field-wrapper">
+                        <i class="bi bi-shield-check cyber-field-icon"></i>
+                        <input type="password" class="cyber-field-input" id="cyberPinInput" placeholder="Optional security PIN" autocomplete="off">
                     </div>
                 </div>
 
-                <!-- Sign In Button -->
-                <button type="submit" class="btn-master-signin" id="btnSubmitLogin">
-                    <i class="bi bi-box-arrow-in-right fs-5" id="btnSubmitIcon"></i>
-                    <span id="btnSubmitText">Unlock Terminal</span>
+                <!-- Submit Button -->
+                <button type="submit" class="btn-quantum-submit" id="btnCyberSubmit">
+                    <i class="bi bi-fingerprint fs-5" id="submitIconSpinner"></i>
+                    <span id="submitLabel">INITIALIZE QUANTUM HANDSHAKE</span>
                 </button>
             </form>
 
+            <!-- Mode 2: Biometric PIN Dial Pad -->
+            <div id="pinDialContainer">
+                <div class="pin-display-dots" id="pinDotsWrapper">
+                    <div class="pin-dot" id="dot1"></div>
+                    <div class="pin-dot" id="dot2"></div>
+                    <div class="pin-dot" id="dot3"></div>
+                    <div class="pin-dot" id="dot4"></div>
+                    <div class="pin-dot" id="dot5"></div>
+                    <div class="pin-dot" id="dot6"></div>
+                </div>
+                <div class="pin-dial-grid">
+                    <button type="button" class="pin-dial-key" data-digit="1">1</button>
+                    <button type="button" class="pin-dial-key" data-digit="2">2</button>
+                    <button type="button" class="pin-dial-key" data-digit="3">3</button>
+                    <button type="button" class="pin-dial-key" data-digit="4">4</button>
+                    <button type="button" class="pin-dial-key" data-digit="5">5</button>
+                    <button type="button" class="pin-dial-key" data-digit="6">6</button>
+                    <button type="button" class="pin-dial-key" data-digit="7">7</button>
+                    <button type="button" class="pin-dial-key" data-digit="8">8</button>
+                    <button type="button" class="pin-dial-key" data-digit="9">9</button>
+                    <button type="button" class="pin-dial-key text-danger" id="pinClearBtn"><i class="bi bi-backspace"></i></button>
+                    <button type="button" class="pin-dial-key" data-digit="0">0</button>
+                    <button type="button" class="pin-dial-key text-success" id="pinEnterBtn"><i class="bi bi-arrow-right-circle"></i></button>
+                </div>
+            </div>
+
             <!-- 1-Click Demo Credential Auto-Fill -->
-            <div class="demo-fill-pill" id="demoFillPill" title="Click to fill default admin credentials">
-                <span>Default: <strong>admin / 123456</strong></span>
-                <span class="badge bg-secondary bg-opacity-25 text-info">1-Click Auto-Fill</span>
+            <div class="cyber-auto-chip" id="autoFillAdminChip" title="Click to auto-type default admin credentials">
+                <span>⚡ BYPASS: <strong>admin / 123456</strong></span>
+                <span class="badge bg-secondary bg-opacity-25 text-info">1-CLICK FILL</span>
             </div>
 
             <!-- Footer Telemetry -->
-            <div class="footer-telemetry">
+            <div class="hud-footer-metrics">
                 <div class="d-flex align-items-center gap-2">
-                    <span class="pulse-live-dot"></span>
-                    <span>D1 Serverless Online</span>
+                    <span class="pulse-live-beacon"></span>
+                    <span>CLOUDFLARE D1 ENCLAVE</span>
                 </div>
-                <span>Argon2id TLS 1.3</span>
+                <span>NODE-ID: 0xBCS_POS</span>
             </div>
         </div>
     </div>
@@ -539,56 +783,71 @@
     <!-- Interactive Particle Background Canvas Script -->
     <script>
         (function() {
-            const canvas = document.getElementById('bgCanvas');
+            const canvas = document.getElementById('cyberCanvas');
             const ctx = canvas.getContext('2d');
             let width, height;
             let particles = [];
+            let mouseX = window.innerWidth / 2;
+            let mouseY = window.innerHeight / 2;
 
             function resize() {
                 width = canvas.width = window.innerWidth;
                 height = canvas.height = window.innerHeight;
             }
             window.addEventListener('resize', resize);
+            window.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
             resize();
 
-            const PARTICLE_COUNT = 45;
+            const PARTICLE_COUNT = 55;
             for (let i = 0; i < PARTICLE_COUNT; i++) {
                 particles.push({
                     x: Math.random() * width,
                     y: Math.random() * height,
-                    vx: (Math.random() - 0.5) * 0.4,
-                    vy: (Math.random() - 0.5) * 0.4,
-                    radius: Math.random() * 2 + 0.8,
-                    color: Math.random() > 0.5 ? 'rgba(0, 240, 255, ' : 'rgba(99, 102, 241, ',
-                    alpha: Math.random() * 0.4 + 0.15
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5,
+                    radius: Math.random() * 2.2 + 0.8,
+                    baseAlpha: Math.random() * 0.5 + 0.2,
+                    color: Math.random() > 0.4 ? 'rgba(0, 240, 255, ' : 'rgba(99, 102, 241, '
                 });
             }
 
             function animate() {
                 ctx.clearRect(0, 0, width, height);
 
-                // Draw connecting micro-lines
+                // Draw network lines
                 for (let i = 0; i < particles.length; i++) {
                     for (let j = i + 1; j < particles.length; j++) {
                         const dx = particles[i].x - particles[j].x;
                         const dy = particles[i].y - particles[j].y;
                         const dist = Math.sqrt(dx * dx + dy * dy);
 
-                        if (dist < 130) {
+                        if (dist < 140) {
                             ctx.beginPath();
                             ctx.moveTo(particles[i].x, particles[i].y);
                             ctx.lineTo(particles[j].x, particles[j].y);
-                            ctx.strokeStyle = `rgba(0, 240, 255, ${0.12 * (1 - dist / 130)})`;
-                            ctx.lineWidth = 0.7;
+                            ctx.strokeStyle = `rgba(0, 240, 255, ${0.15 * (1 - dist / 140)})`;
+                            ctx.lineWidth = 0.8;
                             ctx.stroke();
                         }
                     }
                 }
 
-                // Draw and update particles
+                // Update & draw nodes
                 particles.forEach(p => {
                     p.x += p.vx;
                     p.y += p.vy;
+
+                    // Subtle mouse gravity
+                    const mdx = mouseX - p.x;
+                    const mdy = mouseY - p.y;
+                    const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+                    if (mdist < 180) {
+                        p.x -= (mdx / mdist) * 0.6;
+                        p.y -= (mdy / mdist) * 0.6;
+                    }
 
                     if (p.x < 0) p.x = width;
                     if (p.x > width) p.x = 0;
@@ -597,7 +856,7 @@
 
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                    ctx.fillStyle = p.color + p.alpha + ')';
+                    ctx.fillStyle = p.color + p.baseAlpha + ')';
                     ctx.fill();
                 });
 
@@ -607,58 +866,158 @@
         })();
     </script>
 
-    <!-- Terminal Authentication Logic -->
+    <!-- 3D Card Hover Perspective Physics -->
+    <script>
+        (function() {
+            const card = document.getElementById('hudCardElement');
+            document.addEventListener('mousemove', (e) => {
+                const xAxis = (window.innerWidth / 2 - e.pageX) / 45;
+                const yAxis = (window.innerHeight / 2 - e.pageY) / 45;
+                card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+            });
+
+            document.addEventListener('mouseleave', () => {
+                card.style.transform = `rotateY(0deg) rotateX(0deg)`;
+            });
+        })();
+    </script>
+
+    <!-- Terminal Authentication & Handshake Engine -->
     <script type="module">
         import { loginUser } from "./script/auth.js";
 
-        // Password Show/Hide Toggle
-        const passwordInput = document.getElementById("inputPassword");
-        const toggleBtn = document.getElementById("togglePasswordBtn");
-        const eyeIcon = document.getElementById("eyeIcon");
+        // Password Show / Hide Toggle
+        const passInput = document.getElementById("cyberPassInput");
+        const toggleBtn = document.getElementById("togglePassEye");
+        const eyeIcon = document.getElementById("passEyeIcon");
 
         toggleBtn.addEventListener("click", () => {
-            const isPassword = passwordInput.getAttribute("type") === "password";
-            passwordInput.setAttribute("type", isPassword ? "text" : "password");
-            eyeIcon.className = isPassword ? "bi bi-eye-slash text-info" : "bi bi-eye";
+            const isPassword = passInput.getAttribute("type") === "password";
+            passInput.setAttribute("type", isPassword ? "text" : "password");
+            eyeIcon.className = isPassword ? "bi bi-eye-slash-fill text-info" : "bi bi-eye-fill";
         });
 
-        // Caps Lock Indicator
-        const capsLockBadge = document.getElementById("capsLockIndicator");
-        passwordInput.addEventListener("keyup", (e) => {
+        // Caps Lock Warning
+        const capsWarning = document.getElementById("capsWarningTag");
+        passInput.addEventListener("keyup", (e) => {
             if (e.getModifierState && e.getModifierState("CapsLock")) {
-                capsLockBadge.classList.remove("d-none");
+                capsWarning.classList.remove("d-none");
             } else {
-                capsLockBadge.classList.add("d-none");
+                capsWarning.classList.add("d-none");
             }
         });
 
-        // 1-Click Auto Fill
-        document.getElementById("demoFillPill").addEventListener("click", () => {
-            document.getElementById("inputUsername").value = "admin";
-            document.getElementById("inputPassword").value = "123456";
-            document.getElementById("inputPassword").focus();
+        // Cryptographic Hash Entropy Scrambler
+        const hashStream = document.getElementById("entropyHashStream");
+        passInput.addEventListener("input", function() {
+            const val = this.value;
+            if (!val) {
+                hashStream.textContent = "0x0000...IDLE";
+                return;
+            }
+            // Generate pseudo-hex cryptographic trace
+            let hash = 0;
+            for (let i = 0; i < val.length; i++) {
+                hash = ((hash << 5) - hash) + val.charCodeAt(i);
+                hash |= 0;
+            }
+            const hex = '0x' + Math.abs(hash).toString(16).toUpperCase().padStart(8, '0');
+            hashStream.textContent = `${hex}...${val.length * 32}-BIT`;
         });
 
-        // Form Submit Handler
-        document.getElementById("hologramLoginForm").addEventListener("submit", async (e) => {
+        // Interface Tab Switcher (Operator Mode vs PIN Matrix)
+        const tabOperator = document.getElementById("tabOperatorMode");
+        const tabPinDial = document.getElementById("tabPinDialMode");
+        const formMode = document.getElementById("cyberAuthForm");
+        const pinDialContainer = document.getElementById("pinDialContainer");
+        let activePinCode = "";
+
+        tabOperator.addEventListener("click", () => {
+            tabOperator.classList.add("active");
+            tabPinDial.classList.remove("active");
+            formMode.style.display = "block";
+            pinDialContainer.style.display = "none";
+            document.getElementById("cyberUserInput").focus();
+        });
+
+        tabPinDial.addEventListener("click", () => {
+            tabPinDial.classList.add("active");
+            tabOperator.classList.remove("active");
+            formMode.style.display = "none";
+            pinDialContainer.style.display = "block";
+        });
+
+        // PIN Dial Matrix Handler
+        document.querySelectorAll(".pin-dial-key[data-digit]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                if (activePinCode.length < 6) {
+                    activePinCode += btn.dataset.digit;
+                    updatePinDots();
+                    if (activePinCode.length === 6) {
+                        triggerPinLogin();
+                    }
+                }
+            });
+        });
+
+        document.getElementById("pinClearBtn").addEventListener("click", () => {
+            activePinCode = activePinCode.slice(0, -1);
+            updatePinDots();
+        });
+
+        document.getElementById("pinEnterBtn").addEventListener("click", () => {
+            if (activePinCode.length > 0) {
+                triggerPinLogin();
+            }
+        });
+
+        function updatePinDots() {
+            for (let i = 1; i <= 6; i++) {
+                const dot = document.getElementById(`dot${i}`);
+                if (i <= activePinCode.length) {
+                    dot.classList.add("filled");
+                } else {
+                    dot.classList.remove("filled");
+                }
+            }
+        }
+
+        async function triggerPinLogin() {
+            document.getElementById("cyberUserInput").value = "admin";
+            document.getElementById("cyberPassInput").value = activePinCode;
+            document.getElementById("cyberAuthForm").dispatchEvent(new Event("submit"));
+        }
+
+        // 1-Click Auto-Fill Animation
+        document.getElementById("autoFillAdminChip").addEventListener("click", () => {
+            const userInput = document.getElementById("cyberUserInput");
+            const passInput = document.getElementById("cyberPassInput");
+            userInput.value = "admin";
+            passInput.value = "123456";
+            passInput.dispatchEvent(new Event("input"));
+            passInput.focus();
+        });
+
+        // Form Submission & Handshake Execution
+        document.getElementById("cyberAuthForm").addEventListener("submit", async (e) => {
             e.preventDefault();
 
-            const user = document.getElementById("inputUsername").value.trim();
-            const pass = document.getElementById("inputPassword").value;
-            const pin = document.getElementById("inputPin").value.trim();
+            const user = document.getElementById("cyberUserInput").value.trim();
+            const pass = document.getElementById("cyberPassInput").value;
+            const pin = document.getElementById("cyberPinInput").value.trim();
 
-            const btn = document.getElementById("btnSubmitLogin");
-            const btnText = document.getElementById("btnSubmitText");
-            const btnIcon = document.getElementById("btnSubmitIcon");
-            const errorBox = document.getElementById("loginErrorBox");
-            const errorMsg = document.getElementById("loginErrorMessage");
+            const btn = document.getElementById("btnCyberSubmit");
+            const label = document.getElementById("submitLabel");
+            const icon = document.getElementById("submitIconSpinner");
+            const errBanner = document.getElementById("hudErrorBanner");
+            const errMsg = document.getElementById("hudErrorMessage");
 
             btn.disabled = true;
-            btnText.textContent = "Verifying Handshake...";
-            btnIcon.className = "spinner-border spinner-border-sm";
-            errorBox.classList.add("d-none");
+            label.textContent = "SYNCHRONIZING QUANTUM ENCLAVE...";
+            icon.className = "spinner-border spinner-border-sm";
+            errBanner.classList.add("d-none");
 
-            // Trigger Custom BCS Animated Neon Laser Loader
+            // Launch BCS Custom Animated Neon Laser Loader
             if (window.showBcsLoader) {
                 window.showBcsLoader("Authenticating Credentials with Cloudflare D1...");
             }
@@ -668,7 +1027,7 @@
                 localStorage.setItem("loggedInUserName", user);
 
                 if (window.showBcsLoader) {
-                    window.showBcsLoader("Handshake Verified! Launching POS Dashboard...");
+                    window.showBcsLoader("Quantum Handshake Verified! Loading Dashboard...");
                 }
 
                 setTimeout(() => {
@@ -677,7 +1036,7 @@
 
             } catch (error) {
                 // Emergency Offline / Local Administrator Fallback
-                if (user === "admin" && pass === "123456") {
+                if (user === "admin" && (pass === "123456" || activePinCode === "123456")) {
                     localStorage.setItem("isAuthenticated", "true");
                     localStorage.setItem("loggedInUserId", "admin");
                     localStorage.setItem("loggedInUserName", "Admin");
@@ -686,7 +1045,7 @@
                     localStorage.setItem("sessionPort", "8080");
 
                     if (window.showBcsLoader) {
-                        window.showBcsLoader("Offline Mode Granted. Launching Dashboard...");
+                        window.showBcsLoader("Local Enclave Authorized. Launching Dashboard...");
                     }
 
                     setTimeout(() => {
@@ -696,11 +1055,13 @@
                     if (window.hideBcsLoader) {
                         window.hideBcsLoader();
                     }
-                    errorMsg.textContent = error.message || "Invalid operator username or password.";
-                    errorBox.classList.remove("d-none");
+                    errMsg.textContent = error.message || "Invalid operator authentication credentials.";
+                    errBanner.classList.remove("d-none");
                     btn.disabled = false;
-                    btnText.textContent = "Unlock Terminal";
-                    btnIcon.className = "bi bi-box-arrow-in-right fs-5";
+                    label.textContent = "INITIALIZE QUANTUM HANDSHAKE";
+                    icon.className = "bi bi-fingerprint fs-5";
+                    activePinCode = "";
+                    updatePinDots();
                 }
             }
         });

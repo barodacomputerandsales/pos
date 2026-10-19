@@ -3,16 +3,25 @@ const path = require('path');
 const os = require('os');
 const { autoUpdater } = require('electron-updater');
 
+const APP_ID = 'com.bcsdeveloper.pos';
+if (process.platform === 'win32') {
+  app.setAppUserModelId(APP_ID);
+}
+
 let mainWindow;
 
 function createWindow() {
+  const iconPath = process.platform === 'win32' 
+    ? path.join(__dirname, 'assets/icon.ico') 
+    : path.join(__dirname, 'assets/icon.png');
+
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 800,
     minWidth: 1024,
     minHeight: 768,
-    backgroundColor: '#212529',
-    icon: path.join(__dirname, 'assets/icon.ico'),
+    backgroundColor: '#06080f',
+    icon: iconPath,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
