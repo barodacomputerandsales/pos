@@ -26,7 +26,7 @@ window._renderSidebarImpl = function(activeMenu, activeSubMenu = null) {
                 <span>Dashboard</span>
             </a>
             
-            <a href="pos.html" class="menu-item ${activeMenu === 'pos' ? 'active' : ''}">
+            <a href="pos.html" class="menu-item ${activeMenu === 'pos' ? 'active' : ''}" data-permission="pos_access">
                 <i class="bi bi-calculator-fill"></i>
                 <span>POS System</span>
             </a>
@@ -40,10 +40,10 @@ window._renderSidebarImpl = function(activeMenu, activeSubMenu = null) {
                 </button>
                 <div class="submenu">
                     <div class="submenu-inner">
-                        <a href="all-product.html" class="submenu-item ${activeSubMenu === 'all-product' ? 'active' : ''}">
+                        <a href="all-product.html" class="submenu-item ${activeSubMenu === 'all-product' ? 'active' : ''}" data-permission="view_products">
                             <div class="submenu-dot"></div> All Products
                         </a>
-                        <a href="add-product.html" class="submenu-item ${activeSubMenu === 'add-product' ? 'active' : ''}">
+                        <a href="add-product.html" class="submenu-item ${activeSubMenu === 'add-product' ? 'active' : ''}" data-permission="add_product">
                             <div class="submenu-dot"></div> Add Product
                         </a>
                     </div>
@@ -59,10 +59,10 @@ window._renderSidebarImpl = function(activeMenu, activeSubMenu = null) {
                 </button>
                 <div class="submenu">
                     <div class="submenu-inner">
-                        <a href="add-purchase.html" class="submenu-item ${activeSubMenu === 'add-purchase' ? 'active' : ''}">
+                        <a href="add-purchase.html" class="submenu-item ${activeSubMenu === 'add-purchase' ? 'active' : ''}" data-permission="add_purchase">
                             <div class="submenu-dot"></div> Add Purchase
                         </a>
-                        <a href="purchase-history.html" class="submenu-item ${activeSubMenu === 'purchase-history' ? 'active' : ''}">
+                        <a href="purchase-history.html" class="submenu-item ${activeSubMenu === 'purchase-history' ? 'active' : ''}" data-permission="view_purchases">
                             <div class="submenu-dot"></div> Purchase History
                         </a>
                     </div>
@@ -78,13 +78,13 @@ window._renderSidebarImpl = function(activeMenu, activeSubMenu = null) {
                 </button>
                 <div class="submenu">
                     <div class="submenu-inner">
-                        <a href="add-production.html" class="submenu-item ${activeSubMenu === 'add-production' ? 'active' : ''}">
+                        <a href="add-production.html" class="submenu-item ${activeSubMenu === 'add-production' ? 'active' : ''}" data-permission="add_production">
                             <div class="submenu-dot"></div> Add Production
                         </a>
-                        <a href="production-history.html" class="submenu-item ${activeSubMenu === 'production-history' ? 'active' : ''}">
+                        <a href="production-history.html" class="submenu-item ${activeSubMenu === 'production-history' ? 'active' : ''}" data-permission="view_production">
                             <div class="submenu-dot"></div> Production History
                         </a>
-                        <a href="add-production-product.html" class="submenu-item ${activeSubMenu === 'add-production-product' ? 'active' : ''}">
+                        <a href="add-production-product.html" class="submenu-item ${activeSubMenu === 'add-production-product' ? 'active' : ''}" data-permission="add_production_item">
                             <div class="submenu-dot"></div> Add Production Item
                         </a>
                     </div>
@@ -92,7 +92,7 @@ window._renderSidebarImpl = function(activeMenu, activeSubMenu = null) {
             </div>
             
             <div class="menu-label mt-4">MANAGEMENT</div>
-            <a href="settings.html" class="menu-item ${activeMenu === 'settings' ? 'active' : ''}">
+            <a href="settings.html" class="menu-item ${activeMenu === 'settings' ? 'active' : ''}" data-permission="manage_settings">
                 <i class="bi bi-gear-fill"></i>
                 <span>Settings</span>
             </a>
@@ -107,6 +107,11 @@ window._renderSidebarImpl = function(activeMenu, activeSubMenu = null) {
     
     if (!document.querySelector('.sidebar')) {
         document.body.insertAdjacentHTML('afterbegin', SIDEBAR_HTML);
+        
+        // Auto-filter sidebar UI based on permissions (Admin sees everything)
+        if (window.applyUIPermissions) {
+            window.applyUIPermissions(document.querySelector('.sidebar'));
+        }
         
         try {
             // Populate user details from localStorage

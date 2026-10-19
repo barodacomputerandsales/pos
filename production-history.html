@@ -219,6 +219,7 @@
 <body>
     <script src="template/layout.js"></script>
     <script>
+        protectRoute('view_production');
         renderTopbar();
         renderSidebar('production', 'production-history');
     </script>
@@ -240,7 +241,7 @@
                     <button class="btn btn-outline-info d-flex align-items-center gap-2" id="printReportBtn">
                         <i class="bi bi-printer"></i> Print Report
                     </button>
-                    <a href="add-production.html" class="btn btn-primary d-flex align-items-center gap-2">
+                    <a href="add-production.html" class="btn btn-primary d-flex align-items-center gap-2" data-permission="add_production">
                         <i class="bi bi-plus-circle"></i> Record Production
                     </a>
                 </div>

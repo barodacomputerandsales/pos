@@ -1,4 +1,4 @@
-﻿import { fetchAPI } from './api.js';
+import { fetchAPI } from './api.js';
 
 export async function loginUser(username, password, securityCode) {
     // 1. Send raw credentials to the backend for ultra-fast verification
@@ -31,8 +31,10 @@ export async function loginUser(username, password, securityCode) {
         if (trustRes.success) {
             // Save the session details
             localStorage.setItem('isAuthenticated', 'true');
-            localStorage.setItem('loggedInUserId', loginData.id);
-            localStorage.setItem('userRole', loginData.role);
+            localStorage.setItem('loggedInUserId', loginData.id || '');
+            localStorage.setItem('loggedInUserName', loginData.username || username);
+            localStorage.setItem('userRole', loginData.role || 'employee');
+            localStorage.setItem('userPermissions', JSON.stringify(loginData.permissions || []));
             localStorage.setItem('sessionId', loginData.session_id);
             localStorage.setItem('sessionPort', localPortNumber);
             return loginData;
@@ -45,7 +47,9 @@ export async function loginUser(username, password, securityCode) {
 export function logoutUser() {
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('loggedInUserId');
+    localStorage.removeItem('loggedInUserName');
     localStorage.removeItem('userRole');
+    localStorage.removeItem('userPermissions');
     localStorage.removeItem('sessionId');
     localStorage.removeItem('sessionPort');
     window.location.href = 'index.html';

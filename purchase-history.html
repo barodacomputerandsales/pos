@@ -195,6 +195,7 @@
 <body>
     <script src="template/layout.js"></script>
     <script>
+        protectRoute('view_purchases');
         renderTopbar();
         renderSidebar('purchase', 'purchase-history');
     </script>
@@ -213,7 +214,7 @@
                     <button class="btn btn-outline-secondary d-flex align-items-center gap-2" id="refreshBtn">
                         <i class="bi bi-arrow-clockwise"></i> Refresh
                     </button>
-                    <a href="add-purchase.html" class="btn btn-primary d-flex align-items-center gap-2">
+                    <a href="add-purchase.html" class="btn btn-primary d-flex align-items-center gap-2" data-permission="add_purchase">
                         <i class="bi bi-cart-plus-fill"></i> Add Purchase
                     </a>
                 </div>
