@@ -2,8 +2,8 @@ window._renderTopbarImpl = function() {
     const TOPBAR_HTML = `
     <header class="topbar">
         <div class="d-flex align-items-center gap-2">
-            <img src="assets/logo/bcs-app-icon.svg" alt="BCS" style="width: 28px; height: 28px; object-fit: contain; border-radius: 6px; filter: drop-shadow(0 0 8px rgba(0, 245, 255, 0.4));">
-            <h4 class="mb-0 fw-bold" style="background: linear-gradient(135deg, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">BCS Enterprise</h4>
+            <img src="template/bcs-logo.svg" alt="BCS" style="width: 28px; height: 28px; object-fit: contain; filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.5));">
+            <h4 class="mb-0 fw-bold" style="background: linear-gradient(135deg, #00e5ff, #6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">BCS Enterprise</h4>
             <span id="topbarVersionBadge" class="badge bg-secondary bg-opacity-25 text-muted border border-secondary border-opacity-25 small" style="font-size: 0.75rem;">v1.9.5</span>
         </div>
         <div class="d-flex align-items-center gap-3">

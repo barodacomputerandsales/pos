@@ -635,3 +635,104 @@ body::after {
         animation: none !important;
     }
 }
+
+/* ==========================================================================
+   13. Custom BCS Animated Logo Loader (Brand Identity Spinner)
+   ========================================================================== */
+
+.bcs-loader-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+}
+
+.bcs-loader-wrapper {
+    position: relative;
+    width: 84px;
+    height: 84px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Revolving Particle / Orbital Ring */
+.bcs-loader-orbit {
+    position: absolute;
+    inset: -10px;
+    border-radius: 50%;
+    border: 2px dashed rgba(0, 229, 255, 0.35);
+    animation: bcsOrbitSpin 8s linear infinite;
+    pointer-events: none;
+}
+
+.bcs-loader-orbit::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #00e5ff;
+    box-shadow: 0 0 12px #00e5ff, 0 0 20px #6366f1;
+}
+
+@keyframes bcsOrbitSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Floating & Glowing Logo Mark */
+.bcs-loader-icon {
+    width: 68px;
+    height: 68px;
+    animation: bcsLoaderFloat 2.6s ease-in-out infinite alternate;
+    filter: drop-shadow(0 0 16px rgba(0, 229, 255, 0.45));
+}
+
+@keyframes bcsLoaderFloat {
+    0% {
+        transform: translateY(0px) scale(0.96);
+        filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.3));
+    }
+    100% {
+        transform: translateY(-6px) scale(1.04);
+        filter: drop-shadow(0 0 24px rgba(99, 102, 241, 0.65));
+    }
+}
+
+.bcs-loader-text {
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: #f8fafc;
+    animation: bcsTextBreathe 2s ease-in-out infinite alternate;
+}
+
+@keyframes bcsTextBreathe {
+    0% { opacity: 0.7; }
+    100% { opacity: 1; text-shadow: 0 0 12px rgba(0, 229, 255, 0.5); }
+}
+
+/* Full-Screen Glassmorphic Overlay Loader */
+#bcs-global-loader-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    background: rgba(11, 15, 25, 0.82);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 280ms var(--bcs-ease-out-expo);
+}
+
+#bcs-global-loader-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
