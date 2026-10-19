@@ -1,14 +1,772 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 <head>
+    <script>
+        if (localStorage.getItem('isAuthenticated') !== 'true' || !localStorage.getItem('sessionId') || !localStorage.getItem('sessionPort')) {
+            window.location.replace('index.html');
+        }
+    </script>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width= , initial-scale=1.0">
-    <title>POS | BCS Enterprise POS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS Register | BCS Enterprise POS</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
     <link rel="apple-touch-icon" href="assets/icon.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bs-primary: #6366f1;
+            --bs-body-font-family: 'Inter', sans-serif;
+            --glass-bg: rgba(30, 30, 30, 0.55);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --glass-blur: blur(16px);
+            --page-bg: #0f172a;
+            --orb-1: rgba(99, 102, 241, 0.15);
+            --orb-2: rgba(0, 229, 255, 0.12);
+        }
+
+        body {
+            font-family: var(--bs-body-font-family);
+            background: var(--page-bg) !important;
+            background-attachment: fixed !important;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            position: relative;
+            z-index: 0;
+            overflow-x: hidden;
+            color: #f8fafc;
+        }
+
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            z-index: -1;
+            filter: blur(90px);
+            pointer-events: none;
+        }
+
+        body::before {
+            width: 520px;
+            height: 520px;
+            background: var(--orb-1);
+            top: -160px;
+            left: -120px;
+        }
+
+        body::after {
+            width: 440px;
+            height: 440px;
+            background: var(--orb-2);
+            bottom: -60px;
+            right: -60px;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 80px 24px 30px 24px;
+            flex-grow: 1;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg) !important;
+            backdrop-filter: var(--glass-blur);
+            border: var(--glass-border) !important;
+            box-shadow: var(--glass-shadow) !important;
+            border-radius: 16px;
+        }
+
+        .pos-product-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .pos-product-card:hover {
+            transform: translateY(-3px);
+            border-color: #6366f1;
+            background: rgba(30, 41, 59, 0.8);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.25);
+        }
+
+        .pos-product-card.out-of-stock {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        .pos-product-card.out-of-stock:hover {
+            transform: none;
+            border-color: rgba(255, 255, 255, 0.08);
+            box-shadow: none;
+        }
+
+        .cart-item-row {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cart-qty-btn {
+            width: 26px;
+            height: 26px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+        }
+
+        .category-pill {
+            cursor: pointer;
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 0.82rem;
+            white-space: nowrap;
+            transition: all 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(15, 23, 42, 0.6);
+            color: #cbd5e1;
+        }
+
+        .category-pill.active, .category-pill:hover {
+            background: #6366f1;
+            border-color: #6366f1;
+            color: #ffffff;
+            box-shadow: 0 0 14px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Custom Alert Cards */
+        #custom-alert-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .custom-alert {
+            min-width: 320px;
+            padding: 14px 18px;
+            border-radius: 10px;
+            background: rgba(24, 24, 27, 0.95);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.3s ease-out forwards;
+            border-left: 4px solid;
+            color: #fff;
+        }
+
+        .custom-alert.success { border-left-color: #22c55e; }
+        .custom-alert.error { border-left-color: #ef4444; }
+        .custom-alert.info { border-left-color: #00e5ff; }
+        .custom-alert .title { font-weight: 600; font-size: 0.92rem; }
+        .custom-alert .message { font-size: 0.82rem; opacity: 0.85; }
+        .custom-alert .close-btn { background: none; border: none; color: inherit; cursor: pointer; padding: 0; opacity: 0.6; }
+
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* Printable Receipt Styles */
+        @media print {
+            body * { visibility: hidden; }
+            #printableReceiptArea, #printableReceiptArea * { visibility: visible; }
+            #printableReceiptArea {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 80mm;
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding: 10px;
+                font-family: 'Courier New', Courier, monospace;
+            }
+        }
+    </style>
 </head>
-<body style="background-color: #212529;">
-    <h1>Point of Sale (POS) System</h1>
+<body>
+    <script src="template/layout.js"></script>
+    <script>
+        renderTopbar();
+        renderSidebar('pos');
+    </script>
+
+    <main class="main-content">
+        <div class="container-fluid px-1">
+            <div class="row g-3">
+                <!-- Left Column: POS Terminal & Catalog -->
+                <div class="col-xl-8 col-lg-7">
+                    <!-- Search & Filter Controls -->
+                    <div class="glass-panel p-3 mb-3">
+                        <div class="row g-2 align-items-center">
+                            <div class="col-md-7">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-dark border-secondary border-opacity-25 text-info">
+                                        <i class="bi bi-upc-scan"></i>
+                                    </span>
+                                    <input type="text" class="form-control" id="posSearchInput" placeholder="Scan barcode or type product name / SKU..." autofocus>
+                                </div>
+                            </div>
+                            <div class="col-md-5 d-flex gap-2 justify-content-end">
+                                <button class="btn btn-outline-secondary btn-sm" id="posRefreshBtn" title="Reload Products">
+                                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                                </button>
+                                <a href="add-product.html" class="btn btn-outline-info btn-sm">
+                                    <i class="bi bi-plus-lg"></i> Product
+                                </a>
+                                <a href="add-purchase.html" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-bag-check-fill"></i> Purchase
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Category Filter Pills -->
+                        <div class="d-flex gap-2 overflow-auto py-2 mt-2" id="categoryPillsContainer" style="scrollbar-width: thin;">
+                            <span class="category-pill active" data-cat="ALL">All Categories</span>
+                        </div>
+                    </div>
+
+                    <!-- Products Grid -->
+                    <div class="glass-panel p-3" style="min-height: 520px; max-height: 640px; overflow-y: auto;">
+                        <div class="row g-3" id="posProductsGrid">
+                            <!-- Dynamically generated product cards -->
+                        </div>
+                        <div id="noProductsFound" class="text-center py-5" style="display: none;">
+                            <div class="text-muted fs-2 mb-2"><i class="bi bi-search"></i></div>
+                            <h6 class="text-light">No Matching Products</h6>
+                            <p class="text-muted small">Try a different search term or category.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Active Cart & Checkout -->
+                <div class="col-xl-4 col-lg-5">
+                    <div class="glass-panel p-3 sticky-top" style="top: 86px;">
+                        <!-- Customer Info -->
+                        <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom border-secondary border-opacity-25">
+                            <h6 class="fw-bold mb-0 text-info d-flex align-items-center gap-2">
+                                <i class="bi bi-cart3"></i> Current Order
+                            </h6>
+                            <span id="cartCountBadge" class="badge bg-primary bg-opacity-25 text-primary">0 Items</span>
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-8">
+                                <input type="text" class="form-control form-control-sm" id="customerName" placeholder="Walk-in Customer">
+                            </div>
+                            <div class="col-4">
+                                <input type="tel" class="form-control form-control-sm" id="customerPhone" placeholder="Mobile #">
+                            </div>
+                        </div>
+
+                        <!-- Cart Items Scrollable List -->
+                        <div id="cartItemsList" style="max-height: 260px; min-height: 180px; overflow-y: auto; padding-right: 4px;">
+                            <div id="cartEmptyPlaceholder" class="text-center py-5 text-muted">
+                                <i class="bi bi-basket fs-1 d-block mb-2"></i>
+                                <div class="small">Cart is currently empty</div>
+                                <div style="font-size: 0.75rem;">Click items or scan barcodes to begin sale</div>
+                            </div>
+                        </div>
+
+                        <!-- Cart Financial Totals -->
+                        <div class="p-3 rounded bg-secondary bg-opacity-10 border border-secondary border-opacity-25 my-3">
+                            <div class="d-flex justify-content-between mb-1 small text-muted">
+                                <span>Subtotal:</span>
+                                <span class="text-white font-monospace" id="cartSubtotal">৳0.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-1 small text-muted">
+                                <span>Discount (৳):</span>
+                                <input type="number" class="form-control form-control-sm text-end font-monospace" id="cartDiscount" value="0" min="0" step="any" style="width: 100px;">
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2 small text-muted">
+                                <span>Tax / VAT (৳):</span>
+                                <input type="number" class="form-control form-control-sm text-end font-monospace" id="cartTax" value="0" min="0" step="any" style="width: 100px;">
+                            </div>
+                            <div class="d-flex justify-content-between fs-4 fw-bold text-info border-top border-secondary border-opacity-25 pt-2">
+                                <span>Total:</span>
+                                <span id="cartGrandTotal" class="font-monospace">৳0.00</span>
+                            </div>
+                        </div>
+
+                        <!-- Payment Method & Checkout -->
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1">Payment Method</label>
+                                <select class="form-select form-select-sm" id="cartPaymentMethod">
+                                    <option value="Cash" selected>Cash</option>
+                                    <option value="bKash">bKash</option>
+                                    <option value="Nagad">Nagad</option>
+                                    <option value="Card">Card</option>
+                                    <option value="Bank">Bank</option>
+                                    <option value="Due">Due / Credit</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1">Paid Amount (৳)</label>
+                                <input type="number" class="form-control form-control-sm text-end font-monospace fw-bold text-success" id="cartPaidAmount" value="0" min="0" step="any">
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-outline-danger btn-sm" id="cartClearBtn" title="Clear Cart">
+                                <i class="bi bi-trash3"></i>
+                            </button>
+                            <button type="button" class="btn btn-primary flex-grow-1 py-2 fw-semibold" id="checkoutBtn">
+                                <i class="bi bi-check2-circle me-1"></i> Complete Sale
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Hidden Printable Receipt Area -->
+    <div id="printableReceiptArea" style="display: none;"></div>
+
+    <div id="custom-alert-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { getCollection, addDocument, updateDocument } from './script/api.js';
+
+        let products = [];
+        let cart = [];
+        let activeCategory = 'ALL';
+        const formatCurrency = (amt) => '৳' + Number(amt || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+        window.showCustomAlert = function(title, message, type = 'success') {
+            const container = document.getElementById('custom-alert-container');
+            const alert = document.createElement('div');
+            alert.className = `custom-alert ${type === 'failed' ? 'error' : type}`;
+            const iconSvg = type === 'success' 
+                ? '<i class="bi bi-check-circle-fill text-success fs-5"></i>' 
+                : '<i class="bi bi-exclamation-octagon-fill text-danger fs-5"></i>';
+
+            alert.innerHTML = `
+                <div class="d-flex align-items-center gap-3 w-100">
+                    <div>${iconSvg}</div>
+                    <div class="flex-grow-1">
+                        <div class="title">${title}</div>
+                        <div class="message">${message}</div>
+                    </div>
+                    <button class="close-btn" onclick="this.closest('.custom-alert').remove()">&times;</button>
+                </div>`;
+
+            container.appendChild(alert);
+            setTimeout(() => {
+                alert.style.animation = 'slideOut 0.3s ease-in forwards';
+                setTimeout(() => alert.remove(), 300);
+            }, 3500);
+        };
+
+        // Load Products
+        async function loadPosProducts() {
+            if (window.showBcsLoader) window.showBcsLoader("Loading POS Catalog...");
+
+            try {
+                const res = await getCollection('products', true);
+                products = (res.docs || []).map(d => ({ id: d.id, ...d.data() })).filter(p => !p.deleteScheduledAt);
+
+                renderCategoryPills();
+                renderPosGrid();
+            } catch (err) {
+                console.error("Failed to load products for POS:", err);
+                showCustomAlert("Error", "Could not load inventory: " + err.message, "error");
+            } finally {
+                if (window.hideBcsLoader) window.hideBcsLoader();
+            }
+        }
+
+        // Render Category Filter Pills
+        function renderCategoryPills() {
+            const container = document.getElementById('categoryPillsContainer');
+            const categories = new Set();
+            products.forEach(p => {
+                if (p.category) categories.add(p.category);
+            });
+
+            container.innerHTML = `<span class="category-pill ${activeCategory === 'ALL' ? 'active' : ''}" data-cat="ALL">All Categories</span>` +
+                Array.from(categories).map(cat => `
+                    <span class="category-pill ${activeCategory === cat ? 'active' : ''}" data-cat="${cat}">${cat}</span>
+                `).join('');
+
+            container.querySelectorAll('.category-pill').forEach(pill => {
+                pill.addEventListener('click', () => {
+                    container.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
+                    pill.classList.add('active');
+                    activeCategory = pill.dataset.cat;
+                    renderPosGrid();
+                });
+            });
+        }
+
+        // Render Products Grid
+        function renderPosGrid() {
+            const query = document.getElementById('posSearchInput').value.trim().toLowerCase();
+            const grid = document.getElementById('posProductsGrid');
+            const noFound = document.getElementById('noProductsFound');
+
+            const filtered = products.filter(p => {
+                if (activeCategory !== 'ALL' && (p.category || '') !== activeCategory) {
+                    return false;
+                }
+                if (query) {
+                    const name = (p.name || '').toLowerCase();
+                    const barcode = (p.barcode || '').toLowerCase();
+                    const brand = (p.brand || '').toLowerCase();
+                    if (!name.includes(query) && !barcode.includes(query) && !brand.includes(query)) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                noFound.style.display = 'block';
+                return;
+            }
+
+            noFound.style.display = 'none';
+
+            grid.innerHTML = filtered.map(p => {
+                const stock = Number(p.quantity || p.stock || 0);
+                const isOutOfStock = stock <= 0;
+                const price = Number(p.sellPrice || p.sell_price || 0);
+
+                return `
+                    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+                        <div class="pos-product-card ${isOutOfStock ? 'out-of-stock' : ''}" data-id="${p.id}">
+                            <div>
+                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                    <span class="badge ${stock > 5 ? 'bg-success' : stock > 0 ? 'bg-warning text-dark' : 'bg-danger'} bg-opacity-25" style="font-size: 0.72rem;">
+                                        ${stock > 0 ? `${stock} ${p.unit || 'Pcs'}` : 'Out of Stock'}
+                                    </span>
+                                    <small class="text-muted font-monospace" style="font-size: 0.7rem;">${p.barcode || ''}</small>
+                                </div>
+                                <h6 class="fw-bold mb-1 text-light text-truncate" title="${p.name}">${p.name}</h6>
+                                <div class="text-muted small mb-2" style="font-size: 0.75rem;">${p.category || 'General'}</div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center pt-2 border-top border-secondary border-opacity-25">
+                                <span class="fs-6 fw-bold font-monospace text-info">${formatCurrency(price)}</span>
+                                <button type="button" class="btn btn-sm ${isOutOfStock ? 'btn-secondary' : 'btn-primary'} p-1 px-2 add-to-cart-btn" ${isOutOfStock ? 'disabled' : ''}>
+                                    <i class="bi bi-plus-lg"></i> Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            grid.querySelectorAll('.pos-product-card:not(.out-of-stock)').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    const prodId = card.dataset.id;
+                    const prod = products.find(p => p.id === prodId);
+                    if (prod) addToCart(prod);
+                });
+            });
+        }
+
+        // Cart Logic
+        function addToCart(product) {
+            const existing = cart.find(item => item.id === product.id);
+            const availableStock = Number(product.quantity || product.stock || 0);
+
+            if (existing) {
+                if (existing.qty + 1 > availableStock) {
+                    showCustomAlert("Stock Limit", `Only ${availableStock} units available in stock.`, "error");
+                    return;
+                }
+                existing.qty++;
+            } else {
+                if (availableStock < 1) {
+                    showCustomAlert("Out of Stock", "Product is out of stock.", "error");
+                    return;
+                }
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    barcode: product.barcode || '',
+                    price: Number(product.sellPrice || product.sell_price || 0),
+                    buyPrice: Number(product.buyPrice || product.buy_price || 0),
+                    unit: product.unit || 'Pcs',
+                    qty: 1,
+                    maxStock: availableStock
+                });
+            }
+
+            renderCart();
+        }
+
+        function updateCartQty(productId, delta) {
+            const item = cart.find(i => i.id === productId);
+            if (!item) return;
+
+            const newQty = item.qty + delta;
+            if (newQty <= 0) {
+                cart = cart.filter(i => i.id !== productId);
+            } else if (newQty > item.maxStock) {
+                showCustomAlert("Stock Limit", `Only ${item.maxStock} units available.`, "error");
+                return;
+            } else {
+                item.qty = newQty;
+            }
+
+            renderCart();
+        }
+
+        function removeCartItem(productId) {
+            cart = cart.filter(i => i.id !== productId);
+            renderCart();
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cartItemsList');
+            const placeholder = document.getElementById('cartEmptyPlaceholder');
+            const badge = document.getElementById('cartCountBadge');
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div id="cartEmptyPlaceholder" class="text-center py-5 text-muted">
+                        <i class="bi bi-basket fs-1 d-block mb-2"></i>
+                        <div class="small">Cart is currently empty</div>
+                        <div style="font-size: 0.75rem;">Click items or scan barcodes to begin sale</div>
+                    </div>
+                `;
+                badge.textContent = '0 Items';
+                recalcCartTotals();
+                return;
+            }
+
+            badge.textContent = `${cart.reduce((s, i) => s + i.qty, 0)} Items`;
+
+            container.innerHTML = cart.map(item => `
+                <div class="cart-item-row">
+                    <div class="flex-grow-1 text-truncate">
+                        <div class="fw-semibold small text-light text-truncate">${item.name}</div>
+                        <div class="text-muted font-monospace" style="font-size: 0.75rem;">${formatCurrency(item.price)} / ${item.unit}</div>
+                    </div>
+                    <div class="d-flex align-items-center gap-1">
+                        <button type="button" class="btn btn-sm btn-outline-secondary cart-qty-btn decrease-qty" data-id="${item.id}">-</button>
+                        <span class="font-monospace small px-1">${item.qty}</span>
+                        <button type="button" class="btn btn-sm btn-outline-secondary cart-qty-btn increase-qty" data-id="${item.id}">+</button>
+                    </div>
+                    <div class="text-end font-monospace text-info small fw-bold" style="width: 75px;">
+                        ${formatCurrency(item.price * item.qty)}
+                    </div>
+                    <button type="button" class="btn btn-sm text-danger p-0 ms-1 remove-cart-item" data-id="${item.id}" title="Remove">
+                        <i class="bi bi-x-circle"></i>
+                    </button>
+                </div>
+            `).join('');
+
+            container.querySelectorAll('.decrease-qty').forEach(b => b.addEventListener('click', () => updateCartQty(b.dataset.id, -1)));
+            container.querySelectorAll('.increase-qty').forEach(b => b.addEventListener('click', () => updateCartQty(b.dataset.id, 1)));
+            container.querySelectorAll('.remove-cart-item').forEach(b => b.addEventListener('click', () => removeCartItem(b.dataset.id)));
+
+            recalcCartTotals();
+        }
+
+        function recalcCartTotals() {
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const discount = parseFloat(document.getElementById('cartDiscount').value) || 0;
+            const tax = parseFloat(document.getElementById('cartTax').value) || 0;
+            const grandTotal = Math.max(0, subtotal - discount + tax);
+
+            document.getElementById('cartSubtotal').textContent = formatCurrency(subtotal);
+            document.getElementById('cartGrandTotal').textContent = formatCurrency(grandTotal);
+
+            // Default paid to grandTotal
+            document.getElementById('cartPaidAmount').value = grandTotal;
+        }
+
+        // Checkout Submission
+        async function completeSale() {
+            if (cart.length === 0) {
+                showCustomAlert("Cart Empty", "Please add items to cart before completing sale.", "error");
+                return;
+            }
+
+            const customerName = document.getElementById('customerName').value.trim() || 'Walk-in Customer';
+            const customerPhone = document.getElementById('customerPhone').value.trim();
+            const paymentMethod = document.getElementById('cartPaymentMethod').value;
+            const discount = parseFloat(document.getElementById('cartDiscount').value) || 0;
+            const tax = parseFloat(document.getElementById('cartTax').value) || 0;
+            const subtotal = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+            const grandTotal = Math.max(0, subtotal - discount + tax);
+            const paidAmount = parseFloat(document.getElementById('cartPaidAmount').value) || grandTotal;
+            const dueAmount = Math.max(0, grandTotal - paidAmount);
+
+            const invoiceNo = 'INV-' + Date.now().toString().slice(-6);
+            const operator = localStorage.getItem('loggedInUserName') || 'Admin';
+
+            if (window.showBcsLoader) {
+                window.showBcsLoader("Processing POS Sale & Syncing Stock...");
+            }
+
+            const checkoutBtn = document.getElementById('checkoutBtn');
+            checkoutBtn.disabled = true;
+
+            try {
+                // 1. Record Sale document
+                const saleRecord = {
+                    invoiceNo,
+                    customerName,
+                    customerPhone,
+                    items: JSON.stringify(cart),
+                    itemCount: cart.length,
+                    subtotal,
+                    discount,
+                    tax,
+                    grandTotal,
+                    paidAmount,
+                    dueAmount,
+                    paymentMethod,
+                    paymentStatus: dueAmount === 0 ? 'Paid' : (paidAmount > 0 ? 'Partial' : 'Due'),
+                    soldBy: operator,
+                    date: new Date().toISOString(),
+                    createdAt: new Date().toISOString()
+                };
+
+                await addDocument('sales', saleRecord);
+
+                // 2. Deduct sold quantity from products inventory
+                for (const item of cart) {
+                    const prod = products.find(p => p.id === item.id);
+                    if (prod) {
+                        const curStock = Number(prod.quantity || prod.stock || 0);
+                        const newStock = Math.max(0, curStock - item.qty);
+                        await updateDocument('products', item.id, {
+                            quantity: newStock,
+                            updatedAt: new Date().toISOString()
+                        });
+                        prod.quantity = newStock;
+                    }
+                }
+
+                showCustomAlert("Success", `Sale completed! Invoice #${invoiceNo}`, "success");
+
+                // Print receipt
+                printThermalReceipt(saleRecord, cart);
+
+                // Reset Cart
+                cart = [];
+                renderCart();
+                document.getElementById('customerName').value = '';
+                document.getElementById('customerPhone').value = '';
+                renderPosGrid();
+
+            } catch (err) {
+                console.error("POS Checkout failed:", err);
+                showCustomAlert("Error", "Could not complete sale: " + err.message, "error");
+            } finally {
+                checkoutBtn.disabled = false;
+                if (window.hideBcsLoader) window.hideBcsLoader();
+            }
+        }
+
+        // Print POS Thermal Receipt
+        function printThermalReceipt(sale, items) {
+            const printArea = document.getElementById('printableReceiptArea');
+            printArea.innerHTML = `
+                <div style="font-size: 12px; line-height: 1.4; text-align: center;">
+                    <div style="font-weight: bold; font-size: 15px;">BARODA COMPUTERS &amp; SALES</div>
+                    <div>POS Sales Receipt</div>
+                    <div>--------------------------------</div>
+                    <div style="text-align: left;">
+                        Inv: ${sale.invoiceNo}<br>
+                        Date: ${new Date(sale.date).toLocaleString()}<br>
+                        Cust: ${sale.customerName}<br>
+                        Phone: ${sale.customerPhone || 'N/A'}<br>
+                        Cashier: ${sale.soldBy}
+                    </div>
+                    <div>--------------------------------</div>
+                    <table style="width: 100%; font-size: 12px; text-align: left;">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th style="text-align: center;">Qty</th>
+                                <th style="text-align: right;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${items.map(i => `
+                                <tr>
+                                    <td>${i.name}</td>
+                                    <td style="text-align: center;">${i.qty}</td>
+                                    <td style="text-align: right;">৳${(i.price * i.qty).toFixed(2)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    <div>--------------------------------</div>
+                    <div style="text-align: right;">
+                        Subtotal: ৳${Number(sale.subtotal).toFixed(2)}<br>
+                        Discount: -৳${Number(sale.discount).toFixed(2)}<br>
+                        Tax: +৳${Number(sale.tax).toFixed(2)}<br>
+                        <strong>Total: ৳${Number(sale.grandTotal).toFixed(2)}</strong><br>
+                        Paid: ৳${Number(sale.paidAmount).toFixed(2)}<br>
+                        Due: ৳${Number(sale.dueAmount).toFixed(2)}<br>
+                        Method: ${sale.paymentMethod}
+                    </div>
+                    <div>--------------------------------</div>
+                    <div>Thank you for your visit!</div>
+                    <div style="font-size: 10px; margin-top: 5px;">Powered by BCS Enterprise POS</div>
+                </div>
+            `;
+            printArea.style.display = 'block';
+            window.print();
+            printArea.style.display = 'none';
+        }
+
+        // Barcode / Name Instant Scan Handler
+        document.getElementById('posSearchInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const code = e.target.value.trim().toLowerCase();
+                if (!code) return;
+
+                // Match exact barcode or name
+                const matched = products.find(p => (p.barcode || '').toLowerCase() === code || (p.name || '').toLowerCase() === code);
+                if (matched) {
+                    addToCart(matched);
+                    e.target.value = '';
+                    renderPosGrid();
+                }
+            }
+        });
+
+        document.getElementById('posSearchInput').addEventListener('input', renderPosGrid);
+        document.getElementById('posRefreshBtn').addEventListener('click', loadPosProducts);
+        document.getElementById('cartDiscount').addEventListener('input', recalcCartTotals);
+        document.getElementById('cartTax').addEventListener('input', recalcCartTotals);
+        document.getElementById('cartClearBtn').addEventListener('click', () => {
+            if (confirm("Clear all items from active cart?")) {
+                cart = [];
+                renderCart();
+            }
+        });
+        document.getElementById('checkoutBtn').addEventListener('click', completeSale);
+
+        document.addEventListener('DOMContentLoaded', loadPosProducts);
+    </script>
 </body>
 </html>

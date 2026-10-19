@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <script>
+        if (localStorage.getItem('isAuthenticated') !== 'true' || !localStorage.getItem('sessionId') || !localStorage.getItem('sessionPort')) {
+            window.location.replace('index.html');
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Purchase Invoice | BCS Enterprise POS</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+    <link rel="apple-touch-icon" href="assets/icon.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bs-primary: #6366f1;
+            --bs-body-font-family: 'Inter', sans-serif;
+            --glass-bg: rgba(30, 30, 30, 0.55);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --glass-blur: blur(16px);
+            --page-bg: #0f172a;
+            --orb-1: rgba(99, 102, 241, 0.15);
+            --orb-2: rgba(0, 229, 255, 0.12);
+        }
+
+        body {
+            font-family: var(--bs-body-font-family);
+            background: var(--page-bg) !important;
+            background-attachment: fixed !important;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            position: relative;
+            z-index: 0;
+            overflow-x: hidden;
+            color: #f8fafc;
+        }
+
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            z-index: -1;
+            filter: blur(90px);
+            pointer-events: none;
+        }
+
+        body::before {
+            width: 520px;
+            height: 520px;
+            background: var(--orb-1);
+            top: -160px;
+            left: -120px;
+        }
+
+        body::after {
+            width: 440px;
+            height: 440px;
+            background: var(--orb-2);
+            bottom: -60px;
+            right: -60px;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 80px 30px 40px 30px;
+            flex-grow: 1;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg) !important;
+            backdrop-filter: var(--glass-blur);
+            border: var(--glass-border) !important;
+            box-shadow: var(--glass-shadow) !important;
+            border-radius: 16px;
+        }
+
+        .form-control, .form-select {
+            background-color: rgba(15, 23, 42, 0.6) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            color: #f8fafc !important;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #6366f1 !important;
+            box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25) !important;
+        }
+
+        .form-control::placeholder {
+            color: rgba(148, 163, 184, 0.55);
+        }
+
+        .table-custom th {
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #94a3b8;
+            font-weight: 600;
+            background: rgba(15, 23, 42, 0.5) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+        }
+
+        .table-custom td {
+            vertical-align: middle;
+            background: transparent !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+        }
+
+        .quick-badge-btn {
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-badge-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Custom Alert Cards */
+        #custom-alert-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .custom-alert {
+            min-width: 320px;
+            padding: 14px 18px;
+            border-radius: 10px;
+            background: rgba(24, 24, 27, 0.95);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.3s ease-out forwards;
+            border-left: 4px solid;
+            color: #fff;
+        }
+
+        .custom-alert.success { border-left-color: #22c55e; }
+        .custom-alert.error { border-left-color: #ef4444; }
+        .custom-alert.info { border-left-color: #00e5ff; }
+        .custom-alert .title { font-weight: 600; font-size: 0.92rem; }
+        .custom-alert .message { font-size: 0.82rem; opacity: 0.85; }
+        .custom-alert .close-btn { background: none; border: none; color: inherit; cursor: pointer; padding: 0; opacity: 0.6; }
+
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* Printable Invoice Styles */
+        @media print {
+            body * { visibility: hidden; }
+            #printableInvoiceArea, #printableInvoiceArea * { visibility: visible; }
+            #printableInvoiceArea {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <script src="template/layout.js"></script>
+    <script>
+        renderTopbar();
+        renderSidebar('purchase', 'add-purchase');
+    </script>
+
+    <main class="main-content">
+        <div class="container-fluid px-2">
+            <!-- Header Bar -->
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 pb-3 mb-4 border-bottom border-secondary border-opacity-25">
+                <div>
+                    <h2 class="fw-bold mb-1 d-flex align-items-center gap-2">
+                        <i class="bi bi-bag-check-fill text-primary"></i> Add Purchase Invoice
+                    </h2>
+                    <p class="text-muted mb-0 small">Record vendor purchases, update inventory stock quantities, and manage supplier payment dues.</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="purchase-history.html" class="btn btn-outline-info d-flex align-items-center gap-2">
+                        <i class="bi bi-clock-history"></i> Purchase History
+                    </a>
+                    <a href="add-product.html" class="btn btn-outline-secondary d-flex align-items-center gap-2">
+                        <i class="bi bi-plus-lg"></i> New Product
+                    </a>
+                </div>
+            </div>
+
+            <form id="purchaseForm" novalidate>
+                <div class="row g-4">
+                    <!-- Left Column: Supplier Info & Purchase Items Table -->
+                    <div class="col-xl-8">
+                        <!-- 1. Supplier & Invoice Information Card -->
+                        <div class="glass-panel p-4 mb-4">
+                            <h5 class="fw-bold mb-3 d-flex align-items-center gap-2 text-info">
+                                <i class="bi bi-person-lines-fill"></i> Vendor &amp; Invoice Information
+                            </h5>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label small text-muted text-uppercase fw-semibold">Supplier / Vendor Name *</label>
+                                    <input type="text" class="form-control" id="supplierName" list="supplierDatalist" placeholder="e.g. Walton Distribution" required>
+                                    <datalist id="supplierDatalist"></datalist>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small text-muted text-uppercase fw-semibold">Supplier Phone / Mobile</label>
+                                    <input type="tel" class="form-control" id="supplierPhone" placeholder="e.g. 01700-000000">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small text-muted text-uppercase fw-semibold">Purchase Date *</label>
+                                    <input type="datetime-local" class="form-control" id="purchaseDate" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small text-muted text-uppercase fw-semibold">Invoice / Bill No *</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control font-monospace" id="invoiceNo" required>
+                                        <button class="btn btn-outline-secondary" type="button" id="regenerateInvoiceBtn" title="Regenerate Invoice Number">
+                                            <i class="bi bi-arrow-clockwise"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small text-muted text-uppercase fw-semibold">Purchase Status</label>
+                                    <select class="form-select" id="purchaseStatus">
+                                        <option value="Received" selected>Received (Stock Added)</option>
+                                        <option value="Ordered">Ordered (Pending Arrival)</option>
+                                        <option value="Pending">Pending Verification</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small text-muted text-uppercase fw-semibold">Reference / PO #</label>
+                                    <input type="text" class="form-control" id="referenceNo" placeholder="Optional PO or Memo Ref">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. Purchase Items Table Card -->
+                        <div class="glass-panel p-4 mb-4">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                                <h5 class="fw-bold mb-0 d-flex align-items-center gap-2 text-info">
+                                    <i class="bi bi-cart4"></i> Purchased Items &amp; Inventory Products
+                                </h5>
+                                <div class="small text-muted">
+                                    <span id="itemsCountBadge" class="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-25">0 Items</span>
+                                </div>
+                            </div>
+
+                            <!-- Quick Barcode / Product Search Bar -->
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-dark border-secondary border-opacity-25 text-info">
+                                        <i class="bi bi-upc-scan"></i>
+                                    </span>
+                                    <input type="text" class="form-control" id="quickProductSearch" placeholder="Type product name, SKU or scan barcode to quickly add item..." autocomplete="off">
+                                </div>
+                                <div id="quickSearchResults" class="list-group position-absolute mt-1 shadow-lg border border-secondary border-opacity-25" style="z-index: 1050; display: none; max-height: 240px; overflow-y: auto; width: 60%;"></div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-custom align-middle mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th style="min-width: 220px;">Product / Item</th>
+                                            <th class="text-center" style="width: 100px;">Current Stock</th>
+                                            <th class="text-center" style="width: 110px;">Quantity *</th>
+                                            <th class="text-center" style="width: 100px;">Unit</th>
+                                            <th class="text-center" style="width: 130px;">Buy Cost (৳) *</th>
+                                            <th class="text-center" style="width: 130px;">Sell Price (৳)</th>
+                                            <th class="text-end" style="width: 130px;">Subtotal (৳)</th>
+                                            <th class="text-end" style="width: 48px;"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="purchaseItemsTableBody">
+                                        <!-- Dynamically generated rows -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top border-secondary border-opacity-25">
+                                <button type="button" class="btn btn-outline-primary btn-sm d-flex align-items-center gap-2" id="addItemRowBtn">
+                                    <i class="bi bi-plus-circle"></i> Add Row
+                                </button>
+                                <span class="small text-muted">Stock will be automatically synchronized with catalog upon saving.</span>
+                            </div>
+                        </div>
+
+                        <!-- 3. Notes & Remarks Card -->
+                        <div class="glass-panel p-4">
+                            <label class="form-label small text-muted text-uppercase fw-semibold mb-2">Purchase Notes / Warranty &amp; Terms</label>
+                            <textarea class="form-control" id="purchaseNotes" rows="3" placeholder="Enter warranty information, vendor terms, serial numbers or shipment notes..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Payment & Financial Summary -->
+                    <div class="col-xl-4">
+                        <div class="glass-panel p-4 sticky-top" style="top: 100px;">
+                            <h5 class="fw-bold mb-3 d-flex align-items-center gap-2 text-info">
+                                <i class="bi bi-receipt-cutoff"></i> Payment &amp; Total
+                            </h5>
+
+                            <!-- Calculation Summary -->
+                            <div class="p-3 rounded bg-secondary bg-opacity-10 border border-secondary border-opacity-25 mb-4">
+                                <div class="d-flex justify-content-between mb-2 small text-muted">
+                                    <span>Items Subtotal:</span>
+                                    <span class="text-white font-monospace" id="summaryItemsSubtotal">৳0.00</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mb-2 small text-muted">
+                                    <span>Discount (৳):</span>
+                                    <input type="number" class="form-control form-control-sm text-end font-monospace" id="purchaseDiscount" value="0" min="0" step="any" style="width: 120px;">
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mb-2 small text-muted">
+                                    <span>Shipping / Labor (৳):</span>
+                                    <input type="number" class="form-control form-control-sm text-end font-monospace" id="purchaseShipping" value="0" min="0" step="any" style="width: 120px;">
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mb-3 small text-muted">
+                                    <span>Tax / VAT (৳):</span>
+                                    <input type="number" class="form-control form-control-sm text-end font-monospace" id="purchaseTax" value="0" min="0" step="any" style="width: 120px;">
+                                </div>
+                                <div class="d-flex justify-content-between fs-4 fw-bold text-info border-top border-secondary border-opacity-25 pt-2 mb-1">
+                                    <span>Grand Total:</span>
+                                    <span id="summaryGrandTotal" class="font-monospace">৳0.00</span>
+                                </div>
+                            </div>
+
+                            <!-- Payment Section -->
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label class="form-label small text-muted text-uppercase fw-semibold mb-0">Amount Paid (৳) *</label>
+                                    <div class="d-flex gap-1">
+                                        <span class="badge bg-secondary quick-badge-btn" id="btnPayFull">Full</span>
+                                        <span class="badge bg-secondary quick-badge-btn" id="btnPayZero">Zero</span>
+                                        <span class="badge bg-secondary quick-badge-btn" id="btnPayHalf">50%</span>
+                                    </div>
+                                </div>
+                                <input type="number" class="form-control font-monospace text-end fs-5 fw-bold text-success" id="paidAmount" value="0" min="0" step="any" required>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center p-3 rounded mb-3" style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.1);">
+                                <span class="small text-muted text-uppercase fw-semibold">Due Balance:</span>
+                                <span class="fs-5 fw-bold font-monospace text-danger" id="summaryDueAmount">৳0.00</span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small text-muted text-uppercase fw-semibold">Payment Method</label>
+                                <select class="form-select" id="paymentMethod">
+                                    <option value="Cash" selected>Cash</option>
+                                    <option value="Bank Transfer">Bank Transfer</option>
+                                    <option value="bKash">bKash</option>
+                                    <option value="Nagad">Nagad</option>
+                                    <option value="Rocket">Rocket</option>
+                                    <option value="Cheque">Cheque</option>
+                                    <option value="Card">Card</option>
+                                    <option value="Credit / Due">Credit / Due</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label small text-muted text-uppercase fw-semibold">Payment Status</label>
+                                <div>
+                                    <span id="paymentStatusBadge" class="badge bg-danger fs-6 px-3 py-2 w-100">DUE</span>
+                                </div>
+                            </div>
+
+                            <!-- Submission Buttons -->
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary py-2 fw-semibold fs-6" id="savePurchaseBtn">
+                                    <i class="bi bi-check2-circle me-1"></i> Save Purchase Invoice
+                                </button>
+                                <button type="button" class="btn btn-outline-info py-2" id="saveAndPrintBtn">
+                                    <i class="bi bi-printer me-1"></i> Save &amp; Print Invoice
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary py-2" id="saveAndNewBtn">
+                                    Save &amp; Add Another
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Hidden Printable Invoice Template Container -->
+    <div id="printableInvoiceArea" style="display: none;"></div>
+
+    <div id="custom-alert-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { getCollection, addDocument, updateDocument } from './script/api.js';
+
+        let allProducts = [];
+        let allSuppliers = new Set();
+        const formatCurrency = (amt) => '৳' + Number(amt || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+        // Custom Notification Alert Helper
+        window.showCustomAlert = function(title, message, type = 'success') {
+            const container = document.getElementById('custom-alert-container');
+            const alert = document.createElement('div');
+            alert.className = `custom-alert ${type === 'failed' ? 'error' : type}`;
+            const iconSvg = type === 'success' 
+                ? '<i class="bi bi-check-circle-fill text-success fs-5"></i>' 
+                : type === 'info'
+                    ? '<i class="bi bi-info-circle-fill text-info fs-5"></i>'
+                    : '<i class="bi bi-exclamation-octagon-fill text-danger fs-5"></i>';
+
+            alert.innerHTML = `
+                <div class="d-flex align-items-center gap-3 w-100">
+                    <div>${iconSvg}</div>
+                    <div class="flex-grow-1">
+                        <div class="title">${title}</div>
+                        <div class="message">${message}</div>
+                    </div>
+                    <button class="close-btn" onclick="this.closest('.custom-alert').remove()">&times;</button>
+                </div>`;
+
+            container.appendChild(alert);
+            setTimeout(() => {
+                alert.style.animation = 'slideOut 0.3s ease-in forwards';
+                setTimeout(() => alert.remove(), 300);
+            }, 4000);
+        };
+
+        // Invoice Number Generator
+        function generateInvoiceNumber() {
+            const d = new Date();
+            const dateStr = d.toISOString().slice(2, 10).replace(/-/g, '');
+            const rand = Math.floor(1000 + Math.random() * 9000);
+            return `PUR-${dateStr}-${rand}`;
+        }
+
+        // Initialize Page & Load Inventory
+        async function initPage() {
+            if (window.showBcsLoader) window.showBcsLoader("Loading Inventory Products...");
+
+            // Set default date to current local time
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('purchaseDate').value = now.toISOString().slice(0, 16);
+            document.getElementById('invoiceNo').value = generateInvoiceNumber();
+
+            try {
+                // Fetch products from Cloudflare D1
+                const res = await getCollection('products');
+                allProducts = (res.docs || []).map(d => ({ id: d.id, ...d.data() })).filter(p => !p.deleteScheduledAt);
+
+                // Fetch past purchases to populate supplier list
+                try {
+                    const purRes = await getCollection('purchases');
+                    (purRes.docs || []).forEach(doc => {
+                        const data = doc.data();
+                        if (data && data.supplierName) allSuppliers.add(data.supplierName);
+                    });
+                    const datalist = document.getElementById('supplierDatalist');
+                    datalist.innerHTML = Array.from(allSuppliers).map(s => `<option value="${s}">`).join('');
+                } catch(e) {
+                    console.warn("Could not preload suppliers list:", e);
+                }
+
+                // Check if a pre-selected product was passed via URL (?product=...)
+                const urlParams = new URLSearchParams(window.location.search);
+                const targetProductId = urlParams.get('product');
+
+                if (targetProductId) {
+                    const targetProd = allProducts.find(p => p.id === targetProductId);
+                    if (targetProd) {
+                        addItemRow(targetProd);
+                    } else {
+                        addItemRow();
+                    }
+                } else {
+                    // Add first blank row
+                    addItemRow();
+                }
+
+            } catch (err) {
+                console.error("Initialization error:", err);
+                showCustomAlert("Error", "Could not load inventory: " + err.message, "error");
+                addItemRow();
+            } finally {
+                if (window.hideBcsLoader) window.hideBcsLoader();
+            }
+        }
+
+        // Add a line item to the purchase table
+        function addItemRow(prefillProduct = null) {
+            const tbody = document.getElementById('purchaseItemsTableBody');
+            const rowId = 'pur_row_' + Date.now() + '_' + Math.floor(Math.random() * 100);
+
+            const row = document.createElement('tr');
+            row.id = rowId;
+            row.className = 'purchase-item-row';
+            row.innerHTML = `
+                <td>
+                    <select class="form-select form-select-sm item-select" required>
+                        <option value="">-- Choose or Type Product --</option>
+                        ${allProducts.map(p => {
+                            const isSelected = prefillProduct && prefillProduct.id === p.id ? 'selected' : '';
+                            return `<option value="${p.id}" ${isSelected} data-stock="${p.quantity || p.stock || 0}" data-buyprice="${p.buyPrice || p.buy_price || 0}" data-sellprice="${p.sellPrice || p.sell_price || 0}" data-unit="${p.unit || 'Pcs'}">${p.name} (${p.barcode || 'No SKU'})</option>`;
+                        }).join('')}
+                    </select>
+                </td>
+                <td class="text-center font-monospace small text-muted item-current-stock">
+                    ${prefillProduct ? (prefillProduct.quantity || prefillProduct.stock || 0) + ' ' + (prefillProduct.unit || 'Pcs') : '0 Pcs'}
+                </td>
+                <td class="text-center">
+                    <input type="number" class="form-control form-control-sm text-center font-monospace item-qty-input" min="0.01" step="any" value="1" required>
+                </td>
+                <td class="text-center">
+                    <select class="form-select form-select-sm item-unit-select">
+                        <option value="Pcs" ${prefillProduct && prefillProduct.unit === 'Pcs' ? 'selected' : ''}>Pcs</option>
+                        <option value="Box" ${prefillProduct && prefillProduct.unit === 'Box' ? 'selected' : ''}>Box</option>
+                        <option value="Kg" ${prefillProduct && prefillProduct.unit === 'Kg' ? 'selected' : ''}>Kg</option>
+                        <option value="Liter" ${prefillProduct && prefillProduct.unit === 'Liter' ? 'selected' : ''}>Liter</option>
+                        <option value="Packet" ${prefillProduct && prefillProduct.unit === 'Packet' ? 'selected' : ''}>Packet</option>
+                        <option value="Set" ${prefillProduct && prefillProduct.unit === 'Set' ? 'selected' : ''}>Set</option>
+                    </select>
+                </td>
+                <td class="text-center">
+                    <input type="number" class="form-control form-control-sm text-end font-monospace item-buyprice-input" min="0" step="any" value="${prefillProduct ? (prefillProduct.buyPrice || prefillProduct.buy_price || 0) : 0}" required>
+                </td>
+                <td class="text-center">
+                    <input type="number" class="form-control form-control-sm text-end font-monospace item-sellprice-input" min="0" step="any" value="${prefillProduct ? (prefillProduct.sellPrice || prefillProduct.sell_price || 0) : 0}">
+                </td>
+                <td class="text-end font-monospace text-info fw-semibold item-subtotal-display">
+                    ${prefillProduct ? formatCurrency(prefillProduct.buyPrice || 0) : '৳0.00'}
+                </td>
+                <td class="text-end">
+                    <button type="button" class="btn btn-outline-danger btn-sm p-1 remove-row-btn" title="Remove Item">
+                        <i class="bi bi-trash3"></i>
+                    </button>
+                </td>
+            `;
+
+            tbody.appendChild(row);
+
+            const select = row.querySelector('.item-select');
+            const qtyInput = row.querySelector('.item-qty-input');
+            const buyPriceInput = row.querySelector('.item-buyprice-input');
+            const sellPriceInput = row.querySelector('.item-sellprice-input');
+            const removeBtn = row.querySelector('.remove-row-btn');
+
+            select.addEventListener('change', () => onProductSelectChange(row));
+            qtyInput.addEventListener('input', () => recalcRowAndTotals(row));
+            buyPriceInput.addEventListener('input', () => recalcRowAndTotals(row));
+            sellPriceInput.addEventListener('input', () => recalcTotals());
+            removeBtn.addEventListener('click', () => {
+                row.remove();
+                recalcTotals();
+            });
+
+            recalcTotals();
+        }
+
+        function onProductSelectChange(row) {
+            const select = row.querySelector('.item-select');
+            const stockDisplay = row.querySelector('.item-current-stock');
+            const buyPriceInput = row.querySelector('.item-buyprice-input');
+            const sellPriceInput = row.querySelector('.item-sellprice-input');
+            const unitSelect = row.querySelector('.item-unit-select');
+
+            const opt = select.options[select.selectedIndex];
+            if (!opt || !select.value) {
+                stockDisplay.textContent = '0 Pcs';
+                buyPriceInput.value = 0;
+                sellPriceInput.value = 0;
+                recalcRowAndTotals(row);
+                return;
+            }
+
+            const stock = parseFloat(opt.dataset.stock) || 0;
+            const buyPrice = parseFloat(opt.dataset.buyprice) || 0;
+            const sellPrice = parseFloat(opt.dataset.sellprice) || 0;
+            const unit = opt.dataset.unit || 'Pcs';
+
+            stockDisplay.textContent = `${stock} ${unit}`;
+            buyPriceInput.value = buyPrice;
+            sellPriceInput.value = sellPrice;
+            if (unitSelect) unitSelect.value = unit;
+
+            recalcRowAndTotals(row);
+        }
+
+        function recalcRowAndTotals(row) {
+            const qtyInput = row.querySelector('.item-qty-input');
+            const buyPriceInput = row.querySelector('.item-buyprice-input');
+            const subtotalDisplay = row.querySelector('.item-subtotal-display');
+
+            const qty = parseFloat(qtyInput.value) || 0;
+            const buyPrice = parseFloat(buyPriceInput.value) || 0;
+            const lineSubtotal = qty * buyPrice;
+
+            subtotalDisplay.textContent = formatCurrency(lineSubtotal);
+            recalcTotals();
+        }
+
+        function recalcTotals() {
+            let itemsSubtotal = 0;
+            let totalItemCount = 0;
+
+            document.querySelectorAll('#purchaseItemsTableBody tr').forEach(row => {
+                const qtyInput = row.querySelector('.item-qty-input');
+                const buyPriceInput = row.querySelector('.item-buyprice-input');
+                if (qtyInput && buyPriceInput) {
+                    const qty = parseFloat(qtyInput.value) || 0;
+                    const price = parseFloat(buyPriceInput.value) || 0;
+                    itemsSubtotal += (qty * price);
+                    if (qty > 0) totalItemCount++;
+                }
+            });
+
+            const discount = parseFloat(document.getElementById('purchaseDiscount').value) || 0;
+            const shipping = parseFloat(document.getElementById('purchaseShipping').value) || 0;
+            const tax = parseFloat(document.getElementById('purchaseTax').value) || 0;
+
+            const grandTotal = Math.max(0, itemsSubtotal - discount + shipping + tax);
+            const paid = parseFloat(document.getElementById('paidAmount').value) || 0;
+            const due = Math.max(0, grandTotal - paid);
+
+            document.getElementById('summaryItemsSubtotal').textContent = formatCurrency(itemsSubtotal);
+            document.getElementById('summaryGrandTotal').textContent = formatCurrency(grandTotal);
+            document.getElementById('summaryDueAmount').textContent = formatCurrency(due);
+            document.getElementById('itemsCountBadge').textContent = `${totalItemCount} Items`;
+
+            // Update Payment Status Badge
+            const statusBadge = document.getElementById('paymentStatusBadge');
+            if (paid >= grandTotal && grandTotal > 0) {
+                statusBadge.textContent = 'PAID';
+                statusBadge.className = 'badge bg-success fs-6 px-3 py-2 w-100';
+            } else if (paid > 0 && paid < grandTotal) {
+                statusBadge.textContent = `PARTIAL (DUE: ${formatCurrency(due)})`;
+                statusBadge.className = 'badge bg-warning text-dark fs-6 px-3 py-2 w-100';
+            } else {
+                statusBadge.textContent = `DUE (${formatCurrency(due)})`;
+                statusBadge.className = 'badge bg-danger fs-6 px-3 py-2 w-100';
+            }
+        }
+
+        // Quick Search Autocomplete Filter
+        const quickSearchInput = document.getElementById('quickProductSearch');
+        const quickResults = document.getElementById('quickSearchResults');
+
+        quickSearchInput.addEventListener('input', function() {
+            const query = this.value.trim().toLowerCase();
+            if (query.length < 2) {
+                quickResults.style.display = 'none';
+                return;
+            }
+
+            const matches = allProducts.filter(p => 
+                (p.name && p.name.toLowerCase().includes(query)) ||
+                (p.barcode && p.barcode.toLowerCase().includes(query)) ||
+                (p.category && p.category.toLowerCase().includes(query))
+            ).slice(0, 8);
+
+            if (matches.length === 0) {
+                quickResults.innerHTML = `<div class="list-group-item bg-dark text-muted small p-2">No matching products found.</div>`;
+                quickResults.style.display = 'block';
+                return;
+            }
+
+            quickResults.innerHTML = matches.map(p => `
+                <a href="#" class="list-group-item list-group-item-action bg-dark text-white border-secondary border-opacity-25 d-flex justify-content-between align-items-center quick-prod-item" data-id="${p.id}">
+                    <div>
+                        <div class="fw-semibold small">${p.name}</div>
+                        <div class="text-muted" style="font-size: 0.72rem;">SKU: ${p.barcode || 'N/A'} • Stock: ${p.quantity || 0} ${p.unit || 'Pcs'}</div>
+                    </div>
+                    <span class="badge bg-primary bg-opacity-25 text-primary">৳${p.buyPrice || 0}</span>
+                </a>
+            `).join('');
+            quickResults.style.display = 'block';
+
+            quickResults.querySelectorAll('.quick-prod-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const prodId = item.dataset.id;
+                    const prod = allProducts.find(p => p.id === prodId);
+                    if (prod) {
+                        addItemRow(prod);
+                        quickSearchInput.value = '';
+                        quickResults.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!quickResults.contains(e.target) && e.target !== quickSearchInput) {
+                quickResults.style.display = 'none';
+            }
+        });
+
+        // Quick Payment Buttons
+        document.getElementById('btnPayFull').addEventListener('click', () => {
+            const grandTotalStr = document.getElementById('summaryGrandTotal').textContent.replace('৳', '').replace(/,/g, '');
+            document.getElementById('paidAmount').value = parseFloat(grandTotalStr) || 0;
+            recalcTotals();
+        });
+
+        document.getElementById('btnPayZero').addEventListener('click', () => {
+            document.getElementById('paidAmount').value = 0;
+            recalcTotals();
+        });
+
+        document.getElementById('btnPayHalf').addEventListener('click', () => {
+            const grandTotalStr = document.getElementById('summaryGrandTotal').textContent.replace('৳', '').replace(/,/g, '');
+            const total = parseFloat(grandTotalStr) || 0;
+            document.getElementById('paidAmount').value = (total / 2).toFixed(2);
+            recalcTotals();
+        });
+
+        document.getElementById('purchaseDiscount').addEventListener('input', recalcTotals);
+        document.getElementById('purchaseShipping').addEventListener('input', recalcTotals);
+        document.getElementById('purchaseTax').addEventListener('input', recalcTotals);
+        document.getElementById('paidAmount').addEventListener('input', recalcTotals);
+        document.getElementById('addItemRowBtn').addEventListener('click', () => addItemRow());
+        document.getElementById('regenerateInvoiceBtn').addEventListener('click', () => {
+            document.getElementById('invoiceNo').value = generateInvoiceNumber();
+        });
+
+        // Form Submission & Stock Synchronization
+        async function handlePurchaseSubmit(e, actionType = 'save') {
+            if (e) e.preventDefault();
+
+            const supplierName = document.getElementById('supplierName').value.trim();
+            if (!supplierName) {
+                showCustomAlert("Validation", "Please specify supplier or vendor name.", "error");
+                document.getElementById('supplierName').focus();
+                return;
+            }
+
+            const invoiceNo = document.getElementById('invoiceNo').value.trim();
+            if (!invoiceNo) {
+                showCustomAlert("Validation", "Invoice number is required.", "error");
+                document.getElementById('invoiceNo').focus();
+                return;
+            }
+
+            const purchaseDate = document.getElementById('purchaseDate').value;
+            const supplierPhone = document.getElementById('supplierPhone').value.trim();
+            const referenceNo = document.getElementById('referenceNo').value.trim();
+            const purchaseStatus = document.getElementById('purchaseStatus').value;
+            const paymentMethod = document.getElementById('paymentMethod').value;
+            const notes = document.getElementById('purchaseNotes').value.trim();
+
+            const rows = document.querySelectorAll('#purchaseItemsTableBody tr');
+            if (rows.length === 0) {
+                showCustomAlert("Validation", "Please add at least one product item to purchase.", "error");
+                return;
+            }
+
+            // Extract Line Items
+            const items = [];
+            for (const row of rows) {
+                const select = row.querySelector('.item-select');
+                const qtyInput = row.querySelector('.item-qty-input');
+                const unitSelect = row.querySelector('.item-unit-select');
+                const buyPriceInput = row.querySelector('.item-buyprice-input');
+                const sellPriceInput = row.querySelector('.item-sellprice-input');
+
+                const productId = select.value;
+                if (!productId) {
+                    showCustomAlert("Validation", "Please select a product for all rows.", "error");
+                    select.focus();
+                    return;
+                }
+
+                const opt = select.options[select.selectedIndex];
+                const productName = opt.text.split(' (')[0];
+                const qty = parseFloat(qtyInput.value) || 0;
+                const buyPrice = parseFloat(buyPriceInput.value) || 0;
+                const sellPrice = parseFloat(sellPriceInput.value) || 0;
+                const unit = unitSelect ? unitSelect.value : 'Pcs';
+
+                if (qty <= 0) {
+                    showCustomAlert("Validation", `Quantity for "${productName}" must be greater than zero.`, "error");
+                    qtyInput.focus();
+                    return;
+                }
+
+                items.push({
+                    productId,
+                    name: productName,
+                    quantity: qty,
+                    unit,
+                    buyPrice,
+                    sellPrice,
+                    subtotal: qty * buyPrice
+                });
+            }
+
+            const discount = parseFloat(document.getElementById('purchaseDiscount').value) || 0;
+            const shipping = parseFloat(document.getElementById('purchaseShipping').value) || 0;
+            const tax = parseFloat(document.getElementById('purchaseTax').value) || 0;
+            const itemsSubtotal = items.reduce((sum, item) => sum + item.subtotal, 0);
+            const grandTotal = Math.max(0, itemsSubtotal - discount + shipping + tax);
+            const paidAmount = parseFloat(document.getElementById('paidAmount').value) || 0;
+            const dueAmount = Math.max(0, grandTotal - paidAmount);
+
+            let paymentStatus = 'Due';
+            if (paidAmount >= grandTotal && grandTotal > 0) paymentStatus = 'Paid';
+            else if (paidAmount > 0) paymentStatus = 'Partial';
+
+            const operator = localStorage.getItem('loggedInUserName') || 'Admin';
+
+            // Trigger BCS Laser Loader
+            if (window.showBcsLoader) {
+                window.showBcsLoader("Recording Purchase & Updating Inventory Stock...");
+            }
+
+            const submitBtn = document.getElementById('savePurchaseBtn');
+            submitBtn.disabled = true;
+
+            try {
+                // 1. Construct Purchase Invoice Record
+                const purchaseRecord = {
+                    invoiceNo,
+                    supplierName,
+                    supplierPhone,
+                    purchaseDate: new Date(purchaseDate).toISOString(),
+                    status: purchaseStatus,
+                    referenceNo,
+                    items: JSON.stringify(items),
+                    itemCount: items.length,
+                    subtotal: itemsSubtotal,
+                    discount,
+                    shipping,
+                    tax,
+                    grandTotal,
+                    paidAmount,
+                    dueAmount,
+                    paymentMethod,
+                    paymentStatus,
+                    notes,
+                    recordedBy: operator,
+                    createdAt: new Date().toISOString()
+                };
+
+                // 2. Save purchase document to Cloudflare D1
+                await addDocument('purchases', purchaseRecord);
+
+                // 3. Update stock & prices in products table (if Received or Ordered)
+                if (purchaseStatus === 'Received') {
+                    for (const item of items) {
+                        const existingProd = allProducts.find(p => p.id === item.productId);
+                        if (existingProd) {
+                            const curQty = Number(existingProd.quantity || existingProd.stock || 0);
+                            const updatedQty = curQty + item.quantity;
+                            
+                            const updatePayload = {
+                                quantity: updatedQty,
+                                buyPrice: item.buyPrice,
+                                updatedAt: new Date().toISOString()
+                            };
+
+                            if (item.sellPrice > 0) {
+                                updatePayload.sellPrice = item.sellPrice;
+                            }
+
+                            await updateDocument('products', item.productId, updatePayload);
+                        }
+                    }
+                }
+
+                showCustomAlert("Success", `Purchase invoice ${invoiceNo} saved and stock updated!`, "success");
+
+                if (actionType === 'print') {
+                    renderAndPrintInvoice(purchaseRecord, items);
+                } else if (actionType === 'new') {
+                    document.getElementById('purchaseForm').reset();
+                    document.getElementById('purchaseItemsTableBody').innerHTML = '';
+                    addItemRow();
+                    document.getElementById('invoiceNo').value = generateInvoiceNumber();
+                    recalcTotals();
+                    submitBtn.disabled = false;
+                } else {
+                    setTimeout(() => {
+                        window.location.href = 'purchase-history.html';
+                    }, 1200);
+                }
+
+            } catch (err) {
+                console.error("Failed to save purchase:", err);
+                showCustomAlert("Error", "Could not save purchase invoice: " + err.message, "error");
+                submitBtn.disabled = false;
+            } finally {
+                if (window.hideBcsLoader) window.hideBcsLoader();
+            }
+        }
+
+        // Print Invoice Generator
+        function renderAndPrintInvoice(record, items) {
+            const printArea = document.getElementById('printableInvoiceArea');
+            printArea.innerHTML = `
+                <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; color: #111;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; padding-bottom: 12px; margin-bottom: 20px;">
+                        <div>
+                            <h2 style="margin: 0; font-size: 24px; font-weight: bold; color: #000;">BARODA COMPUTERS AND SALES</h2>
+                            <p style="margin: 3px 0; font-size: 13px; color: #555;">Official Stock Purchase Receipt &amp; Vendor Memo</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <h3 style="margin: 0; color: #2563eb;">PURCHASE INVOICE</h3>
+                            <div style="font-size: 14px; font-weight: bold; margin-top: 4px;">#${record.invoiceNo}</div>
+                            <div style="font-size: 12px; color: #666;">Date: ${new Date(record.purchaseDate).toLocaleDateString()}</div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 13px;">
+                        <div>
+                            <strong>Vendor / Supplier:</strong><br>
+                            ${record.supplierName}<br>
+                            Phone: ${record.supplierPhone || 'N/A'}<br>
+                            Status: ${record.status}
+                        </div>
+                        <div style="text-align: right;">
+                            <strong>Payment Information:</strong><br>
+                            Method: ${record.paymentMethod}<br>
+                            Status: <strong>${record.paymentStatus}</strong><br>
+                            Recorded By: ${record.recordedBy}
+                        </div>
+                    </div>
+
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px;">
+                        <thead>
+                            <tr style="background: #f1f5f9; border-bottom: 1px solid #cbd5e1;">
+                                <th style="padding: 8px; text-align: left;">Item Description</th>
+                                <th style="padding: 8px; text-align: center;">Qty</th>
+                                <th style="padding: 8px; text-align: right;">Buy Cost</th>
+                                <th style="padding: 8px; text-align: right;">Line Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${items.map(it => `
+                                <tr style="border-bottom: 1px solid #e2e8f0;">
+                                    <td style="padding: 8px;">${it.name}</td>
+                                    <td style="padding: 8px; text-align: center;">${it.quantity} ${it.unit}</td>
+                                    <td style="padding: 8px; text-align: right;">৳${Number(it.buyPrice).toFixed(2)}</td>
+                                    <td style="padding: 8px; text-align: right;">৳${Number(it.subtotal).toFixed(2)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: 30px;">
+                        <div style="width: 260px; font-size: 13px;">
+                            <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+                                <span>Subtotal:</span>
+                                <span>৳${Number(record.subtotal).toFixed(2)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+                                <span>Discount:</span>
+                                <span>-৳${Number(record.discount).toFixed(2)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+                                <span>Shipping &amp; Tax:</span>
+                                <span>+৳${(Number(record.shipping) + Number(record.tax)).toFixed(2)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-top: 2px solid #333; font-weight: bold; font-size: 15px;">
+                                <span>Grand Total:</span>
+                                <span>৳${Number(record.grandTotal).toFixed(2)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 4px 0; color: #16a34a; font-weight: bold;">
+                                <span>Paid Amount:</span>
+                                <span>৳${Number(record.paidAmount).toFixed(2)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 4px 0; color: #dc2626; font-weight: bold;">
+                                <span>Due Balance:</span>
+                                <span>৳${Number(record.dueAmount).toFixed(2)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 40px; border-top: 1px dashed #aaa; padding-top: 10px; font-size: 11px; text-align: center; color: #777;">
+                        Thank you for doing business with Baroda Computers And Sales. Generated by BCS Enterprise POS.
+                    </div>
+                </div>
+            `;
+            printArea.style.display = 'block';
+            window.print();
+            printArea.style.display = 'none';
+        }
+
+        document.getElementById('purchaseForm').addEventListener('submit', (e) => handlePurchaseSubmit(e, 'save'));
+        document.getElementById('saveAndPrintBtn').addEventListener('click', (e) => handlePurchaseSubmit(e, 'print'));
+        document.getElementById('saveAndNewBtn').addEventListener('click', (e) => handlePurchaseSubmit(e, 'new'));
+
+        document.addEventListener('DOMContentLoaded', initPage);
+    </script>
+</body>
+</html>

@@ -463,7 +463,7 @@
                         if (submitterId === 'saveProductBtn') {
                             setTimeout(() => window.location.href = 'all-product.html', 1000);
                         } else if (submitterId === 'saveAndGoToPurchaseBtn') {
-                            setTimeout(() => window.location.href = `purchase.html?product=${encodeURIComponent(productData.id)}`, 1000);
+                            setTimeout(() => window.location.href = `add-purchase.html?product=${encodeURIComponent(productData.id)}`, 1000);
                         } else {
                             addProductForm.reset();
                             unitSelect.dispatchEvent(new Event('change'));

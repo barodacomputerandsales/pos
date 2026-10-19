@@ -117,13 +117,13 @@
                 <div class="stat-card">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <p class="text-muted mb-1 small fw-semibold text-uppercase">Total Customers</p>
-                            <h2 class="fw-bold mb-0" id="totalCustomers">
+                            <p class="text-muted mb-1 small fw-semibold text-uppercase">Total Purchases</p>
+                            <h2 class="fw-bold mb-0" id="totalPurchases">
                                 <div class="skeleton skeleton-text"></div>
                             </h2>
                         </div>
                         <div class="stat-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
-                            <i class="bi bi-people"></i>
+                            <i class="bi bi-bag-check"></i>
                         </div>
                     </div>
                 </div>
@@ -187,9 +187,10 @@
                 <div class="stat-card">
                     <h5 class="fw-bold mb-3">Quick Actions</h5>
                     <div class="d-flex flex-column gap-2">
-                        <button class="btn btn-primary text-start"><i class="bi bi-plus-circle me-2"></i> Add New Product</button>
-                        <button class="btn btn-success text-start"><i class="bi bi-cart-plus me-2"></i> Start New Sale</button>
-                        <button class="btn btn-info text-start text-white"><i class="bi bi-person-plus me-2"></i> Add Customer</button>
+                        <a href="add-product.html" class="btn btn-primary text-start"><i class="bi bi-plus-circle me-2"></i> Add New Product</a>
+                        <a href="pos.html" class="btn btn-success text-start"><i class="bi bi-calculator me-2"></i> Start POS Sale</a>
+                        <a href="add-purchase.html" class="btn btn-info text-start text-white"><i class="bi bi-bag-check me-2"></i> Record Purchase</a>
+                        <a href="add-production.html" class="btn btn-secondary text-start"><i class="bi bi-gear-wide-connected me-2"></i> Record Production</a>
                     </div>
                 </div>
             </div>
@@ -202,11 +203,12 @@
         window.logoutUser = logoutUser;
 
         async function loadDashboardData() {
+            if (window.showBcsLoader) window.showBcsLoader("Loading Dashboard Overview...");
             try {
                 // Fetch data in parallel for maximum speed!
-                const [productsRes, customersRes, salesRes, usersRes] = await Promise.all([
+                const [productsRes, purchasesRes, salesRes, usersRes] = await Promise.all([
                     getCollection('products').catch(() => ({ docs: [] })),
-                    getCollection('customers').catch(() => ({ docs: [] })),
+                    getCollection('purchases').catch(() => ({ docs: [] })),
                     getCollection('sales').catch(() => ({ docs: [] })),
                     getCollection('users').catch(() => ({ docs: [] }))
                 ]);
@@ -220,13 +222,13 @@
                         wholesalePrice: data.wholesalePrice || data.wholesale_price || 0
                     };
                 }).filter(p => !p.deleteScheduledAt);
-                const customers = customersRes.docs.map(d => d.data());
+                const purchases = purchasesRes.docs.map(d => d.data());
                 const sales = salesRes.docs.map(d => d.data());
                 const users = usersRes.docs.map(d => d.data());
 
                 // Update Overview Cards
                 document.getElementById('totalProducts').textContent = products.length;
-                document.getElementById('totalCustomers').textContent = customers.length;
+                document.getElementById('totalPurchases').textContent = purchases.length;
                 document.getElementById('totalSales').textContent = sales.length;
                 document.getElementById('totalUsers').textContent = users.length;
 
@@ -250,6 +252,8 @@
             } catch (error) {
                 console.error("Failed to load dashboard data", error);
                 document.getElementById('recentProductsTable').innerHTML = `<tr><td colspan="4" class="text-danger">Error loading data: ${error.message}</td></tr>`;
+            } finally {
+                if (window.hideBcsLoader) window.hideBcsLoader();
             }
         }
 

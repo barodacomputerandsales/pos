@@ -1,9 +1,12 @@
 window._renderSidebarImpl = function(activeMenu, activeSubMenu = null) {
+    const isProductionActive = activeMenu === 'production' || (activeMenu === 'products' && (activeSubMenu === 'add-production' || activeSubMenu === 'production-history' || activeSubMenu === 'add-production-product'));
+    const isProductsActive = (activeMenu === 'products' && !isProductionActive);
+
     const SIDEBAR_HTML = `
     <aside class="sidebar">
         <div class="sidebar-header">
             <h5 class="mb-0 fw-bold text-white d-flex align-items-center gap-2" style="font-family: var(--bs-body-font-family); letter-spacing: 1px;">
-                <img src="template/bcs-logo.svg" alt="BCS" style="width: 38px; height: 38px; object-fit: contain; filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.55));"> BCS POS
+                <img src="assets/icon.png" onerror="this.src='template/bcs-logo.svg'" alt="BCS" style="width: 42px; height: 42px; border-radius: 10px; object-fit: contain; filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.45));"> BCS POS
             </h5>
         </div>
         <div class="sidebar-user">
@@ -23,8 +26,14 @@ window._renderSidebarImpl = function(activeMenu, activeSubMenu = null) {
                 <span>Dashboard</span>
             </a>
             
-            <div class="menu-group ${activeMenu === 'products' ? 'open' : ''}">
-                <button class="menu-item has-submenu ${activeMenu === 'products' ? 'active' : ''}">
+            <a href="pos.html" class="menu-item ${activeMenu === 'pos' ? 'active' : ''}">
+                <i class="bi bi-calculator-fill"></i>
+                <span>POS System</span>
+            </a>
+
+            <!-- Products Menu Group -->
+            <div class="menu-group ${isProductsActive ? 'open' : ''}">
+                <button class="menu-item has-submenu ${isProductsActive ? 'active' : ''}">
                     <i class="bi bi-box-seam-fill"></i>
                     <span>Products</span>
                     <i class="bi bi-chevron-down chevron"></i>
@@ -34,15 +43,6 @@ window._renderSidebarImpl = function(activeMenu, activeSubMenu = null) {
                         <a href="all-product.html" class="submenu-item ${activeSubMenu === 'all-product' ? 'active' : ''}">
                             <div class="submenu-dot"></div> All Products
                         </a>
-                                                <a href="add-production.html" class="submenu-item ${activeSubMenu === 'add-production' ? 'active' : ''}">
-                            <div class="submenu-dot"></div> Add Production
-                        </a>
-                        <a href="production-history.html" class="submenu-item ${activeSubMenu === 'production-history' ? 'active' : ''}">
-                            <div class="submenu-dot"></div> Production History
-                        </a>
-                        <a href="add-production-product.html" class="submenu-item ${activeSubMenu === 'add-production-product' ? 'active' : ''}">
-                            <div class="submenu-dot"></div> Add Production Product
-                        </a>
                         <a href="add-product.html" class="submenu-item ${activeSubMenu === 'add-product' ? 'active' : ''}">
                             <div class="submenu-dot"></div> Add Product
                         </a>
@@ -50,16 +50,48 @@ window._renderSidebarImpl = function(activeMenu, activeSubMenu = null) {
                 </div>
             </div>
 
-            <a href="pos.html" class="menu-item ${activeMenu === 'pos' ? 'active' : ''}">
-                <i class="bi bi-calculator-fill"></i>
-                <span>POS System</span>
-            </a>
+            <!-- Purchase Menu Group -->
+            <div class="menu-group ${activeMenu === 'purchase' ? 'open' : ''}">
+                <button class="menu-item has-submenu ${activeMenu === 'purchase' ? 'active' : ''}">
+                    <i class="bi bi-bag-check-fill"></i>
+                    <span>Purchase</span>
+                    <i class="bi bi-chevron-down chevron"></i>
+                </button>
+                <div class="submenu">
+                    <div class="submenu-inner">
+                        <a href="add-purchase.html" class="submenu-item ${activeSubMenu === 'add-purchase' ? 'active' : ''}">
+                            <div class="submenu-dot"></div> Add Purchase
+                        </a>
+                        <a href="purchase-history.html" class="submenu-item ${activeSubMenu === 'purchase-history' ? 'active' : ''}">
+                            <div class="submenu-dot"></div> Purchase History
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Production Menu Group -->
+            <div class="menu-group ${isProductionActive ? 'open' : ''}">
+                <button class="menu-item has-submenu ${isProductionActive ? 'active' : ''}">
+                    <i class="bi bi-gear-wide-connected"></i>
+                    <span>Production</span>
+                    <i class="bi bi-chevron-down chevron"></i>
+                </button>
+                <div class="submenu">
+                    <div class="submenu-inner">
+                        <a href="add-production.html" class="submenu-item ${activeSubMenu === 'add-production' ? 'active' : ''}">
+                            <div class="submenu-dot"></div> Add Production
+                        </a>
+                        <a href="production-history.html" class="submenu-item ${activeSubMenu === 'production-history' ? 'active' : ''}">
+                            <div class="submenu-dot"></div> Production History
+                        </a>
+                        <a href="add-production-product.html" class="submenu-item ${activeSubMenu === 'add-production-product' ? 'active' : ''}">
+                            <div class="submenu-dot"></div> Add Production Item
+                        </a>
+                    </div>
+                </div>
+            </div>
             
             <div class="menu-label mt-4">MANAGEMENT</div>
-            <a href="customers.html" class="menu-item ${activeMenu === 'customers' ? 'active' : ''}">
-                <i class="bi bi-people-fill"></i>
-                <span>Customers</span>
-            </a>
             <a href="settings.html" class="menu-item ${activeMenu === 'settings' ? 'active' : ''}">
                 <i class="bi bi-gear-fill"></i>
                 <span>Settings</span>
