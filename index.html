@@ -8,6 +8,10 @@
             localStorage.removeItem('isAuthenticated');
             localStorage.removeItem('sessionId');
             localStorage.removeItem('sessionPort');
+            localStorage.removeItem('loggedInUserId');
+            localStorage.removeItem('loggedInUserName');
+            localStorage.removeItem('userRole');
+            localStorage.removeItem('userPermissions');
         } else if (localStorage.getItem('isAuthenticated') === 'true' && localStorage.getItem('sessionId') && localStorage.getItem('sessionPort')) {
             window.location.replace('dashboard.html');
         }
@@ -20,23 +24,14 @@
     <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
     <link rel="apple-touch-icon" href="assets/icon.png">
     
+    <!-- Portable Enterprise Neon Laser Loader (Auto-pushes immediately on load) -->
+    <script src="template/loader/loader-1.js"></script>
+
     <!-- Bootstrap 5 CSS & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="template/animations.css">
-    
-    <!-- Modern Web Polyfill for Electron Context -->
-    <script>
-        if (typeof module === 'object') {
-            window.module = module;
-            module = undefined;
-        }
-    </script>
-    <script src="script/argon2-bundled.min.js"></script>
-    <script>
-        if (window.module) module = window.module;
-    </script>
 
     <style>
         :root {
@@ -662,43 +657,7 @@
     <div class="plasma-orb orb-2"></div>
     <div class="plasma-orb orb-3"></div>
 
-    <!-- Branded Pure Neon Laser Splash Loader (Embedded for instant paint on initial load / refresh) -->
-    <div id="bcs-global-loader-overlay" class="active">
-        <div class="bcs-loader-container">
-            <div class="bcs-loader-wrapper">
-                <div class="bcs-loader-orbit"></div>
-                <div class="bcs-logo-container anim-laser">
-                    <svg viewBox="460 380 1120 1280" class="bcs-logo-svg" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <filter id="neonGlowLoginOverlay" x="-35%" y="-35%" width="170%" height="170%">
-                                <feGaussianBlur stdDeviation="8" result="blur1" />
-                                <feGaussianBlur stdDeviation="22" result="blur2" />
-                                <feMerge>
-                                    <feMergeNode in="blur2" />
-                                    <feMergeNode in="blur1" />
-                                    <feMergeNode in="SourceGraphic" />
-                                </feMerge>
-                            </filter>
-                        </defs>
-                        <g filter="url(#neonGlowLoginOverlay)">
-                            <path d="M 640 450 L 1260 450 C 1380 450 1480 550 1480 670 C 1480 770 1410 855 1315 880 C 1435 910 1520 1010 1520 1140 C 1520 1270 1410 1380 1275 1380 L 640 1380 Z" 
-                                  fill="none" stroke="rgba(0, 229, 255, 0.12)" stroke-width="65" stroke-linejoin="round" class="bcs-stroke-guide" />
-                            <path d="M 640 450 L 1260 450 C 1380 450 1480 550 1480 670 C 1480 770 1410 855 1315 880 C 1435 910 1520 1010 1520 1140 C 1520 1270 1410 1380 1275 1380 L 640 1380 Z" 
-                                  fill="none" stroke="#00e5ff" stroke-width="70" stroke-linecap="round" stroke-linejoin="round" class="bcs-stroke-outer" />
-                            <path d="M 850 630 L 1190 630 C 1245 630 1290 675 1290 730 C 1290 785 1245 830 1190 830 L 850 830 Z" 
-                                  fill="none" stroke="#00e5ff" stroke-width="60" stroke-linecap="round" stroke-linejoin="round" class="bcs-stroke-top" />
-                            <path d="M 850 990 L 1210 990 C 1270 990 1320 1040 1320 1100 C 1320 1160 1270 1210 1210 1210 L 850 1210 Z" 
-                                  fill="none" stroke="#00e5ff" stroke-width="60" stroke-linecap="round" stroke-linejoin="round" class="bcs-stroke-bottom" />
-                        </g>
-                    </svg>
-                </div>
-                <div class="bcs-loader-icon"><i class="bi bi-shield-lock-fill"></i></div>
-            </div>
-            <div class="bcs-loader-text" id="bcs-global-loader-msg">Initializing BCS Enterprise Terminal...</div>
-        </div>
-    </div>
-
-    <!-- Layout Engine Scripts (Loads showBcsLoader / hideBcsLoader & Animations) -->
+    <!-- Layout Engine Scripts (Loads RBAC, Permissions, Global Layout Engine) -->
     <script src="template/layout.js"></script>
 
     <!-- Centered Dual-Pane Container -->
@@ -796,7 +755,7 @@
 
                 <!-- Customer Portal Sublink -->
                 <div class="customer-link-row">
-                    Are you a customer? If yes, then please <a href="https://customer.bcs.bcsdeveloper.com" target="_blank" rel="noopener">Login Here</a>
+                    Are you a customer? If yes, then please <a href="https://bcs.bcsdeveloper.com" target="_blank" rel="noopener">Login Here</a>
                 </div>
 
                 <!-- 1-Click Demo Fill -->
@@ -823,20 +782,6 @@
 
         // Terminal Bootstrapping & Initial Splash Transition
         function initLoginTerminal() {
-            const overlay = document.getElementById('bcs-global-loader-overlay');
-            if (overlay) {
-                try {
-                    const elOuter = overlay.querySelector('.bcs-stroke-outer');
-                    const elTop = overlay.querySelector('.bcs-stroke-top');
-                    const elBottom = overlay.querySelector('.bcs-stroke-bottom');
-                    if (elOuter && elOuter.getTotalLength) {
-                        elOuter.style.strokeDasharray = Math.ceil(elOuter.getTotalLength() || 10060);
-                        elTop.style.strokeDasharray = Math.ceil(elTop.getTotalLength() || 1180);
-                        elBottom.style.strokeDasharray = Math.ceil(elBottom.getTotalLength() || 1160);
-                    }
-                } catch(e) {}
-            }
-
             // Sync dynamic version from Electron runtime
             if (typeof require !== 'undefined') {
                 try {
@@ -856,24 +801,21 @@
             const sessPort = localStorage.getItem('sessionPort');
 
             if (isAuth && sessId && sessPort) {
-                const msgEl = document.getElementById('bcs-global-loader-msg');
-                if (msgEl) msgEl.textContent = "Restoring active session...";
+                if (window.BCSLoader) {
+                    window.BCSLoader.setText("Restoring active session...");
+                    window.BCSLoader.show();
+                }
                 setTimeout(() => {
                     window.location.replace("dashboard.html");
-                }, 400);
+                }, 350);
                 return;
             }
 
-            // Smooth laser splash transition on initial load or page refresh
+            // Focus on username input once initial splash fades
             setTimeout(() => {
-                if (window.hideBcsLoader) {
-                    window.hideBcsLoader();
-                } else if (overlay) {
-                    overlay.classList.remove('active');
-                }
                 const userInput = document.getElementById("loginUser");
                 if (userInput) userInput.focus();
-            }, 600);
+            }, 300);
         }
 
         if (document.readyState === 'loading') {
@@ -928,22 +870,32 @@
             errorBox.classList.add("d-none");
 
             // Trigger BCS Custom Neon Laser Loader
-            if (window.showBcsLoader) {
+            if (window.BCSLoader) {
+                window.BCSLoader.show("Authenticating Credentials with Cloudflare D1...");
+            } else if (window.showBcsLoader) {
                 window.showBcsLoader("Authenticating Credentials with Cloudflare D1...");
             }
 
             try {
                 const res = await loginUser(user, pass, pin);
                 if (res && res.is_verified) {
-                    if (window.showBcsLoader) {
+                    if (window.BCSLoader) {
+                        window.BCSLoader.setText("Credentials Verified! Launching Dashboard...");
+                    } else if (window.showBcsLoader) {
                         window.showBcsLoader("Credentials Verified! Launching Dashboard...");
                     }
                     setTimeout(() => {
                         window.location.replace("dashboard.html");
-                    }, 500);
+                    }, 400);
+                } else {
+                    throw new Error(res && res.error ? res.error : "Login verification failed");
                 }
             } catch (err) {
-                if (window.hideBcsLoader) window.hideBcsLoader();
+                if (window.BCSLoader) {
+                    window.BCSLoader.hide();
+                } else if (window.hideBcsLoader) {
+                    window.hideBcsLoader();
+                }
 
                 let message = err.message || "Invalid operator credentials";
                 if (message.includes("Failed to fetch") || message.includes("NetworkError")) {
@@ -956,13 +908,6 @@
                 errorBox.classList.remove("d-none");
                 btn.disabled = false;
                 btnText.textContent = "Sign In";
-            } finally {
-                if (btn.disabled && !errorBox.classList.contains("d-none")) {
-                    if (window.hideBcsLoader) window.hideBcsLoader();
-                    errorBox.classList.remove("d-none");
-                    btn.disabled = false;
-                    btnText.textContent = "Sign In";
-                }
             }
         });
     </script>
