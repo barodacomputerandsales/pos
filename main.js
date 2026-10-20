@@ -39,10 +39,12 @@ function createWindow() {
     mainWindow.focus();
   });
   
-  // After the app loads, silently check for updates in the background (production builds)
+  // After the app loads, silently check for updates in the background (production builds or dev update test)
   mainWindow.webContents.once('did-finish-load', () => {
-    if (app.isPackaged) {
-      autoUpdater.checkForUpdatesAndNotify();
+    if (app.isPackaged || autoUpdater.forceDevUpdateConfig) {
+      autoUpdater.checkForUpdatesAndNotify().catch(err => {
+        console.warn('[AutoUpdater] Silent check notice:', err.message);
+      });
     }
   });
 }
@@ -129,10 +131,15 @@ function scheduleSmartUpdateRetry(reason) {
 autoUpdater.autoDownload = true;
 autoUpdater.autoInstallOnAppQuit = false; // Never auto-install on quit or interrupt shop business hours!
 
+// Enable autoUpdater testing in development mode
+if (isDev) {
+  autoUpdater.forceDevUpdateConfig = true;
+}
+
 // Direct runtime autoUpdater to fetch updates through the serverless backend relay
 autoUpdater.setFeedURL({
   provider: 'generic',
-  url: 'https://backend.bcs.bcsdeveloper.com/api/updater'
+  url: 'https://backend.bcs.bcsdeveloper.com/api/updater/'
 });
 
 // Quiet background update check every 30 minutes

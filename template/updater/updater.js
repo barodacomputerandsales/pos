@@ -10,7 +10,7 @@
  */
 
 (function() {
-    let currentAppVersion = '2.2.0';
+    let currentAppVersion = '2.2.2';
     let downloadedUpdateInfo = null;
     let isIpcBound = false;
     let lastUserActivityTime = Date.now();
@@ -445,6 +445,24 @@
         }
 
         const fallbackMap = {
+            '2.2.2': `
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Universal Auto-Updater Resolution</strong>: Full absolute URL manifest rewrites and root edge redirects guarantee seamless 1-click updates across all POS terminals.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Zero-404 Edge Architecture</strong>: Dedicated Cloudflare Pages binary catch-all ensuring backwards compatibility for legacy client paths.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Laser Neon Precision</strong>: Complete AST-validated views with integrated zero-flicker splash loader.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Hardened Release Delivery</strong>: Authenticated private repository asset streaming with cryptographic SHA-512 verification.</div></div>
+            `,
+            '2.2.1': `
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Portable Neon Laser Loader</strong>: Integrated zero-flicker laser loading indicator across all views and portals.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Session Loop Protection</strong>: Sanitized logout credentials and resolved authentication redirect loops.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Customer Portal Sync</strong>: Direct routing to https://bcs.bcsdeveloper.com for omnichannel invoices.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Optimized Distribution</strong>: Pure Windows 64-bit NSIS packaging with asInvoker execution level.</div></div>
+            `,
+            '2.2.0': `
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-info fw-bold">•</span><div><strong class="text-white">Windows NSIS Engine Hardening</strong>: Refined 64-bit enterprise installer with seamless background update and instant silent restart handoff.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-info fw-bold">•</span><div><strong class="text-white">Streamlined Build Pipeline</strong>: Optimized CI/CD packaging workflow targeting pure Windows environments.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-info fw-bold">•</span><div><strong class="text-white">Zero-Flicker Branded Splash</strong>: Universal laser neon loader with smooth hardware-accelerated DWM rendering.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-info fw-bold">•</span><div><strong class="text-white">Edge Security Standards</strong>: Strengthened session validation and Cloudflare D1 edge synchronizations.</div></div>
+            `,
             '2.0.0': `
                 <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Atomic Port Bonding</strong>: Single-shot operator session registration and port trust eliminated edge race conditions.</div></div>
                 <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Self-Healing Admin Auth</strong>: Instant fallback recovery ensuring uninterrupted terminal sign-in out of the box.</div></div>
