@@ -356,7 +356,7 @@
                                         <div class="col-md-6 border-end border-secondary border-opacity-25">
                                             <div class="small text-muted text-uppercase fw-semibold mb-1">Installed Version</div>
                                             <div class="d-flex align-items-baseline gap-2">
-                                                <h2 class="fw-extrabold mb-0 text-white mono" id="installedVersionText">v1.9.5</h2>
+                                                <h2 class="fw-extrabold mb-0 text-white mono" id="installedVersionText">v1.9.8</h2>
                                                 <span class="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-25">Current</span>
                                             </div>
                                             <div class="small text-muted mt-2">Architecture: <span class="mono text-white">x64 (Windows NSIS)</span></div>
@@ -444,7 +444,7 @@
                                 <div>
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <label class="small text-muted text-uppercase fw-semibold mb-0">Release Notes &amp; Changelog</label>
-                                        <span class="small text-muted" id="releaseNotesVersionTag">v1.9.5 Production</span>
+                                        <span class="small text-muted" id="releaseNotesVersionTag">v1.9.8 Production</span>
                                     </div>
                                     <div class="p-3 rounded-3 bg-dark border border-secondary border-opacity-25 font-monospace small" style="max-height: 180px; overflow-y: auto;" id="releaseNotesContent">
                                         <p class="text-muted mb-0">Click "Check for Updates" to pull the latest changelog directly from GitHub.</p>
@@ -486,7 +486,7 @@
                                     The Cloudflare backend microservice queries GitHub API securely to deliver updates even behind restricted firewalls.
                                 </p>
                                 <div class="p-2 rounded bg-dark border border-secondary border-opacity-25 small mono text-truncate mb-3 text-info">
-                                    /api/updater/check?current=1.9.5
+                                    /api/updater/check?current=1.9.8
                                 </div>
                                 <button class="btn btn-outline-info btn-sm w-100 d-flex align-items-center justify-content-center gap-2" id="testUpdaterApiBtn">
                                     <i class="bi bi-broadcast"></i> Test Backend Updater Relay
@@ -685,7 +685,7 @@
     <script type="module">
         import { fetchAPI } from './script/api.js';
 
-        let appCurrentVersion = '1.9.5';
+        let appCurrentVersion = '1.9.8';
         let latestInstallerDownloadUrl = '';
 
         window.showAlert = function(title, message, type = 'success') {
@@ -762,7 +762,7 @@
                         document.getElementById('installedVersionText').textContent = `v${ver}`;
                     }
                     checkBackendUpdater(appCurrentVersion);
-                }).catch(() => checkBackendUpdater('1.9.5'));
+                }).catch(() => checkBackendUpdater('1.9.8'));
 
                 ipcRenderer.invoke('get_system_info').then(info => {
                     if (!info) return;
@@ -784,7 +784,7 @@
                     document.getElementById('runtimeNode').textContent = info.node || '20.x';
                 }).catch(() => {});
             } else {
-                checkBackendUpdater('1.9.5');
+                checkBackendUpdater('1.9.8');
             }
 
             // 2. Buttons & Event Handlers
@@ -890,21 +890,24 @@
 
                 // Restart & Install with Animation
                 restartBtn.addEventListener('click', () => {
-                    document.getElementById('installingOverlay').classList.remove('d-none');
-                    setTimeout(() => {
-                        ipcRenderer.send('restart_app');
-                    }, 1200);
+                    if (window.applyBcsUpdateAndRestart) {
+                        window.applyBcsUpdateAndRestart();
+                    } else {
+                        document.getElementById('installingOverlay').classList.remove('d-none');
+                        setTimeout(() => {
+                            ipcRenderer.send('restart_app');
+                        }, 1200);
+                    }
                 });
-            }
 
-            // Test Backend Relay Button
-            document.getElementById('testUpdaterApiBtn').addEventListener('click', async () => {
-                const btn = document.getElementById('testUpdaterApiBtn');
-                btn.disabled = true;
-                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Querying...';
+                // Test Backend Relay Button
+                document.getElementById('testUpdaterApiBtn').addEventListener('click', async () => {
+                    const btn = document.getElementById('testUpdaterApiBtn');
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Querying...';
 
-                try {
-                    const res = await fetchAPI('updater/check?current=1.9.5');
+                    try {
+                        const res = await fetchAPI('updater/check?current=1.9.8');
                     showAlert('Backend Relay Healthy', `Received response from ${res.source}. Latest tag: ${res.latestVersion}`, 'success');
                 } catch(e) {
                     showAlert('Relay Error', e.message, 'error');

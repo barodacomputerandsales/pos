@@ -50,6 +50,8 @@ app.on('window-all-closed', function () {
 
 // --- AUTO UPDATER CONFIGURATION & EVENTS ---
 
+let downloadedUpdateInfo = null;
+
 autoUpdater.autoDownload = true;
 autoUpdater.autoInstallOnAppQuit = false; // Never auto-install on quit or interrupt shop business hours!
 
@@ -86,6 +88,7 @@ autoUpdater.on('download-progress', (progressObj) => {
 
 // 5. When the update is fully downloaded and ready to install
 autoUpdater.on('update-downloaded', (info) => {
+  downloadedUpdateInfo = info;
   if (mainWindow) mainWindow.webContents.send('update_downloaded', info);
 });
 
@@ -106,6 +109,11 @@ ipcMain.on('check_for_updates', () => {
 // Get current application version
 ipcMain.handle('get_app_version', () => {
   return app.getVersion();
+});
+
+// Get cached downloaded update info
+ipcMain.handle('get_downloaded_update_info', () => {
+  return downloadedUpdateInfo;
 });
 
 // Get detailed system diagnostics
@@ -153,8 +161,9 @@ ipcMain.handle('open_external', async (event, url) => {
   return false;
 });
 
-// Restart app and install the downloaded update
+// Restart app and install the downloaded update silently without legacy setup wizards
 ipcMain.on('restart_app', () => {
-  autoUpdater.quitAndInstall();
+  // isSilent: true (runs /S silently), isForceRunAfter: true (relaunches app immediately)
+  autoUpdater.quitAndInstall(true, true);
 });
 

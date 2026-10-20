@@ -25,9 +25,15 @@ function loadGlobalAnimations() {
     }
 }
 
-// Auto-inject global styling, icons, and professional animation engine immediately
+function loadGlobalUpdater() {
+    loadCss('updater');
+    loadScript('updater').catch(() => {});
+}
+
+// Auto-inject global styling, icons, animation engine, and holographic auto-updater immediately
 loadGlobalIcons();
 loadGlobalAnimations();
+loadGlobalUpdater();
 
 function loadScript(name) {
     return new Promise((resolve, reject) => {
