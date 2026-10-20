@@ -503,3 +503,123 @@
     box-shadow: 0 0 28px rgba(16, 185, 129, 0.45);
     color: #ffffff;
 }
+
+/* --- 6. DEDICATED TOPBAR UPDATE BUTTON --- */
+.bcs-dedicated-update-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(6, 182, 212, 0.25));
+    border: 1px solid rgba(6, 182, 212, 0.6);
+    color: #38bdf8;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 0 16px rgba(6, 182, 212, 0.3);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: bcsDedicatedPulse 2s infinite alternate;
+}
+
+.bcs-dedicated-update-btn:hover {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.45), rgba(6, 182, 212, 0.45));
+    border-color: #38bdf8;
+    color: #ffffff;
+    box-shadow: 0 0 24px rgba(6, 182, 212, 0.6);
+    transform: translateY(-1px);
+}
+
+@keyframes bcsDedicatedPulse {
+    0% {
+        box-shadow: 0 0 10px rgba(6, 182, 212, 0.25), 0 0 0 0 rgba(99, 102, 241, 0.4);
+    }
+    100% {
+        box-shadow: 0 0 20px rgba(6, 182, 212, 0.5), 0 0 0 3px rgba(6, 182, 212, 0);
+    }
+}
+
+/* --- 7. DEDICATED SYSTEM UPDATE ALERT MODAL / BANNER --- */
+.bcs-update-alert-card {
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(99, 102, 241, 0.45);
+    border-radius: 24px;
+    padding: 32px 30px;
+    width: 520px;
+    max-width: calc(100vw - 32px);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), 0 0 50px rgba(99, 102, 241, 0.35);
+    position: relative;
+    animation: bcsModalZoom 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    color: #ffffff;
+}
+
+.bcs-btn-settings {
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #94a3b8;
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.bcs-btn-settings:hover {
+    background: rgba(51, 65, 85, 0.9);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.bcs-btn-reinstall {
+    background: rgba(6, 182, 212, 0.12);
+    border: 1px solid rgba(6, 182, 212, 0.45);
+    color: #22d3ee;
+    padding: 11px 18px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.86rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    width: 100%;
+}
+
+.bcs-btn-reinstall:hover {
+    background: rgba(6, 182, 212, 0.25);
+    border-color: #22d3ee;
+    color: #ffffff;
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+}
+
+/* Big Update Now Button in Settings */
+.bcs-big-update-btn {
+    background: linear-gradient(135deg, #10b981, #06b6d4) !important;
+    border: none !important;
+    color: #ffffff !important;
+    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.45), 0 0 20px rgba(6, 182, 212, 0.3) !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.bcs-big-update-btn:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 15px 40px rgba(16, 185, 129, 0.6), 0 0 30px rgba(6, 182, 212, 0.5) !important;
+}
+
+.bcs-big-update-btn:active {
+    transform: translateY(1px) !important;
+}
+

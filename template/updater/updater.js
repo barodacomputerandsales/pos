@@ -10,7 +10,8 @@
  */
 
 (function() {
-    let currentAppVersion = '2.2.2';
+    let currentAppVersion = '2.2.3';
+    let availableRemoteInfo = null;
     let downloadedUpdateInfo = null;
     let isIpcBound = false;
     let lastUserActivityTime = Date.now();
@@ -311,7 +312,22 @@
         const container = document.getElementById('topbarUpdateContainer');
         if (!container) return;
 
-        if (state === 'downloading') {
+        if (state === 'available') {
+            const ver = data && (data.version || data.latestVersion) ? (data.version || data.latestVersion) : currentAppVersion;
+            container.innerHTML = `
+                <button id="bcsTopbarDedicatedBtn" class="bcs-dedicated-update-btn" type="button" title="System update available: Click to review and update">
+                    <span class="bcs-pill-dot pulse" style="background:#38bdf8;"></span>
+                    <i class="bi bi-cloud-arrow-down-fill"></i>
+                    <span>Update Available (v${ver})</span>
+                </button>
+            `;
+            const btn = document.getElementById('bcsTopbarDedicatedBtn');
+            if (btn) {
+                btn.addEventListener('click', () => {
+                    window.showUpdateAvailableAlert(data);
+                });
+            }
+        } else if (state === 'downloading') {
             const pct = Math.round(data && data.percent ? data.percent : 0);
             container.innerHTML = `
                 <div class="bcs-updater-pill downloading" title="Update downloading quietly in background">
@@ -426,10 +442,134 @@
             reviewBtn.addEventListener('click', () => {
                 const toast = document.getElementById('bcsModernUpdateToast');
                 if (toast) toast.remove();
-                window.openBcsUpdateModal(downloadedUpdateInfo);
+                window.openBcsUpdateModal(downloadedUpdateInfo || availableRemoteInfo);
             });
         }
     }
+
+    /**
+     * Reinstall App directly with standalone .exe installer
+     */
+    window.reinstallBcsApp = async function(ver) {
+        const targetUrl = 'https://backend.bcs.bcsdeveloper.com/api/updater/download';
+        if (typeof showAlert === 'function') {
+            showAlert('Reinstall Initiated', 'Requesting standalone setup installer from Cloudflare serverless edge...', 'info');
+        }
+        if (ipcRenderer) {
+            try {
+                await ipcRenderer.invoke('open_external', targetUrl);
+            } catch (e) {
+                window.open(targetUrl, '_blank');
+            }
+        } else {
+            window.open(targetUrl, '_blank');
+        }
+    };
+
+    /**
+     * Dedicated System Update Alert Dialog
+     * Shows high-priority alert telling the user to update the system
+     * with dedicated buttons for Update Now, Settings, and Standalone Reinstall.
+     */
+    window.showUpdateAvailableAlert = function(info) {
+        if (window.isCheckoutActive && window.isCheckoutActive()) return;
+        const existing = document.getElementById('bcsSystemUpdateAlertModal');
+        if (existing) existing.remove();
+
+        const targetVer = info && (info.version || info.latestVersion) ? (info.version || info.latestVersion) : currentAppVersion;
+        const isDownloaded = !!downloadedUpdateInfo;
+
+        const modalHtml = `
+        <div id="bcsSystemUpdateAlertModal" class="bcs-modal-backdrop">
+            <div class="bcs-update-alert-card text-center">
+                <button type="button" class="bcs-modal-close" onclick="document.getElementById('bcsSystemUpdateAlertModal').remove()" title="Close">&times;</button>
+                
+                <div class="bcs-orbital-emblem mb-3">
+                    <div class="bcs-orbital-ring"></div>
+                    <div class="bcs-orbital-ring reverse"></div>
+                    <div class="bcs-orbital-core" style="color: #06b6d4;">
+                        <i class="bi bi-bell-fill"></i>
+                    </div>
+                </div>
+
+                <div class="badge bg-warning bg-opacity-20 text-warning border border-warning border-opacity-25 px-3 py-1 mb-2 fw-bold" style="font-size: 0.76rem; letter-spacing: 0.08em;">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i> CRITICAL SYSTEM UPDATE AVAILABLE
+                </div>
+
+                <h4 class="fw-extrabold text-white mb-2">Update Ready: Version v${targetVer}</h4>
+                <p class="text-muted small mb-3" style="line-height: 1.45;">
+                    A new production build has been published. Updating ensures uninterrupted terminal checkout, peak hardware performance, and Cloudflare D1 central database integrity.
+                </p>
+
+                <div class="bcs-version-diff mb-4">
+                    <div class="text-center">
+                        <div class="text-muted small" style="font-size: 0.7rem;">CURRENT</div>
+                        <span class="bcs-version-tag old">v${currentAppVersion}</span>
+                    </div>
+                    <div class="bcs-version-arrow">
+                        <span>──</span>
+                        <i class="bi bi-arrow-right-circle-fill text-info"></i>
+                        <span>──&gt;</span>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-muted small" style="font-size: 0.7rem;">NEW RELEASE</div>
+                        <span class="bcs-version-tag new">v${targetVer}</span>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column gap-2">
+                    <button type="button" class="bcs-btn-update-now w-100 py-3" id="bcsAlertUpdateNowBtn">
+                        <i class="bi bi-rocket-takeoff-fill fs-5"></i>
+                        <span>${isDownloaded ? 'Restart & Install Now (~3s)' : 'Update System Now (One-Click)'}</span>
+                    </button>
+
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <button type="button" class="bcs-btn-settings w-100" id="bcsAlertOpenSettingsBtn">
+                                <i class="bi bi-sliders2-vertical text-info"></i>
+                                <span>Go to Settings</span>
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button type="button" class="bcs-btn-settings w-100" onclick="document.getElementById('bcsSystemUpdateAlertModal').remove()">
+                                <i class="bi bi-clock-history"></i>
+                                <span>Remind Later</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="button" class="bcs-btn-reinstall mt-1" id="bcsAlertReinstallBtn">
+                        <i class="bi bi-box-arrow-down fs-5"></i>
+                        <span>Reinstall App with New Version (.exe Installer)</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+        document.getElementById('bcsAlertUpdateNowBtn').addEventListener('click', () => {
+            document.getElementById('bcsSystemUpdateAlertModal').remove();
+            if (isDownloaded) {
+                window.captureBcsSessionSnapshot();
+                window.applyBcsUpdateAndRestart();
+            } else {
+                window.openBcsUpdateModal(info);
+                if (ipcRenderer) ipcRenderer.send('download_update');
+            }
+        });
+
+        document.getElementById('bcsAlertOpenSettingsBtn').addEventListener('click', () => {
+            document.getElementById('bcsSystemUpdateAlertModal').remove();
+            window.location.href = 'settings.html#tab-updates';
+        });
+
+        document.getElementById('bcsAlertReinstallBtn').addEventListener('click', () => {
+            document.getElementById('bcsSystemUpdateAlertModal').remove();
+            window.reinstallBcsApp(targetVer);
+        });
+    };
 
     /**
      * Format Markdown / Release Notes for Changelog Views
@@ -445,6 +585,12 @@
         }
 
         const fallbackMap = {
+            '2.2.3': `
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Dedicated System Update Alert</strong>: Instant holographic popup and topbar badge with 1-click update action when new releases arrive.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Quick Settings Navigation</strong>: Added direct button to open the Software Updater settings hub with one click.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Big Update Now Button</strong>: Massive high-visibility action button on Settings for instant background binary swap.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Standalone Reinstaller Option</strong>: Dedicated button to download and run full setup .exe for clean reinstallation.</div></div>
+            `,
             '2.2.2': `
                 <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Universal Auto-Updater Resolution</strong>: Full absolute URL manifest rewrites and root edge redirects guarantee seamless 1-click updates across all POS terminals.</div></div>
                 <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Zero-404 Edge Architecture</strong>: Dedicated Cloudflare Pages binary catch-all ensuring backwards compatibility for legacy client paths.</div></div>
@@ -603,6 +749,15 @@
                         Remind on Shift End
                     </button>
                 </div>
+
+                <div class="d-flex gap-2 mt-3 pt-2 border-top border-secondary border-opacity-25">
+                    <button type="button" class="bcs-btn-settings w-50 py-2 small" onclick="window.closeBcsUpdateModal(); window.location.href='settings.html#tab-updates';">
+                        <i class="bi bi-sliders2-vertical text-info"></i> Open Settings
+                    </button>
+                    <button type="button" class="bcs-btn-settings w-50 py-2 small" onclick="window.closeBcsUpdateModal(); window.reinstallBcsApp('${targetVer}');">
+                        <i class="bi bi-box-arrow-down text-info"></i> Reinstall (.exe)
+                    </button>
+                </div>
             </div>
         </div>
         `;
@@ -717,6 +872,17 @@
             }
         }).catch(() => {});
 
+        // 0. Update Available Notification
+        ipcRenderer.on('update_available', (event, info) => {
+            availableRemoteInfo = info;
+            updateTopbarPill('available', info);
+            showModernUpdateToast(info ? info.version : currentAppVersion);
+            if (!sessionStorage.getItem('bcs_update_alert_shown')) {
+                sessionStorage.setItem('bcs_update_alert_shown', 'true');
+                window.showUpdateAvailableAlert(info);
+            }
+        });
+
         // 1. Download Progress
         ipcRenderer.on('download_progress', (event, progress) => {
             updateTopbarPill('downloading', progress);
@@ -735,12 +901,35 @@
             retryState = data;
             updateTopbarPill('retry', data);
         });
+
+        // Universal Edge Telemetry Discovery Check
+        triggerSilentDiscoveryCheck();
+    }
+
+    function triggerSilentDiscoveryCheck() {
+        setTimeout(async () => {
+            try {
+                const res = await fetch(`https://backend.bcs.bcsdeveloper.com/api/updater/check?current=${currentAppVersion}`).then(r => r.json());
+                if (res && res.updateAvailable) {
+                    availableRemoteInfo = res;
+                    updateTopbarPill('available', res);
+                    if (!sessionStorage.getItem('bcs_update_alert_shown')) {
+                        sessionStorage.setItem('bcs_update_alert_shown', 'true');
+                        window.showUpdateAvailableAlert(res);
+                    }
+                }
+            } catch (e) {}
+        }, 2200);
     }
 
     // Auto-init on load
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initUpdater);
+        document.addEventListener('DOMContentLoaded', () => {
+            initUpdater();
+            if (!ipcRenderer) triggerSilentDiscoveryCheck();
+        });
     } else {
         initUpdater();
+        if (!ipcRenderer) triggerSilentDiscoveryCheck();
     }
 })();
