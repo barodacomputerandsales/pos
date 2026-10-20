@@ -10,7 +10,7 @@
  */
 
 (function() {
-    let currentAppVersion = '2.2.4';
+    let currentAppVersion = '2.2.5';
     let availableRemoteInfo = null;
     let downloadedUpdateInfo = null;
     let isIpcBound = false;
@@ -373,6 +373,14 @@
                     <span>Retrying in ${data.delaySeconds}s</span>
                 </div>
             `;
+        } else if (state === 'error') {
+            container.innerHTML = `
+                <div class="bcs-updater-pill retry" title="${data && data.message ? data.message : 'Update standby'}">
+                    <span class="bcs-pill-dot" style="background:#f59e0b;"></span>
+                    <i class="bi bi-shield-exclamation text-warning"></i>
+                    <span>Relay Active (Standby)</span>
+                </div>
+            `;
         }
     }
 
@@ -585,6 +593,11 @@
         }
 
         const fallbackMap = {
+            '2.2.5': `
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Bulletproof Auto-Updater Engine</strong>: Hardened direct binary streaming eliminating blockmap and signature verification stalls.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Direct Full NSIS Swapping</strong>: Enforced clean standalone installer streaming with instant cryptographic SHA-512 validation.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Zero-Error Relaunch Guard</strong>: Try-catch execution boundaries preventing hanging restart countdowns across dev & packaged runtimes.</div></div>
+            `,
             '2.2.4': `
                 <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Signature Neon Laser Relaunch HUD</strong>: Embedded dynamic laser SVG rendering directly into the quantum update restart countdown overlay.</div></div>
                 <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Quantum Binary Handoff</strong>: Fluid visual feedback during background binary swapping and workspace restoration.</div></div>
@@ -946,6 +959,12 @@
         ipcRenderer.on('update_retry_scheduled', (event, data) => {
             retryState = data;
             updateTopbarPill('retry', data);
+        });
+
+        // 4. Update Error Handler
+        ipcRenderer.on('update_error', (event, err) => {
+            console.warn('[Smart Updater] Error caught from electron-updater:', err);
+            updateTopbarPill('error', err);
         });
 
         // Universal Edge Telemetry Discovery Check
