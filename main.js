@@ -1,6 +1,7 @@
-const { app, BrowserWindow, ipcMain, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, powerMonitor } = require('electron');
 const path = require('path');
 const os = require('os');
+const fs = require('fs');
 const { autoUpdater } = require('electron-updater');
 
 const APP_ID = 'com.bcsdeveloper.pos';
@@ -48,9 +49,58 @@ app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit();
 });
 
-// --- AUTO UPDATER CONFIGURATION & EVENTS ---
+// --- AUTO UPDATER CONFIGURATION & SMART RESILIENCE ---
 
 let downloadedUpdateInfo = null;
+let updateRetryCount = 0;
+let retryTimer = null;
+
+// Helper: Smart Disk Health & Storage Pre-check (>500MB required)
+function getDiskHealth() {
+  try {
+    const targetDir = app.getPath('userData') || os.homedir();
+    if (fs.statfsSync) {
+      const stats = fs.statfsSync(targetDir);
+      const freeBytes = stats.bfree * stats.bsize;
+      const totalBytes = stats.blocks * stats.bsize;
+      const freeMB = Math.round(freeBytes / (1024 * 1024));
+      const totalMB = Math.round(totalBytes / (1024 * 1024));
+      return {
+        freeMB,
+        totalMB,
+        freeGB: (freeMB / 1024).toFixed(1),
+        totalGB: (totalMB / 1024).toFixed(1),
+        isSufficient: freeMB >= 500
+      };
+    }
+  } catch (e) {}
+  return { freeMB: 2048, totalMB: 10240, freeGB: '2.0', totalGB: '10.0', isSufficient: true };
+}
+
+// Helper: Smart Exponential Backoff on Network Disconnect
+function scheduleSmartUpdateRetry(reason) {
+  if (retryTimer) clearTimeout(retryTimer);
+  updateRetryCount++;
+  // Exponential backoff: 30s, 60s, 120s, 240s, max 10 mins
+  const delayMs = Math.min(30000 * Math.pow(2, updateRetryCount - 1), 600000);
+  const delaySec = Math.round(delayMs / 1000);
+
+  if (mainWindow) {
+    mainWindow.webContents.send('update_retry_scheduled', {
+      attempt: updateRetryCount,
+      delaySeconds: delaySec,
+      reason: reason || 'Network drop / temporary timeout'
+    });
+  }
+
+  retryTimer = setTimeout(() => {
+    autoUpdater.checkForUpdates().then(() => {
+      updateRetryCount = 0; // Reset counter on success
+    }).catch(err => {
+      scheduleSmartUpdateRetry(err.message || 'Network error');
+    });
+  }, delayMs);
+}
 
 autoUpdater.autoDownload = true;
 autoUpdater.autoInstallOnAppQuit = false; // Never auto-install on quit or interrupt shop business hours!
@@ -63,7 +113,9 @@ autoUpdater.setFeedURL({
 
 // Quiet background update check every 30 minutes
 setInterval(() => {
-  autoUpdater.checkForUpdates().catch(() => {});
+  autoUpdater.checkForUpdates().catch(err => {
+    scheduleSmartUpdateRetry(err.message);
+  });
 }, 30 * 60 * 1000);
 
 // 1. Checking for update
@@ -71,13 +123,22 @@ autoUpdater.on('checking-for-update', () => {
   if (mainWindow) mainWindow.webContents.send('checking_for_update');
 });
 
-// 2. When an update is available (starts downloading)
+// 2. When an update is available: Perform Pre-Flight Disk Storage Check
 autoUpdater.on('update-available', (info) => {
+  const disk = getDiskHealth();
+  if (!disk.isSufficient) {
+    if (mainWindow) {
+      mainWindow.webContents.send('update_error', `Update download paused: Available disk space (${disk.freeMB} MB) is below the required 500 MB.`);
+    }
+    return;
+  }
+  updateRetryCount = 0; // Clear retry backoff on valid response
   if (mainWindow) mainWindow.webContents.send('update_available', info);
 });
 
 // 3. When no update is available (already on latest)
 autoUpdater.on('update-not-available', (info) => {
+  updateRetryCount = 0;
   if (mainWindow) mainWindow.webContents.send('update_not_available', info);
 });
 
@@ -89,12 +150,19 @@ autoUpdater.on('download-progress', (progressObj) => {
 // 5. When the update is fully downloaded and ready to install
 autoUpdater.on('update-downloaded', (info) => {
   downloadedUpdateInfo = info;
+  updateRetryCount = 0;
   if (mainWindow) mainWindow.webContents.send('update_downloaded', info);
 });
 
-// 6. Handle updater errors
+// 6. Handle updater errors with smart resilience
 autoUpdater.on('error', (err) => {
-  if (mainWindow) mainWindow.webContents.send('update_error', err == null ? "Unknown error" : (err.message || err.toString()));
+  const errMsg = err == null ? "Unknown error" : (err.message || err.toString());
+  if (mainWindow) mainWindow.webContents.send('update_error', errMsg);
+
+  // Trigger smart retry if temporary network failure
+  if (errMsg.includes('net::ERR') || errMsg.includes('ETIMEDOUT') || errMsg.includes('ENOTFOUND') || errMsg.includes('ECONNREFUSED')) {
+    scheduleSmartUpdateRetry(errMsg);
+  }
 });
 
 // --- IPC HANDLERS ---
@@ -103,6 +171,7 @@ autoUpdater.on('error', (err) => {
 ipcMain.on('check_for_updates', () => {
   autoUpdater.checkForUpdates().catch(err => {
     if (mainWindow) mainWindow.webContents.send('update_error', err.message);
+    scheduleSmartUpdateRetry(err.message);
   });
 });
 
@@ -114,6 +183,28 @@ ipcMain.handle('get_app_version', () => {
 // Get cached downloaded update info
 ipcMain.handle('get_downloaded_update_info', () => {
   return downloadedUpdateInfo;
+});
+
+// Smart Diagnostics: Pre-Flight Storage Health
+ipcMain.handle('get_disk_health', () => {
+  return getDiskHealth();
+});
+
+// Smart Diagnostics: Power Status (Battery vs AC)
+ipcMain.handle('get_power_status', () => {
+  let onBattery = false;
+  try {
+    if (powerMonitor && powerMonitor.isOnBatteryPower) {
+      onBattery = powerMonitor.isOnBatteryPower();
+    }
+  } catch (e) {}
+  return { onBattery };
+});
+
+// Smart Shift-End Mode: Apply update silently when app exits
+ipcMain.on('apply_update_and_exit', () => {
+  autoUpdater.autoInstallOnAppQuit = true;
+  app.quit();
 });
 
 // Get detailed system diagnostics

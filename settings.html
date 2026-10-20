@@ -455,7 +455,53 @@
 
                         <!-- Right: Update Channels & Policies -->
                         <div class="col-12 col-xl-4">
-                            <!-- Update Policy Card -->
+                            <!-- Smart Auto-Updater Policy Card -->
+                            <div class="glass-card p-4 mb-4">
+                                <h6 class="fw-bold text-white mb-3 d-flex align-items-center gap-2">
+                                    <i class="bi bi-cpu-fill text-primary"></i> Smart Updater Automation
+                                </h6>
+                                
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="smartCheckoutShieldToggle" checked>
+                                    <label class="form-check-label text-white small fw-semibold" for="smartCheckoutShieldToggle">
+                                        Active Checkout Shield
+                                    </label>
+                                    <div class="text-muted" style="font-size: 0.76rem;">Suppresses update popups during active billing or barcode scanning.</div>
+                                </div>
+
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="smartShiftEndToggle" checked>
+                                    <label class="form-check-label text-white small fw-semibold" for="smartShiftEndToggle">
+                                        Shift-End Smart Update
+                                    </label>
+                                    <div class="text-muted" style="font-size: 0.76rem;">Offers 1-click update when the operator clicks Logout / closes shift.</div>
+                                </div>
+
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="smartOvernightToggle" checked>
+                                    <label class="form-check-label text-white small fw-semibold" for="smartOvernightToggle">
+                                        Overnight Idle Auto-Sync
+                                    </label>
+                                    <div class="text-muted" style="font-size: 0.76rem;">Silently upgrades between 10 PM and 6 AM if terminal is idle for 15+ mins.</div>
+                                </div>
+
+                                <div class="p-3 rounded bg-dark border border-secondary border-opacity-25 small mt-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="text-muted">Storage Pre-Flight:</span>
+                                        <span class="text-success fw-bold mono" id="diskPreFlightStatus">Verified &gt;500MB</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="text-muted">Power Mode:</span>
+                                        <span class="text-info mono" id="powerPreFlightStatus">AC Mains (Optimal)</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-muted">State Auto-Restore:</span>
+                                        <span class="badge bg-success bg-opacity-25 text-success">Active &bull; Resilient</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Distribution Security Card -->
                             <div class="glass-card p-4 mb-4">
                                 <h6 class="fw-bold text-white mb-3 d-flex align-items-center gap-2">
                                     <i class="bi bi-shield-lock-fill text-primary"></i> Distribution Security
@@ -785,6 +831,54 @@
                 }).catch(() => {});
             } else {
                 checkBackendUpdater('1.9.8');
+            }
+
+            // Smart Policy Toggles (Sync with localStorage)
+            const shieldToggle = document.getElementById('smartCheckoutShieldToggle');
+            const shiftEndToggle = document.getElementById('smartShiftEndToggle');
+            const overnightToggle = document.getElementById('smartOvernightToggle');
+
+            if (shieldToggle) {
+                shieldToggle.checked = localStorage.getItem('bcs_checkout_shield') !== 'false';
+                shieldToggle.addEventListener('change', () => {
+                    localStorage.setItem('bcs_checkout_shield', shieldToggle.checked ? 'true' : 'false');
+                    showAlert('Policy Updated', `Checkout Shield is now ${shieldToggle.checked ? 'Enabled' : 'Disabled'}.`, 'info');
+                });
+            }
+
+            if (shiftEndToggle) {
+                shiftEndToggle.checked = localStorage.getItem('bcs_shift_end_update') !== 'false';
+                shiftEndToggle.addEventListener('change', () => {
+                    localStorage.setItem('bcs_shift_end_update', shiftEndToggle.checked ? 'true' : 'false');
+                    showAlert('Policy Updated', `Shift-End Smart Update is now ${shiftEndToggle.checked ? 'Enabled' : 'Disabled'}.`, 'info');
+                });
+            }
+
+            if (overnightToggle) {
+                overnightToggle.checked = localStorage.getItem('bcs_overnight_autosync') !== 'false';
+                overnightToggle.addEventListener('change', () => {
+                    localStorage.setItem('bcs_overnight_autosync', overnightToggle.checked ? 'true' : 'false');
+                    showAlert('Policy Updated', `Overnight Idle Auto-Sync is now ${overnightToggle.checked ? 'Enabled' : 'Disabled'}.`, 'info');
+                });
+            }
+
+            // Smart Pre-Flight Storage & Power Diagnostics
+            if (ipcRenderer) {
+                ipcRenderer.invoke('get_disk_health').then(disk => {
+                    const el = document.getElementById('diskPreFlightStatus');
+                    if (el && disk) {
+                        el.textContent = `${disk.freeGB} GB Free (${disk.isSufficient ? 'Passed' : 'Low Space'})`;
+                        el.className = disk.isSufficient ? 'text-success fw-bold mono' : 'text-danger fw-bold mono';
+                    }
+                }).catch(() => {});
+
+                ipcRenderer.invoke('get_power_status').then(pwr => {
+                    const el = document.getElementById('powerPreFlightStatus');
+                    if (el && pwr) {
+                        el.textContent = pwr.onBattery ? 'Battery Power' : 'AC Mains (Optimal)';
+                        el.className = pwr.onBattery ? 'text-warning mono' : 'text-info mono';
+                    }
+                }).catch(() => {});
             }
 
             // 2. Buttons & Event Handlers

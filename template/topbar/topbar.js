@@ -17,7 +17,7 @@ window._renderTopbarImpl = function() {
                     <small class="text-muted" style="font-size: 0.75rem;" id="topbarUserRole">Administrator</small>
                 </div>
             </div>
-            <button class="btn logout-btn" onclick="if(window.logoutUser) window.logoutUser(); else window.location.href='index.html';">
+            <button class="btn logout-btn" onclick="if(window.handleSmartLogout) window.handleSmartLogout(); else if(window.logoutUser) window.logoutUser(); else window.location.href='index.html';">
                 <i class="bi bi-box-arrow-right"></i> Logout
             </button>
         </div>

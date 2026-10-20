@@ -1,6 +1,6 @@
 /* ==========================================================================
-   BCS Enterprise POS - Next-Gen Holographic Auto-Updater Styling
-   Modern 1-Click Silent Engine, Glassmorphism & Cyberpunk HUD Aesthetics
+   BCS Enterprise POS - Smart Holographic Auto-Updater Styling
+   1-Click Silent Engine, Checkout Shield, Shift-End Sheet & Welcome Toast
    ========================================================================== */
 
 /* --- 1. TOPBAR UPDATE PILL --- */
@@ -42,6 +42,23 @@
     color: #ffffff;
     box-shadow: 0 0 25px rgba(16, 185, 129, 0.55);
     transform: translateY(-1px);
+}
+
+/* Smart Checkout Shield: Standby Pill */
+.bcs-updater-pill.standby {
+    background: rgba(245, 158, 11, 0.12);
+    border-color: rgba(245, 158, 11, 0.35);
+    color: #fbbf24;
+    cursor: default;
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.15);
+}
+
+/* Smart Network Retry Pill */
+.bcs-updater-pill.retry {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.35);
+    color: #f87171;
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.15);
 }
 
 @keyframes bcsPillPulse {
@@ -113,7 +130,26 @@
     to { transform: translateY(0) scale(1); opacity: 1; }
 }
 
-/* --- 3. MODERN HOLOGRAPHIC UPDATE MODAL --- */
+/* Post-Update Welcome Toast */
+.bcs-welcome-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 420px;
+    max-width: calc(100vw - 48px);
+    background: rgba(15, 23, 42, 0.96);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(99, 102, 241, 0.4);
+    border-left: 4px solid #6366f1;
+    border-radius: 16px;
+    padding: 16px 18px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65), 0 0 35px rgba(99, 102, 241, 0.25);
+    z-index: 10050;
+    color: #ffffff;
+    animation: bcsToastSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* --- 3. MODERN HOLOGRAPHIC UPDATE MODAL & SHIFT-END SHEET --- */
 .bcs-modal-backdrop {
     position: fixed;
     inset: 0;
@@ -288,6 +324,7 @@
 .bcs-feature-icon.cyan { background: rgba(6, 182, 212, 0.18); color: #22d3ee; }
 .bcs-feature-icon.purple { background: rgba(147, 51, 234, 0.2); color: #c084fc; }
 .bcs-feature-icon.emerald { background: rgba(16, 185, 129, 0.18); color: #34d399; }
+.bcs-feature-icon.amber { background: rgba(245, 158, 11, 0.18); color: #fbbf24; }
 
 /* Safe Mode Notice */
 .bcs-safe-notice {
