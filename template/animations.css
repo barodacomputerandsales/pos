@@ -38,9 +38,11 @@
    1. Page & Layout Entrance (Choreographed Staggered Cascade)
    ========================================================================== */
 
+/* High-DPI Sharp Typography: Avoid persistent will-change: transform on root container */
 .main-content {
     animation: bcsViewEntrance var(--bcs-dur-smooth) var(--bcs-ease-out-expo) forwards;
-    will-change: transform, opacity;
+    -webkit-font-smoothing: subpixel-antialiased;
+    text-rendering: geometricPrecision;
 }
 
 @keyframes bcsViewEntrance {
@@ -50,7 +52,7 @@
     }
     100% {
         opacity: 1;
-        transform: translateY(0);
+        transform: none; /* Releases 3D matrix compositor to guarantee crystal-clear DirectWrite font rendering */
     }
 }
 
@@ -83,7 +85,7 @@
     }
     100% {
         opacity: 1;
-        transform: translateY(0) scale(1);
+        transform: none; /* Releases GPU raster surface so fonts snap cleanly to pixel grid */
     }
 }
 

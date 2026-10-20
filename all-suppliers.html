@@ -8,7 +8,7 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Suppliers | BCS Enterprise POS</title>
+    <title>All Suppliers Directory | BCS Enterprise POS</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
     <link rel="apple-touch-icon" href="assets/icon.png">
@@ -20,53 +20,32 @@
     
     <style>
         :root {
-            --bs-primary: #6366f1;
-            --bs-body-font-family: 'Inter', sans-serif;
-            --glass-bg: rgba(30, 30, 30, 0.55);
-            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
-            --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            --glass-blur: blur(16px);
-            --page-bg: #0f172a;
-            --orb-1: rgba(99, 102, 241, 0.15);
-            --orb-2: rgba(0, 229, 255, 0.12);
+            --bs-body-font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            --page-bg: #0b132b;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --input-bg: #0f172a;
+            --input-border: #334155;
+            --accent-cyan: #00e5ff;
+            --text-primary: #ffffff;
+            --text-secondary: #f1f5f9;
+            --text-muted: #94a3b8;
+        }
+
+        /* Enforce native DirectWrite ClearType sharp font rendering (Never blurry) */
+        * {
+            -webkit-font-smoothing: subpixel-antialiased !important;
+            text-rendering: geometricPrecision !important;
         }
 
         body {
             font-family: var(--bs-body-font-family);
             background: var(--page-bg) !important;
-            background-attachment: fixed !important;
+            color: var(--text-primary);
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
-            position: relative;
-            z-index: 0;
             overflow-x: hidden;
-            color: #f8fafc;
-        }
-
-        body::before, body::after {
-            content: '';
-            position: fixed;
-            border-radius: 50%;
-            z-index: -1;
-            filter: blur(90px);
-            pointer-events: none;
-        }
-
-        body::before {
-            width: 520px;
-            height: 520px;
-            background: var(--orb-1);
-            top: -160px;
-            left: -120px;
-        }
-
-        body::after {
-            width: 440px;
-            height: 440px;
-            background: var(--orb-2);
-            bottom: -60px;
-            right: -60px;
         }
 
         .main-content {
@@ -75,49 +54,84 @@
             flex-grow: 1;
         }
 
-        .glass-panel {
-            background: var(--glass-bg) !important;
-            backdrop-filter: var(--glass-blur);
-            border: var(--glass-border) !important;
-            box-shadow: var(--glass-shadow) !important;
-            border-radius: 16px;
+        /* Solid High-Contrast Cards (Zero Blurry Backdrop Glitches) */
+        .solid-panel {
+            background: var(--card-bg) !important;
+            border: 1px solid var(--card-border) !important;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
         }
 
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 18px;
+            transition: border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .stat-card:hover {
+            border-color: var(--accent-cyan);
+            transform: translateY(-2px);
+        }
+
+        /* Pin-Sharp Text Inputs */
         .form-control, .form-select {
-            background-color: rgba(15, 23, 42, 0.6) !important;
-            border: 1px solid rgba(255, 255, 255, 0.15) !important;
-            color: #f8fafc !important;
-            border-radius: 8px;
+            background-color: var(--input-bg) !important;
+            border: 1.5px solid var(--input-border) !important;
+            color: #ffffff !important;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border-radius: 9px;
+            padding: 10px 14px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
 
         .form-control:focus, .form-select:focus {
-            border-color: #6366f1 !important;
-            box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25) !important;
+            background-color: #0b1329 !important;
+            border-color: var(--accent-cyan) !important;
+            box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.25) !important;
+            color: #ffffff !important;
         }
 
-        .table-custom th {
-            font-size: 0.8rem;
+        .form-control::placeholder {
+            color: #64748b !important;
+            font-weight: 400;
+        }
+
+        /* High-Contrast Table Styling */
+        .table-custom {
+            margin-bottom: 0;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .table-custom thead th {
+            font-size: 0.82rem;
             text-transform: uppercase;
             letter-spacing: 0.06em;
-            color: #94a3b8;
-            font-weight: 600;
-            background: rgba(15, 23, 42, 0.8) !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
-            padding: 14px 16px;
+            color: #ffffff !important;
+            font-weight: 800;
+            background: #0f172a !important;
+            border-bottom: 2px solid #334155 !important;
+            padding: 16px 18px;
+            white-space: nowrap;
         }
 
-        .table-custom td {
+        .table-custom tbody td {
             vertical-align: middle;
-            background: transparent !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
-            padding: 14px 16px;
+            background: #1e293b !important;
+            border-bottom: 1px solid #334155 !important;
+            padding: 14px 18px;
+            color: #f8fafc !important;
+            font-size: 0.92rem;
         }
 
         .table-custom tbody tr:hover td {
-            background: rgba(99, 102, 241, 0.08) !important;
+            background: #253349 !important;
         }
 
-        /* Custom Alert Cards */
+        /* Custom Floating Alerts */
         #custom-alert-container {
             position: fixed;
             top: 24px;
@@ -126,47 +140,33 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            max-width: 400px;
+            max-width: 420px;
         }
 
         .custom-alert {
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: #0f172a;
+            border: 1px solid #334155;
             border-radius: 12px;
             padding: 14px 18px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
             display: flex;
             align-items: center;
             gap: 12px;
-            color: #f8fafc;
-            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            color: #ffffff;
+            animation: alertSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        .custom-alert.success { border-left: 4px solid #10b981; }
-        .custom-alert.error { border-left: 4px solid #ef4444; }
-        .custom-alert.info { border-left: 4px solid #06b6d4; }
+        .custom-alert.success { border-left: 5px solid #10b981; }
+        .custom-alert.error { border-left: 5px solid #ef4444; }
+        .custom-alert.info { border-left: 5px solid #00e5ff; }
 
-        .custom-alert .title { font-weight: 600; font-size: 0.92rem; margin-bottom: 2px; }
-        .custom-alert .message { font-size: 0.82rem; color: #94a3b8; line-height: 1.35; }
-        .custom-alert .close-btn { background: none; border: none; color: #64748b; cursor: pointer; padding: 0; font-size: 1.2rem; }
-        .custom-alert .close-btn:hover { color: #f8fafc; }
+        .custom-alert .title { font-weight: 700; font-size: 0.94rem; margin-bottom: 2px; }
+        .custom-alert .message { font-size: 0.84rem; color: #cbd5e1; line-height: 1.35; }
+        .custom-alert .close-btn { background: none; border: none; color: #94a3b8; cursor: pointer; padding: 0; font-size: 1.25rem; }
+        .custom-alert .close-btn:hover { color: #ffffff; }
 
-        @keyframes slideIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes slideOut { to { transform: translateX(110%); opacity: 0; } }
-
-        .stat-card {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 14px;
-            padding: 18px;
-            transition: all 0.2s ease;
-        }
-
-        .stat-card:hover {
-            border-color: rgba(99, 102, 241, 0.3);
-            transform: translateY(-2px);
-        }
+        @keyframes alertSlideIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes alertSlideOut { to { transform: translateX(110%); opacity: 0; } }
     </style>
 </head>
 
@@ -184,21 +184,21 @@
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 pb-3 mb-4 border-bottom border-secondary border-opacity-25">
                 <div>
                     <div class="d-flex align-items-center gap-2 mb-1">
-                        <span class="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-25 px-2 py-1" style="font-size: 0.72rem;">
+                        <span class="badge bg-primary bg-opacity-25 text-info border border-info border-opacity-30 px-2 py-1 fw-bold" style="font-size: 0.74rem;">
                             <i class="bi bi-people-fill me-1"></i> DIRECTORY &bull; BCS POS
                         </span>
-                        <span class="text-muted small">&bull; Enterprise Inventory Vendors</span>
+                        <span class="text-white-50 small">&bull; Enterprise Inventory Vendors</span>
                     </div>
-                    <h2 class="fw-bold mb-1 d-flex align-items-center gap-2">
+                    <h2 class="fw-extrabold mb-1 d-flex align-items-center gap-2 text-white">
                         <i class="bi bi-person-lines-fill text-info"></i> All Suppliers Directory
                     </h2>
-                    <p class="text-muted mb-0 small">Manage registered suppliers, contact lines, wholesale storefronts, and purchasing records.</p>
+                    <p class="text-secondary mb-0 small" style="font-size: 0.88rem;">Manage registered suppliers, contact lines, wholesale storefronts, and purchasing records.</p>
                 </div>
                 <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2 px-3 py-2" id="exportCsvBtn">
+                    <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2 px-3 py-2 fw-semibold" id="exportCsvBtn">
                         <i class="bi bi-download"></i> Export CSV
                     </button>
-                    <a href="add-supplier.html" class="btn btn-primary d-flex align-items-center gap-2 px-3 py-2 fw-semibold">
+                    <a href="add-supplier.html" class="btn btn-primary d-flex align-items-center gap-2 px-3 py-2 fw-bold">
                         <i class="bi bi-person-plus-fill"></i> Add New Supplier
                     </a>
                 </div>
@@ -209,47 +209,47 @@
                 <div class="col-md-3 col-6">
                     <div class="stat-card">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="text-muted small text-uppercase fw-semibold" style="font-size: 0.72rem;">Total Suppliers</span>
-                            <div class="p-2 rounded bg-info bg-opacity-20 text-info" style="font-size: 1.1rem;"><i class="bi bi-people-fill"></i></div>
+                            <span class="text-secondary small text-uppercase fw-bold" style="font-size: 0.74rem;">Total Suppliers</span>
+                            <div class="p-2 rounded bg-info bg-opacity-20 text-info" style="font-size: 1.15rem;"><i class="bi bi-people-fill"></i></div>
                         </div>
-                        <div class="fs-3 fw-bold text-white font-monospace" id="kpiTotal">0</div>
+                        <div class="fs-2 fw-bold text-white font-monospace" id="kpiTotal">0</div>
                     </div>
                 </div>
                 <div class="col-md-3 col-6">
                     <div class="stat-card">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="text-muted small text-uppercase fw-semibold" style="font-size: 0.72rem;">Active Vendors</span>
-                            <div class="p-2 rounded bg-success bg-opacity-20 text-success" style="font-size: 1.1rem;"><i class="bi bi-check-circle-fill"></i></div>
+                            <span class="text-secondary small text-uppercase fw-bold" style="font-size: 0.74rem;">Active Vendors</span>
+                            <div class="p-2 rounded bg-success bg-opacity-20 text-success" style="font-size: 1.15rem;"><i class="bi bi-check-circle-fill"></i></div>
                         </div>
-                        <div class="fs-3 fw-bold text-success font-monospace" id="kpiActive">0</div>
+                        <div class="fs-2 fw-bold text-success font-monospace" id="kpiActive">0</div>
                     </div>
                 </div>
                 <div class="col-md-3 col-6">
                     <div class="stat-card">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="text-muted small text-uppercase fw-semibold" style="font-size: 0.72rem;">Inactive / On Hold</span>
-                            <div class="p-2 rounded bg-secondary bg-opacity-20 text-muted" style="font-size: 1.1rem;"><i class="bi bi-pause-circle-fill"></i></div>
+                            <span class="text-secondary small text-uppercase fw-bold" style="font-size: 0.74rem;">Inactive / On Hold</span>
+                            <div class="p-2 rounded bg-secondary bg-opacity-20 text-muted" style="font-size: 1.15rem;"><i class="bi bi-pause-circle-fill"></i></div>
                         </div>
-                        <div class="fs-3 fw-bold text-muted font-monospace" id="kpiInactive">0</div>
+                        <div class="fs-2 fw-bold text-muted font-monospace" id="kpiInactive">0</div>
                     </div>
                 </div>
                 <div class="col-md-3 col-6">
                     <div class="stat-card">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="text-muted small text-uppercase fw-semibold" style="font-size: 0.72rem;">Total Opening Due</span>
-                            <div class="p-2 rounded bg-danger bg-opacity-20 text-danger" style="font-size: 1.1rem;"><i class="bi bi-wallet-fill"></i></div>
+                            <span class="text-secondary small text-uppercase fw-bold" style="font-size: 0.74rem;">Total Opening Due</span>
+                            <div class="p-2 rounded bg-danger bg-opacity-20 text-danger" style="font-size: 1.15rem;"><i class="bi bi-wallet-fill"></i></div>
                         </div>
-                        <div class="fs-3 fw-bold text-danger font-monospace" id="kpiTotalDue">৳0.00</div>
+                        <div class="fs-2 fw-bold text-danger font-monospace" id="kpiTotalDue">৳0.00</div>
                     </div>
                 </div>
             </div>
 
             <!-- Filters Bar -->
-            <div class="glass-panel p-3 mb-4">
+            <div class="solid-panel p-3 mb-4">
                 <div class="row g-2 align-items-center">
                     <div class="col-lg-5 col-md-6">
                         <div class="input-group">
-                            <span class="input-group-text bg-transparent border-secondary border-opacity-25"><i class="bi bi-search"></i></span>
+                            <span class="input-group-text bg-transparent border-secondary border-opacity-25 text-info"><i class="bi bi-search"></i></span>
                             <input type="text" class="form-control" id="searchFilter" placeholder="Search by supplier name, phone, shop name, or location...">
                         </div>
                     </div>
@@ -260,14 +260,14 @@
                             <option value="Inactive">Inactive Only</option>
                         </select>
                     </div>
-                    <div class="col-lg-4 col-md-3 text-md-end text-muted small">
-                        Showing <strong id="filterCount" class="text-white">0</strong> suppliers
+                    <div class="col-lg-4 col-md-3 text-md-end text-secondary small fw-medium">
+                        Showing <strong id="filterCount" class="text-white fs-6">0</strong> suppliers
                     </div>
                 </div>
             </div>
 
             <!-- Suppliers Directory Table -->
-            <div class="glass-panel p-0 overflow-hidden mb-4">
+            <div class="solid-panel p-0 overflow-hidden mb-4">
                 <div class="table-responsive">
                     <table class="table table-custom align-middle mb-0" id="suppliersTable">
                         <thead>
@@ -284,7 +284,7 @@
                         </thead>
                         <tbody id="suppliersTableBody">
                             <tr>
-                                <td colspan="8" class="text-center py-5 text-muted">
+                                <td colspan="8" class="text-center py-5 text-secondary">
                                     <div class="spinner-border spinner-border-sm text-info mb-2" role="status"></div>
                                     <div>Loading suppliers directory...</div>
                                 </td>
@@ -299,7 +299,7 @@
     <!-- Edit Supplier Modal -->
     <div class="modal fade" id="editSupplierModal" tabindex="-1" aria-labelledby="editSupplierModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content glass-panel border border-secondary border-opacity-25" style="background: rgba(15, 23, 42, 0.95) !important;">
+            <div class="modal-content solid-panel" style="background: #1e293b !important; border: 1.5px solid #334155 !important;">
                 <div class="modal-header border-bottom border-secondary border-opacity-25">
                     <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2" id="editSupplierModalLabel">
                         <i class="bi bi-pencil-square text-info"></i> Edit Supplier Profile
@@ -311,49 +311,49 @@
                         <input type="hidden" id="editSupplierId">
                         <div class="row g-3">
                             <div class="col-md-7">
-                                <label class="form-label small text-muted text-uppercase fw-semibold">Supplier Name *</label>
+                                <label class="form-label text-white fw-bold small">Supplier Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="editSupplierName" required>
                             </div>
                             <div class="col-md-5">
-                                <label class="form-label small text-muted text-uppercase fw-semibold">Phone Number *</label>
+                                <label class="form-label text-white fw-bold small">Phone Number <span class="text-danger">*</span></label>
                                 <input type="tel" class="form-control font-monospace" id="editPhoneNumber" required>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label small text-muted text-uppercase fw-semibold">Supplier Code</label>
+                                <label class="form-label text-white fw-bold small">Supplier Code</label>
                                 <input type="text" class="form-control font-monospace text-info fw-bold" id="editSupplierCode">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label small text-muted text-uppercase fw-semibold">Email Address</label>
+                                <label class="form-label text-white fw-bold small">Email Address</label>
                                 <input type="email" class="form-control" id="editEmail">
                             </div>
 
                             <div class="col-md-7">
-                                <label class="form-label small text-muted text-uppercase fw-semibold">Shop Name *</label>
+                                <label class="form-label text-white fw-bold small">Shop Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="editShopName" required>
                             </div>
                             <div class="col-md-5">
-                                <label class="form-label small text-muted text-uppercase fw-semibold">Shop Mobile Number *</label>
+                                <label class="form-label text-white fw-bold small">Shop Mobile Number <span class="text-danger">*</span></label>
                                 <input type="tel" class="form-control font-monospace" id="editShopMobileNumber" required>
                             </div>
 
                             <div class="col-12">
-                                <label class="form-label small text-muted text-uppercase fw-semibold">Location / Address *</label>
+                                <label class="form-label text-white fw-bold small">Location / Address <span class="text-danger">*</span></label>
                                 <textarea class="form-control" id="editLocation" rows="2" required></textarea>
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label small text-muted text-uppercase fw-semibold">Opening Due (৳)</label>
+                                <label class="form-label text-white fw-bold small">Opening Due (৳)</label>
                                 <input type="number" class="form-control font-monospace text-end" id="editOpeningBalance" min="0" step="any">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label small text-muted text-uppercase fw-semibold">Status</label>
+                                <label class="form-label text-white fw-bold small">Status</label>
                                 <select class="form-select" id="editStatus">
-                                    <option value="Active">Active</option>
-                                    <option value="Inactive">Inactive</option>
+                                    <option value="Active">🟢 Active</option>
+                                    <option value="Inactive">🔴 Inactive</option>
                                 </select>
                             </div>
                             <div class="col-12">
-                                <label class="form-label small text-muted text-uppercase fw-semibold">Notes / Terms</label>
+                                <label class="form-label text-white fw-bold small">Notes / Terms</label>
                                 <textarea class="form-control" id="editNotes" rows="2"></textarea>
                             </div>
                         </div>
@@ -361,7 +361,7 @@
                 </div>
                 <div class="modal-footer border-top border-secondary border-opacity-25">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary px-4 fw-semibold" id="btnUpdateSupplier">Save Changes</button>
+                    <button type="button" class="btn btn-primary px-4 fw-bold" id="btnUpdateSupplier">Save Changes</button>
                 </div>
             </div>
         </div>
@@ -401,7 +401,7 @@
 
             container.appendChild(alert);
             setTimeout(() => {
-                alert.style.animation = 'slideOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+                alert.style.animation = 'alertSlideOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards';
                 setTimeout(() => alert.remove(), 300);
             }, 4500);
         };
@@ -463,10 +463,10 @@
             if (list.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="8" class="text-center py-5 text-muted">
+                        <td colspan="8" class="text-center py-5 text-secondary">
                             <i class="bi bi-people text-secondary fs-1 d-block mb-2 opacity-50"></i>
-                            <div>No matching suppliers found.</div>
-                            <div class="small text-muted mt-1">Try adjusting your filters or click "Add New Supplier" to create one.</div>
+                            <div class="fw-semibold">No matching suppliers found.</div>
+                            <div class="text-muted mt-1">Try adjusting your search filters or click "Add New Supplier" to create one.</div>
                         </td>
                     </tr>
                 `;
@@ -476,44 +476,48 @@
             tbody.innerHTML = list.map(s => {
                 const isActive = (s.status || 'Active').toLowerCase() === 'active';
                 const statusBadge = isActive 
-                    ? `<span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25">Active</span>`
-                    : `<span class="badge bg-secondary bg-opacity-25 text-muted border border-secondary border-opacity-25">Inactive</span>`;
+                    ? `<span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-30 px-2 py-1">Active</span>`
+                    : `<span class="badge bg-secondary bg-opacity-25 text-muted border border-secondary border-opacity-30 px-2 py-1">Inactive</span>`;
 
                 const dueVal = parseFloat(s.openingBalance) || 0;
                 const dueDisplay = dueVal > 0 
-                    ? `<span class="font-monospace text-danger fw-semibold">${formatCurrency(dueVal)}</span>`
-                    : `<span class="font-monospace text-muted">৳0.00</span>`;
+                    ? `<span class="font-monospace text-danger fw-bold fs-6">${formatCurrency(dueVal)}</span>`
+                    : `<span class="font-monospace text-secondary">৳0.00</span>`;
 
                 return `
                     <tr>
-                        <td class="font-monospace text-info fw-bold">${escapeHtml(s.supplierCode || 'SUP')}</td>
                         <td>
-                            <div class="fw-semibold text-white">${escapeHtml(s.supplierName || 'Unnamed')}</div>
-                            <div class="small text-muted d-flex align-items-center gap-1 font-monospace">
+                            <span class="badge bg-info bg-opacity-15 text-info font-monospace border border-info border-opacity-30 fw-bold px-2 py-1" style="font-size: 0.82rem;">
+                                ${escapeHtml(s.supplierCode || 'SUP')}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="fw-bold text-white fs-6">${escapeHtml(s.supplierName || 'Unnamed')}</div>
+                            <div class="small d-flex align-items-center gap-1 font-monospace mt-1">
                                 <i class="bi bi-telephone text-success"></i>
-                                <a href="tel:${escapeHtml(s.phoneNumber || '')}" class="text-muted text-decoration-none">${escapeHtml(s.phoneNumber || 'N/A')}</a>
+                                <a href="tel:${escapeHtml(s.phoneNumber || '')}" class="text-success text-decoration-none fw-bold">${escapeHtml(s.phoneNumber || 'N/A')}</a>
                             </div>
                         </td>
                         <td>
-                            <div class="fw-medium text-light"><i class="bi bi-shop text-primary me-1"></i>${escapeHtml(s.shopName || 'N/A')}</div>
-                            ${s.email ? `<div class="small text-muted"><i class="bi bi-envelope me-1"></i>${escapeHtml(s.email)}</div>` : ''}
+                            <div class="fw-semibold text-white"><i class="bi bi-shop text-primary me-1"></i>${escapeHtml(s.shopName || 'N/A')}</div>
+                            ${s.email ? `<div class="small text-secondary mt-1"><i class="bi bi-envelope text-info me-1"></i>${escapeHtml(s.email)}</div>` : ''}
                         </td>
-                        <td class="font-monospace text-warning">
+                        <td class="font-monospace text-warning fw-bold">
                             ${s.shopMobileNumber ? `<i class="bi bi-phone me-1"></i>${escapeHtml(s.shopMobileNumber)}` : '<span class="text-muted">N/A</span>'}
                         </td>
-                        <td class="small text-muted" style="max-width: 200px;">
+                        <td class="small text-secondary" style="max-width: 220px;">
                             <div class="text-truncate" title="${escapeHtml(s.location || '')}">
-                                <i class="bi bi-geo-alt text-secondary me-1"></i>${escapeHtml(s.location || 'N/A')}
+                                <i class="bi bi-geo-alt text-danger me-1"></i>${escapeHtml(s.location || 'N/A')}
                             </div>
                         </td>
                         <td class="text-end">${dueDisplay}</td>
                         <td class="text-center">${statusBadge}</td>
                         <td class="text-end">
                             <div class="d-inline-flex gap-1">
-                                <a href="add-purchase.html?supplier=${encodeURIComponent(s.supplierName || '')}" class="btn btn-sm btn-outline-info" title="Add Purchase Invoice">
+                                <a href="add-purchase.html?supplier=${encodeURIComponent(s.supplierName || '')}" class="btn btn-sm btn-outline-info fw-semibold" title="Add Purchase Invoice">
                                     <i class="bi bi-bag-plus"></i>
                                 </a>
-                                <button type="button" class="btn btn-sm btn-outline-secondary btn-edit-supplier" data-id="${s.id}" title="Edit Supplier">
+                                <button type="button" class="btn btn-sm btn-outline-secondary btn-edit-supplier" data-id="${s.id}" title="Edit Supplier Profile">
                                     <i class="bi bi-pencil"></i>
                                 </button>
                                 <button type="button" class="btn btn-sm btn-outline-danger btn-delete-supplier" data-id="${s.id}" data-name="${escapeHtml(s.supplierName || '')}" title="Delete Supplier">

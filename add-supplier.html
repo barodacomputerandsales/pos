@@ -20,53 +20,33 @@
     
     <style>
         :root {
-            --bs-primary: #6366f1;
-            --bs-body-font-family: 'Inter', sans-serif;
-            --glass-bg: rgba(30, 30, 30, 0.55);
-            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
-            --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            --glass-blur: blur(16px);
-            --page-bg: #0f172a;
-            --orb-1: rgba(99, 102, 241, 0.15);
-            --orb-2: rgba(0, 229, 255, 0.12);
+            --bs-body-font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            --page-bg: #0b132b;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --input-bg: #0f172a;
+            --input-border: #334155;
+            --accent-cyan: #00e5ff;
+            --accent-indigo: #6366f1;
+            --text-primary: #ffffff;
+            --text-secondary: #f1f5f9;
+            --text-muted: #94a3b8;
+        }
+
+        /* Enforce native DirectWrite ClearType sharp font rendering (Never blurry) */
+        * {
+            -webkit-font-smoothing: subpixel-antialiased !important;
+            text-rendering: geometricPrecision !important;
         }
 
         body {
             font-family: var(--bs-body-font-family);
             background: var(--page-bg) !important;
-            background-attachment: fixed !important;
+            color: var(--text-primary);
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
-            position: relative;
-            z-index: 0;
             overflow-x: hidden;
-            color: #f8fafc;
-        }
-
-        body::before, body::after {
-            content: '';
-            position: fixed;
-            border-radius: 50%;
-            z-index: -1;
-            filter: blur(90px);
-            pointer-events: none;
-        }
-
-        body::before {
-            width: 520px;
-            height: 520px;
-            background: var(--orb-1);
-            top: -160px;
-            left: -120px;
-        }
-
-        body::after {
-            width: 440px;
-            height: 440px;
-            background: var(--orb-2);
-            bottom: -60px;
-            right: -60px;
         }
 
         .main-content {
@@ -75,72 +55,134 @@
             flex-grow: 1;
         }
 
-        .glass-panel {
-            background: var(--glass-bg) !important;
-            backdrop-filter: var(--glass-blur);
-            border: var(--glass-border) !important;
-            box-shadow: var(--glass-shadow) !important;
-            border-radius: 16px;
+        /* Solid High-Contrast Cards (Zero Blurry Backdrop Glitches) */
+        .solid-panel {
+            background: var(--card-bg) !important;
+            border: 1px solid var(--card-border) !important;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
         }
 
+        /* High-Contrast Crisp Labels */
+        .field-label {
+            color: var(--text-secondary) !important;
+            font-size: 0.88rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            margin-bottom: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .field-hint {
+            color: var(--text-muted) !important;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        /* Pin-Sharp Text Inputs */
         .form-control, .form-select {
-            background-color: rgba(15, 23, 42, 0.6) !important;
-            border: 1px solid rgba(255, 255, 255, 0.15) !important;
-            color: #f8fafc !important;
-            border-radius: 8px;
+            background-color: var(--input-bg) !important;
+            border: 1.5px solid var(--input-border) !important;
+            color: #ffffff !important;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border-radius: 9px;
             padding: 10px 14px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
 
         .form-control:focus, .form-select:focus {
-            border-color: #6366f1 !important;
-            box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25) !important;
+            background-color: #0b1329 !important;
+            border-color: var(--accent-cyan) !important;
+            box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.25) !important;
+            color: #ffffff !important;
         }
 
         .form-control::placeholder {
-            color: rgba(148, 163, 184, 0.55);
+            color: #64748b !important;
+            font-weight: 400;
         }
 
         .input-group-text {
-            background-color: rgba(15, 23, 42, 0.8) !important;
-            border: 1px solid rgba(255, 255, 255, 0.15) !important;
-            color: #94a3b8 !important;
-            border-radius: 8px 0 0 8px;
+            background-color: #1a2436 !important;
+            border: 1.5px solid var(--input-border) !important;
+            border-right: none !important;
+            color: var(--accent-cyan) !important;
+            font-size: 1.05rem;
+            padding: 0 14px;
+            border-radius: 9px 0 0 9px;
         }
 
+        .input-group .form-control {
+            border-left: none !important;
+        }
+
+        .input-group .form-control:focus {
+            border-left: 1.5px solid var(--accent-cyan) !important;
+        }
+
+        /* Header Accent Icons */
         .section-header {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             margin-bottom: 20px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--card-border);
         }
 
         .section-icon {
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.15rem;
+            font-size: 1.25rem;
+            flex-shrink: 0;
         }
 
+        .section-title {
+            color: #ffffff;
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-bottom: 2px;
+        }
+
+        .section-subtitle {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            font-weight: 500;
+        }
+
+        /* High-Contrast Recent Supplier Cards */
         .recent-supplier-card {
-            background: rgba(15, 23, 42, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
+            background: #0f172a;
+            border: 1px solid var(--card-border);
+            border-radius: 11px;
             padding: 14px;
             transition: all 0.2s ease;
         }
 
         .recent-supplier-card:hover {
-            background: rgba(15, 23, 42, 0.8);
-            border-color: rgba(99, 102, 241, 0.4);
+            background: #172554;
+            border-color: var(--accent-cyan);
             transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
         }
 
-        /* Custom Alert Floating Cards */
+        /* Stat Badges */
+        .stat-badge {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        /* Custom Floating Alerts */
         #custom-alert-container {
             position: fixed;
             top: 24px;
@@ -149,41 +191,33 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            max-width: 400px;
+            max-width: 420px;
         }
 
         .custom-alert {
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: #0f172a;
+            border: 1px solid #334155;
             border-radius: 12px;
             padding: 14px 18px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
             display: flex;
             align-items: center;
             gap: 12px;
-            color: #f8fafc;
-            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            color: #ffffff;
+            animation: alertSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        .custom-alert.success { border-left: 4px solid #10b981; }
-        .custom-alert.error { border-left: 4px solid #ef4444; }
-        .custom-alert.info { border-left: 4px solid #06b6d4; }
+        .custom-alert.success { border-left: 5px solid #10b981; }
+        .custom-alert.error { border-left: 5px solid #ef4444; }
+        .custom-alert.info { border-left: 5px solid #00e5ff; }
 
-        .custom-alert .title { font-weight: 600; font-size: 0.92rem; margin-bottom: 2px; }
-        .custom-alert .message { font-size: 0.82rem; color: #94a3b8; line-height: 1.35; }
-        .custom-alert .close-btn { background: none; border: none; color: #64748b; cursor: pointer; padding: 0; font-size: 1.2rem; }
-        .custom-alert .close-btn:hover { color: #f8fafc; }
+        .custom-alert .title { font-weight: 700; font-size: 0.94rem; margin-bottom: 2px; }
+        .custom-alert .message { font-size: 0.84rem; color: #cbd5e1; line-height: 1.35; }
+        .custom-alert .close-btn { background: none; border: none; color: #94a3b8; cursor: pointer; padding: 0; font-size: 1.25rem; }
+        .custom-alert .close-btn:hover { color: #ffffff; }
 
-        @keyframes slideIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes slideOut { to { transform: translateX(110%); opacity: 0; } }
-
-        .stat-badge {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            padding: 16px;
-        }
+        @keyframes alertSlideIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes alertSlideOut { to { transform: translateX(110%); opacity: 0; } }
     </style>
 </head>
 
@@ -201,21 +235,21 @@
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 pb-3 mb-4 border-bottom border-secondary border-opacity-25">
                 <div>
                     <div class="d-flex align-items-center gap-2 mb-1">
-                        <span class="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-25 px-2 py-1" style="font-size: 0.72rem;">
-                            <i class="bi bi-people-fill me-1"></i> VENDOR DIRECTORY
+                        <span class="badge bg-primary bg-opacity-25 text-info border border-info border-opacity-30 px-2 py-1 fw-bold" style="font-size: 0.74rem;">
+                            <i class="bi bi-people-fill me-1"></i> VENDOR ONBOARDING
                         </span>
-                        <span class="text-muted small">&bull; Enterprise Inventory Sourcing</span>
+                        <span class="text-white-50 small">&bull; Enterprise Inventory Sourcing</span>
                     </div>
-                    <h2 class="fw-bold mb-1 d-flex align-items-center gap-2">
+                    <h2 class="fw-extrabold mb-1 d-flex align-items-center gap-2 text-white">
                         <i class="bi bi-person-plus-fill text-info"></i> Add New Supplier
                     </h2>
-                    <p class="text-muted mb-0 small">Register vendors, wholesale merchants, and distributors with unified shop identity and contact tracking.</p>
+                    <p class="text-secondary mb-0 small" style="font-size: 0.88rem;">Register vendors, wholesale merchants, and distributors with centralized store and contact details.</p>
                 </div>
                 <div class="d-flex gap-2">
-                    <a href="all-suppliers.html" class="btn btn-outline-info d-flex align-items-center gap-2 px-3 py-2">
+                    <a href="all-suppliers.html" class="btn btn-outline-info d-flex align-items-center gap-2 px-3 py-2 fw-semibold">
                         <i class="bi bi-person-lines-fill"></i> View All Suppliers
                     </a>
-                    <a href="add-purchase.html" class="btn btn-outline-secondary d-flex align-items-center gap-2 px-3 py-2">
+                    <a href="add-purchase.html" class="btn btn-outline-secondary d-flex align-items-center gap-2 px-3 py-2 fw-semibold">
                         <i class="bi bi-bag-plus"></i> New Purchase Invoice
                     </a>
                 </div>
@@ -227,153 +261,153 @@
                 <div class="col-xl-8">
                     <form id="addSupplierForm" autocomplete="off">
                         <!-- Card 1: Supplier Personal & Primary Identity -->
-                        <div class="glass-panel p-4 mb-4">
+                        <div class="solid-panel p-4 mb-4">
                             <div class="section-header">
-                                <div class="section-icon bg-info bg-opacity-20 text-info border border-info border-opacity-25">
+                                <div class="section-icon bg-info bg-opacity-20 text-info border border-info border-opacity-30">
                                     <i class="bi bi-person-vcard"></i>
                                 </div>
                                 <div>
-                                    <h5 class="fw-bold mb-0 text-white">Supplier Identity &amp; Contact</h5>
-                                    <div class="text-muted small">Personal representation, primary contact details, and assigned supplier code</div>
+                                    <h5 class="section-title">Supplier Identity &amp; Contact</h5>
+                                    <div class="section-subtitle">Official business representative, primary contact line, and unique vendor ID</div>
                                 </div>
                             </div>
 
                             <div class="row g-3">
                                 <div class="col-md-7">
-                                    <label class="form-label small text-muted text-uppercase fw-semibold" for="supplierName">
-                                        Supplier Name <span class="text-danger">*</span>
+                                    <label class="field-label" for="supplierName">
+                                        <span>Supplier Name <span class="text-danger fw-bold">*</span></span>
                                     </label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-person"></i></span>
                                         <input type="text" class="form-control" id="supplierName" placeholder="e.g. Rahim Uddin / Walton Distribution" required autofocus>
                                     </div>
-                                    <div class="form-text text-muted small">Official business representative or vendor contact person.</div>
+                                    <div class="field-hint">Full name of the sales representative or wholesale proprietor.</div>
                                 </div>
 
                                 <div class="col-md-5">
-                                    <label class="form-label small text-muted text-uppercase fw-semibold" for="phoneNumber">
-                                        Phone Number <span class="text-danger">*</span>
+                                    <label class="field-label" for="phoneNumber">
+                                        <span>Phone Number <span class="text-danger fw-bold">*</span></span>
                                     </label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-telephone"></i></span>
                                         <input type="tel" class="form-control font-monospace" id="phoneNumber" placeholder="e.g. 01712-345678" required>
                                     </div>
-                                    <div class="form-text text-muted small">Primary personal / WhatsApp mobile number.</div>
+                                    <div class="field-hint">Primary personal / WhatsApp mobile number.</div>
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label small text-muted text-uppercase fw-semibold" for="supplierCode">
-                                        Supplier Code / ID
+                                    <label class="field-label" for="supplierCode">
+                                        <span>Supplier Code / ID</span>
                                     </label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-hash"></i></span>
                                         <input type="text" class="form-control font-monospace text-info fw-bold" id="supplierCode" placeholder="SUP-XXXX">
-                                        <button class="btn btn-outline-secondary" type="button" id="btnGenCode" title="Generate New Code">
+                                        <button class="btn btn-outline-secondary" type="button" id="btnGenCode" title="Generate New Random Code">
                                             <i class="bi bi-arrow-repeat"></i>
                                         </button>
                                     </div>
-                                    <div class="form-text text-muted small">Unique vendor tracking code for invoices and purchase orders.</div>
+                                    <div class="field-hint">Unique tracking identifier for purchase orders and ledger statements.</div>
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label small text-muted text-uppercase fw-semibold" for="email">
-                                        Email Address <span class="text-muted fw-normal">(Optional)</span>
+                                    <label class="field-label" for="email">
+                                        <span>Email Address <span class="text-muted fw-normal">(Optional)</span></span>
                                     </label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                                         <input type="email" class="form-control" id="email" placeholder="vendor@example.com">
                                     </div>
-                                    <div class="form-text text-muted small">For electronic purchase orders and payment receipts.</div>
+                                    <div class="field-hint">For electronic purchase orders and billing receipts.</div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Card 2: Shop & Business Details -->
-                        <div class="glass-panel p-4 mb-4">
+                        <div class="solid-panel p-4 mb-4">
                             <div class="section-header">
-                                <div class="section-icon bg-primary bg-opacity-20 text-primary border border-primary border-opacity-25">
+                                <div class="section-icon bg-primary bg-opacity-20 text-info border border-primary border-opacity-30">
                                     <i class="bi bi-shop"></i>
                                 </div>
                                 <div>
-                                    <h5 class="fw-bold mb-0 text-white">Shop &amp; Establishment Details</h5>
-                                    <div class="text-muted small">Vendor commercial entity, physical shop address, and dedicated shop helpline</div>
+                                    <h5 class="section-title">Shop &amp; Establishment Details</h5>
+                                    <div class="section-subtitle">Commercial trade name, dispatch mobile line, and physical warehouse address</div>
                                 </div>
                             </div>
 
                             <div class="row g-3">
                                 <div class="col-md-7">
-                                    <label class="form-label small text-muted text-uppercase fw-semibold" for="shopName">
-                                        Shop Name <span class="text-danger">*</span>
+                                    <label class="field-label" for="shopName">
+                                        <span>Shop Name <span class="text-danger fw-bold">*</span></span>
                                     </label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-building"></i></span>
                                         <input type="text" class="form-control" id="shopName" placeholder="e.g. Baroda Computer Wholesale Center" required>
                                     </div>
-                                    <div class="form-text text-muted small">Commercial trade name or warehouse entity.</div>
+                                    <div class="field-hint">Official storefront, market stall, or distribution agency.</div>
                                 </div>
 
                                 <div class="col-md-5">
-                                    <label class="form-label small text-muted text-uppercase fw-semibold" for="shopMobileNumber">
-                                        Shop Mobile Number <span class="text-danger">*</span>
+                                    <label class="field-label" for="shopMobileNumber">
+                                        <span>Shop Mobile Number <span class="text-danger fw-bold">*</span></span>
                                     </label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-phone"></i></span>
                                         <input type="tel" class="form-control font-monospace" id="shopMobileNumber" placeholder="e.g. 01800-112233" required>
                                     </div>
-                                    <div class="form-text text-muted small">Official store or order dispatch phone line.</div>
+                                    <div class="field-hint">Dedicated store hotline or order delivery phone.</div>
                                 </div>
 
                                 <div class="col-12">
-                                    <label class="form-label small text-muted text-uppercase fw-semibold" for="location">
-                                        Location / Shop Address <span class="text-danger">*</span>
+                                    <label class="field-label" for="location">
+                                        <span>Location / Shop Address <span class="text-danger fw-bold">*</span></span>
                                     </label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
                                         <textarea class="form-control" id="location" rows="2" placeholder="e.g. Shop #42, BCS Computer City, IDB Bhaban, Agargaon, Dhaka" required></textarea>
                                     </div>
-                                    <div class="form-text text-muted small">Complete physical address, market name, floor, or delivery warehouse point.</div>
+                                    <div class="field-hint">Full physical address, city, and landmark for deliveries and product returns.</div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Card 3: Financial & Operational Profile -->
-                        <div class="glass-panel p-4 mb-4">
+                        <div class="solid-panel p-4 mb-4">
                             <div class="section-header">
-                                <div class="section-icon bg-success bg-opacity-20 text-success border border-success border-opacity-25">
+                                <div class="section-icon bg-success bg-opacity-20 text-success border border-success border-opacity-30">
                                     <i class="bi bi-wallet2"></i>
                                 </div>
                                 <div>
-                                    <h5 class="fw-bold mb-0 text-white">Financial &amp; Operational Profile</h5>
-                                    <div class="text-muted small">Opening credit/due balance, vendor active status, and custom payment remarks</div>
+                                    <h5 class="section-title">Financial &amp; Operational Profile</h5>
+                                    <div class="section-subtitle">Initial due balance, active availability status, and vendor warranty terms</div>
                                 </div>
                             </div>
 
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label class="form-label small text-muted text-uppercase fw-semibold" for="openingBalance">
-                                        Opening Due / Balance (৳)
+                                    <label class="field-label" for="openingBalance">
+                                        <span>Opening Due / Balance (৳)</span>
                                     </label>
                                     <div class="input-group">
-                                        <span class="input-group-text font-monospace text-muted">৳</span>
+                                        <span class="input-group-text font-monospace text-warning">৳</span>
                                         <input type="number" class="form-control font-monospace text-end fs-6 fw-bold text-danger" id="openingBalance" value="0" min="0" step="any">
                                     </div>
-                                    <div class="form-text text-muted small">Existing outstanding balance owed to this supplier (if any).</div>
+                                    <div class="field-hint">Pre-existing outstanding balance owed to this supplier (if any).</div>
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label small text-muted text-uppercase fw-semibold" for="status">
-                                        Supplier Status
+                                    <label class="field-label" for="status">
+                                        <span>Supplier Status</span>
                                     </label>
                                     <select class="form-select" id="status">
-                                        <option value="Active" selected>🟢 Active (Available for purchase)</option>
+                                        <option value="Active" selected>🟢 Active (Available for purchase invoices)</option>
                                         <option value="Inactive">🔴 Inactive (Suspended / Closed)</option>
                                     </select>
-                                    <div class="form-text text-muted small">Inactive suppliers are suppressed from purchase autocomplete lists.</div>
+                                    <div class="field-hint">Inactive suppliers are hidden from purchase autocomplete lists.</div>
                                 </div>
 
                                 <div class="col-12">
-                                    <label class="form-label small text-muted text-uppercase fw-semibold" for="notes">
-                                        Vendor Notes &amp; Payment Terms <span class="text-muted fw-normal">(Optional)</span>
+                                    <label class="field-label" for="notes">
+                                        <span>Vendor Notes &amp; Payment Terms <span class="text-muted fw-normal">(Optional)</span></span>
                                     </label>
                                     <textarea class="form-control" id="notes" rows="2" placeholder="e.g. 15-day credit period, returns accepted within 7 days, RMA contact details..."></textarea>
                                 </div>
@@ -381,18 +415,18 @@
                         </div>
 
                         <!-- Form Actions Bar -->
-                        <div class="glass-panel p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
-                            <div class="text-muted small">
-                                <i class="bi bi-shield-check text-success me-1"></i> Data automatically syncs with Cloudflare D1 central database and local cache.
+                        <div class="solid-panel p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <div class="text-secondary small fw-medium">
+                                <i class="bi bi-shield-check text-success me-1 fs-6"></i> Cloudflare D1 central database and local cache synchronization enabled.
                             </div>
                             <div class="d-flex gap-2">
-                                <button type="button" class="btn btn-outline-secondary px-3 py-2" id="resetBtn">
-                                    <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Form
+                                <button type="button" class="btn btn-outline-secondary px-3 py-2 fw-semibold" id="resetBtn">
+                                    <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
                                 </button>
-                                <button type="button" class="btn btn-outline-info px-4 py-2 fw-semibold" id="saveAndNewBtn">
+                                <button type="button" class="btn btn-outline-info px-3 py-2 fw-semibold" id="saveAndNewBtn">
                                     <i class="bi bi-plus-circle me-1"></i> Save &amp; Add Another
                                 </button>
-                                <button type="submit" class="btn btn-primary px-4 py-2 fw-semibold d-flex align-items-center gap-2" id="saveSupplierBtn">
+                                <button type="submit" class="btn btn-primary px-4 py-2 fw-bold d-flex align-items-center gap-2" id="saveSupplierBtn">
                                     <i class="bi bi-check2-circle fs-5"></i> Save Supplier
                                 </button>
                             </div>
@@ -407,43 +441,43 @@
                         <div class="row g-3 mb-4">
                             <div class="col-6">
                                 <div class="stat-badge">
-                                    <div class="text-muted small text-uppercase fw-semibold mb-1" style="font-size: 0.72rem;">Total Suppliers</div>
-                                    <div class="fs-3 fw-bold text-white font-monospace" id="statTotalSuppliers">0</div>
+                                    <div class="text-secondary small text-uppercase fw-bold mb-1" style="font-size: 0.74rem;">Total Suppliers</div>
+                                    <div class="fs-2 fw-bold text-white font-monospace" id="statTotalSuppliers">0</div>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="stat-badge">
-                                    <div class="text-muted small text-uppercase fw-semibold mb-1" style="font-size: 0.72rem;">Active Vendors</div>
-                                    <div class="fs-3 fw-bold text-success font-monospace" id="statActiveSuppliers">0</div>
+                                    <div class="text-secondary small text-uppercase fw-bold mb-1" style="font-size: 0.74rem;">Active Vendors</div>
+                                    <div class="fs-2 fw-bold text-success font-monospace" id="statActiveSuppliers">0</div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Recent Suppliers Directory Preview -->
-                        <div class="glass-panel p-4">
+                        <div class="solid-panel p-4">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5 class="fw-bold mb-0 text-white d-flex align-items-center gap-2">
                                     <i class="bi bi-clock-history text-info"></i> Recent Suppliers
                                 </h5>
-                                <span class="badge bg-secondary bg-opacity-25 text-info border border-secondary border-opacity-25 small" id="badgeRecentCount">0 registered</span>
+                                <span class="badge bg-dark text-info border border-info border-opacity-30 small" id="badgeRecentCount">0 registered</span>
                             </div>
 
                             <!-- Search Filter for Quick Directory -->
                             <div class="input-group mb-3">
                                 <span class="input-group-text bg-transparent border-secondary border-opacity-25"><i class="bi bi-search"></i></span>
-                                <input type="text" class="form-control form-control-sm border-secondary border-opacity-25" id="recentSearchInput" placeholder="Quick filter by name, shop, or phone...">
+                                <input type="text" class="form-control form-control-sm" id="recentSearchInput" placeholder="Filter by name, shop, or phone...">
                             </div>
 
                             <!-- List Container -->
-                            <div id="recentSuppliersList" class="d-flex flex-column gap-2" style="max-height: 480px; overflow-y: auto;">
-                                <div class="text-center py-4 text-muted small">
+                            <div id="recentSuppliersList" class="d-flex flex-column gap-2" style="max-height: 520px; overflow-y: auto;">
+                                <div class="text-center py-4 text-secondary small">
                                     <div class="spinner-border spinner-border-sm text-info mb-2" role="status"></div>
                                     <div>Loading registered suppliers...</div>
                                 </div>
                             </div>
 
                             <div class="pt-3 mt-3 border-top border-secondary border-opacity-25 text-center">
-                                <a href="all-suppliers.html" class="btn btn-outline-info btn-sm w-100 py-2 d-flex align-items-center justify-content-center gap-2">
+                                <a href="all-suppliers.html" class="btn btn-outline-info btn-sm w-100 py-2 d-flex align-items-center justify-content-center gap-2 fw-semibold">
                                     <i class="bi bi-list-ul"></i> Manage All Suppliers Directory
                                 </a>
                             </div>
@@ -485,7 +519,7 @@
 
             container.appendChild(alert);
             setTimeout(() => {
-                alert.style.animation = 'slideOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+                alert.style.animation = 'alertSlideOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards';
                 setTimeout(() => alert.remove(), 300);
             }, 4500);
         };
@@ -512,7 +546,7 @@
                 const listEl = document.getElementById('recentSuppliersList');
                 if (listEl) {
                     listEl.innerHTML = `
-                        <div class="text-center py-4 text-muted small">
+                        <div class="text-center py-4 text-secondary small">
                             <i class="bi bi-cloud-slash text-danger fs-3 d-block mb-2"></i>
                             <div>Unable to load suppliers from server.</div>
                         </div>
@@ -540,10 +574,10 @@
 
             if (list.length === 0) {
                 container.innerHTML = `
-                    <div class="text-center py-5 text-muted small">
+                    <div class="text-center py-5 text-secondary small">
                         <i class="bi bi-people text-secondary fs-2 d-block mb-2 opacity-50"></i>
-                        <div>No suppliers registered yet.</div>
-                        <div class="small text-muted mt-1">Fill in the form on the left to add your first supplier.</div>
+                        <div class="fw-semibold">No suppliers registered yet.</div>
+                        <div class="text-muted mt-1">Fill in the form on the left to add your first supplier.</div>
                     </div>
                 `;
                 return;
@@ -554,49 +588,49 @@
             container.innerHTML = displayItems.map(s => {
                 const isActive = (s.status || 'Active').toLowerCase() === 'active';
                 const statusBadge = isActive 
-                    ? `<span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25" style="font-size: 0.65rem;">Active</span>`
-                    : `<span class="badge bg-secondary bg-opacity-25 text-muted border border-secondary border-opacity-25" style="font-size: 0.65rem;">Inactive</span>`;
+                    ? `<span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-30" style="font-size: 0.7rem;">Active</span>`
+                    : `<span class="badge bg-secondary bg-opacity-25 text-muted border border-secondary border-opacity-30" style="font-size: 0.7rem;">Inactive</span>`;
 
                 const dueAmt = Number(s.openingBalance || 0);
-                const dueDisplay = dueAmt > 0 ? `<div class="small font-monospace text-danger mt-1">Due: ৳${dueAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</div>` : '';
+                const dueDisplay = dueAmt > 0 ? `<div class="small font-monospace text-danger fw-bold mt-1">Due: ৳${dueAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</div>` : '';
 
                 return `
                     <div class="recent-supplier-card">
                         <div class="d-flex justify-content-between align-items-start mb-1">
                             <div>
-                                <strong class="text-white d-block" style="font-size: 0.9rem;">${escapeHtml(s.supplierName || 'Unnamed')}</strong>
-                                <small class="text-info font-monospace">${escapeHtml(s.supplierCode || 'SUP')}</small>
+                                <strong class="text-white d-block" style="font-size: 0.95rem;">${escapeHtml(s.supplierName || 'Unnamed')}</strong>
+                                <span class="badge bg-info bg-opacity-15 text-info font-monospace border border-info border-opacity-25" style="font-size: 0.72rem;">${escapeHtml(s.supplierCode || 'SUP')}</span>
                             </div>
                             ${statusBadge}
                         </div>
 
-                        <div class="small text-muted mb-1 d-flex align-items-center gap-1">
+                        <div class="small text-secondary mb-1 d-flex align-items-center gap-1">
                             <i class="bi bi-shop text-primary"></i>
-                            <span class="text-light fw-medium">${escapeHtml(s.shopName || 'N/A')}</span>
+                            <span class="text-white fw-semibold">${escapeHtml(s.shopName || 'N/A')}</span>
                         </div>
 
-                        <div class="small text-muted d-flex align-items-center justify-content-between">
-                            <span class="d-flex align-items-center gap-1">
+                        <div class="small text-secondary d-flex align-items-center justify-content-between mt-1">
+                            <span class="d-flex align-items-center gap-1 font-monospace">
                                 <i class="bi bi-telephone text-success"></i>
-                                <a href="tel:${escapeHtml(s.phoneNumber || '')}" class="text-muted text-decoration-none font-monospace">${escapeHtml(s.phoneNumber || 'N/A')}</a>
+                                <a href="tel:${escapeHtml(s.phoneNumber || '')}" class="text-success text-decoration-none fw-bold">${escapeHtml(s.phoneNumber || 'N/A')}</a>
                             </span>
-                            <span class="d-flex align-items-center gap-1" title="Shop Mobile">
+                            <span class="d-flex align-items-center gap-1 font-monospace" title="Shop Mobile">
                                 <i class="bi bi-phone text-warning"></i>
-                                <span class="font-monospace">${escapeHtml(s.shopMobileNumber || 'N/A')}</span>
+                                <span class="text-warning fw-bold">${escapeHtml(s.shopMobileNumber || 'N/A')}</span>
                             </span>
                         </div>
 
-                        <div class="small text-muted mt-1 text-truncate" title="${escapeHtml(s.location || '')}">
-                            <i class="bi bi-geo-alt text-secondary me-1"></i>${escapeHtml(s.location || 'No location specified')}
+                        <div class="small text-secondary mt-1 text-truncate" title="${escapeHtml(s.location || '')}">
+                            <i class="bi bi-geo-alt text-secondary me-1"></i>${escapeHtml(s.location || 'No address')}
                         </div>
 
                         ${dueDisplay}
 
                         <div class="d-flex justify-content-end gap-1 mt-2 pt-2 border-top border-secondary border-opacity-25">
-                            <a href="add-purchase.html?supplier=${encodeURIComponent(s.supplierName || '')}" class="btn btn-sm btn-outline-info py-0 px-2" style="font-size: 0.72rem;" title="Create Purchase with Supplier">
+                            <a href="add-purchase.html?supplier=${encodeURIComponent(s.supplierName || '')}" class="btn btn-sm btn-outline-info py-0 px-2 fw-semibold" style="font-size: 0.74rem;" title="Create Purchase with Supplier">
                                 <i class="bi bi-bag-plus"></i> Purchase
                             </a>
-                            <button class="btn btn-sm btn-outline-danger py-0 px-2 btn-delete-supplier" data-id="${s.id}" data-name="${escapeHtml(s.supplierName || '')}" style="font-size: 0.72rem;" title="Delete Supplier">
+                            <button class="btn btn-sm btn-outline-danger py-0 px-2 btn-delete-supplier" data-id="${s.id}" data-name="${escapeHtml(s.supplierName || '')}" style="font-size: 0.74rem;" title="Delete Supplier">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </div>
@@ -606,7 +640,7 @@
 
             // Bind delete buttons
             container.querySelectorAll('.btn-delete-supplier').forEach(btn => {
-                btn.addEventListener('click', async (e) => {
+                btn.addEventListener('click', async () => {
                     const id = btn.getAttribute('data-id');
                     const name = btn.getAttribute('data-name');
                     if (confirm(`Are you sure you want to delete supplier "${name}"? This action cannot be undone.`)) {

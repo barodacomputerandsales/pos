@@ -10,7 +10,7 @@
  */
 
 (function() {
-    let currentAppVersion = '2.2.6';
+    let currentAppVersion = '2.2.7';
     let availableRemoteInfo = null;
     let downloadedUpdateInfo = null;
     let isIpcBound = false;
@@ -593,6 +593,11 @@
         }
 
         const fallbackMap = {
+            '2.2.7': `
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">DirectWrite High-DPI Sharpness</strong>: Eliminated GPU compositor texture traps and blurriness across all cards and typography.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Crystal-Clear Supplier UI</strong>: High-contrast solid slate panels with sharp readable field labels and bright input contrast.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Dynamic Up-to-Date Hub</strong>: Intelligent verified status indicator in settings when running the latest release.</div></div>
+            `,
             '2.2.6': `
                 <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Dedicated People &amp; Supplier Management</strong>: Interactive supplier directory under new People submenu with live search, direct dialing, and CSV export.</div></div>
                 <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Real-Time Sourcing Profile</strong>: Tracks Supplier Name, Phone Number, Shop Name, Shop Mobile, Location, and Opening Due Balance.</div></div>
