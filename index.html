@@ -775,9 +775,9 @@
         <div id="loginUpdateContainer" class="text-center mt-3 d-none"></div>
     </div>
 
-    <!-- Bottom Page Credit Footer (Version 1.9.9) -->
+    <!-- Bottom Page Credit Footer (Version 2.0.0) -->
     <footer class="fixed-page-footer">
-        Made with care in <strong>Bangladesh 🇧🇩</strong> | Developed by: <span class="highlight-purple">BCSdeveloper™</span> | Version: <strong id="loginVersionDisplay">1.9.9</strong> | Powered by: <strong>Cloudflare D1</strong>.
+        Made with care in <strong>Bangladesh 🇧🇩</strong> | Developed by: <span class="highlight-purple">BCSdeveloper™</span> | Version: <strong id="loginVersionDisplay">2.0.0</strong> | Powered by: <strong>Cloudflare D1</strong>.
     </footer>
 
     <!-- Login Authentication Handler -->
@@ -848,12 +848,10 @@
                 if (window.hideBcsLoader) window.hideBcsLoader();
 
                 let message = err.message || "Invalid operator credentials";
-                if (message.includes("401") || message.includes("User not found") || message.includes("Invalid")) {
-                    message = "Invalid username or password. Please verify and try again.";
-                } else if (message.includes("locked")) {
-                    message = err.message;
-                } else if (message.includes("Failed to fetch") || message.includes("NetworkError")) {
+                if (message.includes("Failed to fetch") || message.includes("NetworkError")) {
                     message = "Cannot reach Cloudflare edge server. Check internet connection.";
+                } else if (message === "401" || message.includes("status: 401")) {
+                    message = "Invalid username or password. Please verify and try again.";
                 }
 
                 errorMsg.textContent = message;

@@ -60,6 +60,7 @@ export async function fetchAPI(endpoint, options = {}) {
     
     const headers = {
         'Content-Type': 'application/json',
+        'x-api-key': 'backend-bcs-pos',
         'x-session-id': localStorage.getItem('sessionId') || '',
         'x-session-port': localStorage.getItem('sessionPort') || '',
         ...options.headers
@@ -68,13 +69,20 @@ export async function fetchAPI(endpoint, options = {}) {
     const response = await fetch(url, { ...options, headers });
     
     if (response.status === 401) {
-        localStorage.removeItem('isAuthenticated');
-        localStorage.removeItem('loggedInUserId');
-        localStorage.removeItem('userRole');
-        localStorage.removeItem('sessionId');
-        localStorage.removeItem('sessionPort');
-        window.location.replace('index.html');
-        throw new Error("Session expired. Please log in again.");
+        const isAuthRequest = endpoint.includes('auth/');
+        const isLoginPage = window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname === '';
+
+        if (!isAuthRequest && !isLoginPage) {
+            localStorage.removeItem('isAuthenticated');
+            localStorage.removeItem('loggedInUserId');
+            localStorage.removeItem('userRole');
+            localStorage.removeItem('sessionId');
+            localStorage.removeItem('sessionPort');
+            window.location.replace('index.html');
+            throw new Error("Session expired. Please log in again.");
+        }
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error || "Authentication failed");
     }
 
     if (!response.ok) {
@@ -107,7 +115,7 @@ export async function getCollection(collectionName, forceRefresh = false) {
         }
         
         return {
-            docs: cached.data.map(item => ({
+            docs: (cached.data || []).map(item => ({
                 id: item.id || item.firestoreId,
                 data: () => item
             }))
@@ -162,5 +170,3 @@ export async function deleteDocument(collectionName, id) {
     await deleteCache(collectionName);
     return result;
 }
-
-
