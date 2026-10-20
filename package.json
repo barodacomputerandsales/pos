@@ -75,14 +75,9 @@
                     "arch": [
                         "x64"
                     ]
-                },
-                {
-                    "target": "deb",
-                    "arch": [
-                        "x64"
-                    ]
                 }
             ],
+            "executableName": "bcs-enterprise-pos",
             "icon": "assets/icon.png",
             "category": "Office",
             "synopsis": "BCS Enterprise POS PRO Max",
