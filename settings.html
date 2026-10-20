@@ -1010,18 +1010,19 @@
                     radarBox.classList.add('d-none');
                     showAlert('Updater Notice', err || 'Could not reach update server. Checking fallback channel.', 'info');
                 });
+            }
 
-                // Restart & Install with Animation
-                restartBtn.addEventListener('click', () => {
-                    if (window.applyBcsUpdateAndRestart) {
-                        window.applyBcsUpdateAndRestart();
-                    } else {
-                        document.getElementById('installingOverlay').classList.remove('d-none');
-                        setTimeout(() => {
-                            ipcRenderer.send('restart_app');
-                        }, 1200);
-                    }
-                });
+            // Restart & Install with Animation
+            restartBtn.addEventListener('click', () => {
+                if (window.applyBcsUpdateAndRestart) {
+                    window.applyBcsUpdateAndRestart();
+                } else {
+                    document.getElementById('installingOverlay').classList.remove('d-none');
+                    setTimeout(() => {
+                        if (ipcRenderer) ipcRenderer.send('restart_app');
+                    }, 1200);
+                }
+            });
 
                 // Test Backend Relay Button
                 document.getElementById('testUpdaterApiBtn').addEventListener('click', async () => {

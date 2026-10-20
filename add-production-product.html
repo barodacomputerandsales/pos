@@ -249,19 +249,15 @@
                 }
 
                 const selectedUnit = 'Pcs';
-                let priceTiers = {};
-
-                 
-                    priceTiers = {
-                        pcs: {
-                            buy: parseFloat(document.getElementById('buyPrice').value) || 0,
-                            wholesale: parseFloat(document.getElementById('wholesalePriceNormal').value) || 0,
-                            shop_wholesale: parseFloat(document.getElementById('wholesalePriceShop').value) || 0,
-                            sell: parseFloat(document.getElementById('sellPriceNormal').value) || 0,
-                            shop_sell: parseFloat(document.getElementById('sellPriceShop').value) || 0,
-                        }
+                const priceTiers = {
+                    pcs: {
+                        buy: parseFloat(document.getElementById('buyPrice').value) || 0,
+                        wholesale: parseFloat(document.getElementById('wholesalePriceNormal').value) || 0,
+                        shop_wholesale: parseFloat(document.getElementById('wholesalePriceShop').value) || 0,
+                        sell: parseFloat(document.getElementById('sellPriceNormal').value) || 0,
+                        shop_sell: parseFloat(document.getElementById('sellPriceShop').value) || 0,
                     }
-                }
+                };
 
                 // D1 SQLite accepts complex arrays/objects cleanly if stringified.
                 // Our frontend all-product logic handles stringified parsing.
