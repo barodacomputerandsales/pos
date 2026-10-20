@@ -794,8 +794,13 @@
         }
 
         window.editProduct = function(id) {
+            const p = allProducts.find(item => item.firestoreId === id || item.id === id);
             localStorage.setItem('editProductId', id);
-            window.location.href = 'add-product.html';
+            if (p && p.isProduction) {
+                window.location.href = 'add-production-product.html';
+            } else {
+                window.location.href = 'add-product.html';
+            }
         };
         window.hardDeleteProd = async function(id) {
             if(confirm("Are you sure you want to permanently delete this product? This action CANNOT be undone.")) {
@@ -1132,6 +1137,9 @@
                         <button type="button" class="btn btn-outline-info btn-sm mt-2 w-100 d-flex align-items-center justify-content-center gap-1 shadow-sm" onclick="handleDownloadProductJpeg('${p.imageUrl}', '${p.barcode || p.name}')">
                             <i class="bi bi-download"></i> Download as JPEG
                         </button>` : ''}
+                        <button type="button" class="btn btn-outline-warning btn-sm mt-2 w-100 d-flex align-items-center justify-content-center gap-1 shadow-sm" onclick="if(detailsModal) detailsModal.hide(); editProduct('${p.firestoreId}')">
+                            <i class="bi bi-pencil-square"></i> Edit / Update Image & Details
+                        </button>
                     </div>
                     <div class="col-md-8 mt-3 mt-md-0">
                         <h3 class="fw-bold mb-1">${p.name}</h3>

@@ -143,8 +143,70 @@
                                 <input type="number" class="form-control bg-dark text-light border-secondary" id="alertQuantity" min="1" value="1">
                             </div>
                             <div class="col-12">
-                                <label for="productImageUrl" class="form-label">8. Product Image (URL)</label>
-                                <input type="url" class="form-control bg-dark text-light border-secondary" id="productImageUrl" placeholder="images\no_image_--product.png">
+                                <div class="card bg-dark border-secondary p-3 rounded-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <label class="form-label mb-0 fw-bold text-light">
+                                            <i class="bi bi-image me-1 text-info"></i> 8. Product Image
+                                        </label>
+                                        <div id="imageCompressionBadge" style="display:none;"></div>
+                                    </div>
+
+                                    <!-- Mode Toggle Tabs: Upload File vs Image Link -->
+                                    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                                        <div class="btn-group btn-group-sm" role="group" aria-label="Product Image Source">
+                                            <input type="radio" class="btn-check" name="imageMode" id="imageModeUpload" autocomplete="off" checked>
+                                            <label class="btn btn-outline-info px-3" for="imageModeUpload">
+                                                <i class="bi bi-cloud-arrow-up me-1"></i> Upload File
+                                            </label>
+
+                                            <input type="radio" class="btn-check" name="imageMode" id="imageModeLink" autocomplete="off">
+                                            <label class="btn btn-outline-info px-3" for="imageModeLink">
+                                                <i class="bi bi-link-45deg me-1"></i> Use Image Link
+                                            </label>
+                                        </div>
+
+                                        <button type="button" class="btn btn-sm btn-outline-danger" id="clearImageBtn" style="display: none;" title="Remove Current Image">
+                                            <i class="bi bi-trash3 me-1"></i> Remove Image
+                                        </button>
+                                    </div>
+
+                                    <div class="d-flex flex-column flex-md-row gap-3 align-items-start">
+                                        <!-- Image Preview Box -->
+                                        <div id="imagePreviewContainer" class="rounded-3 border border-secondary bg-black d-flex align-items-center justify-content-center p-2" style="width: 140px; height: 140px; overflow: hidden; flex-shrink: 0; position: relative;">
+                                            <i id="imagePlaceholderIcon" class="bi bi-card-image text-muted" style="font-size: 3rem;"></i>
+                                            <img id="imagePreview" src="" alt="Preview" style="display: none; max-width: 100%; max-height: 100%; object-fit: contain;">
+                                        </div>
+
+                                        <!-- Panels for Upload vs Link -->
+                                        <div class="flex-grow-1 w-100">
+                                            <!-- Panel 1: File Upload -->
+                                            <div id="imageUploadPanel">
+                                                <label class="form-label small text-muted mb-1">Select an image file from your computer (PNG, JPG, WebP, BMP):</label>
+                                                <input type="file" class="form-control bg-dark text-light border-secondary" id="productImageFileInput" accept="image/png, image/jpeg, image/webp, image/bmp">
+                                                <div class="form-text text-muted small mt-2">
+                                                    <i class="bi bi-shield-check text-success me-1"></i> Photos are automatically compressed to WebP and securely saved to your private image store.
+                                                </div>
+                                            </div>
+
+                                            <!-- Panel 2: Link / URL Input -->
+                                            <div id="imageLinkPanel" style="display: none;">
+                                                <label class="form-label small text-muted mb-1">Enter or paste direct image URL:</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-dark text-muted border-secondary"><i class="bi bi-globe2"></i></span>
+                                                    <input type="url" class="form-control bg-dark text-light border-secondary" id="productImageUrl" placeholder="https://example.com/image.jpg or https://bcs.bcsdeveloper.com/{barcode}_1.webp">
+                                                </div>
+                                                <div class="form-text text-muted small mt-2">
+                                                    <i class="bi bi-info-circle me-1"></i> Paste any direct web image URL. Preview updates automatically.
+                                                </div>
+                                            </div>
+
+                                            <!-- Image Status in Edit Mode -->
+                                            <div id="currentImageNotice" class="text-info small mt-2" style="display: none;">
+                                                <i class="bi bi-check2-circle me-1"></i> Current image is loaded. Select a new file above to replace it, or switch to "Use Image Link" to edit the URL.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             
                             <div id="standardPriceFields" class="row g-3 border-top border-secondary pt-3 mt-3">
@@ -180,14 +242,131 @@
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
-        import { getCollection, getDocument, addDocument, updateDocument } from './script/api.js';
+        import { getCollection, getDocument, addDocument, updateDocument, compressImageToWebP, uploadProductImage } from './script/api.js';
 
         document.addEventListener('DOMContentLoaded', function () {
             const addProductForm = document.getElementById('addProductForm');
+            const unitSelect = document.getElementById('unit');
             
             let currentUser = null;
             let allProducts = [];
             let editProductId = null;
+
+            // --- Modern Client WebP Image Pipeline ---
+            let pendingWebPBase64 = null;
+            let pendingWebPBlob = null;
+            const fileInput = document.getElementById('productImageFileInput');
+            const imgPreview = document.getElementById('imagePreview');
+            const placeholderIcon = document.getElementById('imagePlaceholderIcon');
+            const clearImgBtn = document.getElementById('clearImageBtn');
+            const badge = document.getElementById('imageCompressionBadge');
+            const urlInput = document.getElementById('productImageUrl');
+            const modeUploadRadio = document.getElementById('imageModeUpload');
+            const modeLinkRadio = document.getElementById('imageModeLink');
+            const uploadPanel = document.getElementById('imageUploadPanel');
+            const linkPanel = document.getElementById('imageLinkPanel');
+            const currentNotice = document.getElementById('currentImageNotice');
+
+            // Handle preview error gracefully
+            if (imgPreview) {
+                imgPreview.onerror = function() {
+                    this.style.display = 'none';
+                    if (placeholderIcon) placeholderIcon.style.display = 'block';
+                };
+                imgPreview.onload = function() {
+                    if (this.src && this.src !== window.location.href) {
+                        this.style.display = 'block';
+                        if (placeholderIcon) placeholderIcon.style.display = 'none';
+                    }
+                };
+            }
+
+            // Mode switching: Upload File vs Image Link
+            if (modeUploadRadio && modeLinkRadio) {
+                modeUploadRadio.addEventListener('change', () => {
+                    if (modeUploadRadio.checked) {
+                        if (uploadPanel) uploadPanel.style.display = 'block';
+                        if (linkPanel) linkPanel.style.display = 'none';
+                    }
+                });
+
+                modeLinkRadio.addEventListener('change', () => {
+                    if (modeLinkRadio.checked) {
+                        if (uploadPanel) uploadPanel.style.display = 'none';
+                        if (linkPanel) linkPanel.style.display = 'block';
+                    }
+                });
+            }
+
+            if (fileInput) {
+                fileInput.addEventListener('change', async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    try {
+                        badge.style.display = 'inline';
+                        badge.innerHTML = '<span class="badge bg-secondary">Compressing to WebP...</span>';
+
+                        const compressed = await compressImageToWebP(file, 1920, 0.85);
+                        pendingWebPBlob = compressed.blob;
+                        pendingWebPBase64 = compressed.base64;
+
+                        imgPreview.src = compressed.base64;
+                        imgPreview.style.display = 'block';
+                        if (placeholderIcon) placeholderIcon.style.display = 'none';
+                        if (clearImgBtn) clearImgBtn.style.display = 'inline-block';
+                        if (currentNotice) currentNotice.style.display = 'none';
+
+                        const origSizeKB = (file.size / 1024).toFixed(1);
+                        const pctSaved = Math.max(0, Math.round((1 - compressed.sizeKB / origSizeKB) * 100));
+                        badge.innerHTML = `<span class="badge bg-success-subtle text-success border border-success">${origSizeKB} KB &rarr; ${compressed.sizeKB} KB WebP (${pctSaved}% saved)</span>`;
+                    } catch (err) {
+                        showCustomAlert('Image Error', err.message, 'failed');
+                        badge.style.display = 'none';
+                    }
+                });
+            }
+
+            if (clearImgBtn) {
+                clearImgBtn.addEventListener('click', () => {
+                    if (fileInput) fileInput.value = '';
+                    if (urlInput) urlInput.value = '';
+                    pendingWebPBlob = null;
+                    pendingWebPBase64 = null;
+                    if (imgPreview) {
+                        imgPreview.src = '';
+                        imgPreview.style.display = 'none';
+                    }
+                    if (placeholderIcon) placeholderIcon.style.display = 'block';
+                    clearImgBtn.style.display = 'none';
+                    if (badge) badge.style.display = 'none';
+                    if (currentNotice) currentNotice.style.display = 'none';
+                });
+            }
+
+            if (urlInput) {
+                urlInput.addEventListener('input', () => {
+                    const url = urlInput.value.trim();
+                    if (url) {
+                        // User typed or pasted a URL: override pending file
+                        pendingWebPBase64 = null;
+                        pendingWebPBlob = null;
+                        if (fileInput) fileInput.value = '';
+                        if (badge) badge.style.display = 'none';
+                        if (currentNotice) currentNotice.style.display = 'none';
+
+                        imgPreview.src = url;
+                        imgPreview.style.display = 'block';
+                        if (placeholderIcon) placeholderIcon.style.display = 'none';
+                        if (clearImgBtn) clearImgBtn.style.display = 'inline-block';
+                    } else if (!pendingWebPBase64) {
+                        imgPreview.src = '';
+                        imgPreview.style.display = 'none';
+                        if (placeholderIcon) placeholderIcon.style.display = 'block';
+                        if (clearImgBtn) clearImgBtn.style.display = 'none';
+                    }
+                });
+            }
 
             window.showCustomAlert = function(title, message, type = 'success') {
                 const container = document.getElementById('custom-alert-container');
@@ -283,6 +462,26 @@
                 btn.innerHTML = 'Saving...';
                 btn.disabled = true;
 
+                // Seamless WebP upload to private image store
+                if (pendingWebPBase64 && productData.barcode) {
+                    btn.innerHTML = 'Uploading Image...';
+                    try {
+                        const uploadRes = await uploadProductImage({
+                            barcode: productData.barcode,
+                            image: pendingWebPBase64,
+                            index: 1,
+                            isPrimary: true
+                        });
+                        if (uploadRes && uploadRes.url) {
+                            productData.imageUrl = uploadRes.url;
+                            if (urlInput) urlInput.value = uploadRes.url;
+                        }
+                    } catch (uploadErr) {
+                        console.warn("Background image upload notice:", uploadErr.message);
+                    }
+                    btn.innerHTML = 'Saving Product...';
+                }
+
                 if (editProductId) {
                     try {
                         productData.updatedAt = new Date().toISOString();
@@ -368,6 +567,16 @@
                 document.getElementById('category').value = productToEdit.category || '';
                 document.getElementById('alertQuantity').value = productToEdit.alertQuantity || 1;
                 document.getElementById('productImageUrl').value = productToEdit.imageUrl || '';
+                if (productToEdit.imageUrl && imgPreview) {
+                    imgPreview.src = productToEdit.imageUrl;
+                    imgPreview.style.display = 'block';
+                    if (placeholderIcon) placeholderIcon.style.display = 'none';
+                    if (clearImgBtn) clearImgBtn.style.display = 'inline-block';
+                    if (currentNotice) {
+                        currentNotice.style.display = 'block';
+                        currentNotice.innerHTML = `<i class="bi bi-check-circle-fill text-success me-1"></i> Current image active: <code class="text-info">${productToEdit.imageUrl.split('/').pop()}</code>. Choose a new file to replace it, or switch to <strong>Use Image Link</strong> to edit the URL.`;
+                    }
+                }
                 document.getElementById('description').value = productToEdit.description || '';
 
                 unitSelect.dispatchEvent(new Event('change'));
