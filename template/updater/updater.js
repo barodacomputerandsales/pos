@@ -10,7 +10,7 @@
  */
 
 (function() {
-    let currentAppVersion = '2.0.1';
+    let currentAppVersion = '2.2.0';
     let downloadedUpdateInfo = null;
     let isIpcBound = false;
     let lastUserActivityTime = Date.now();

@@ -356,7 +356,7 @@
                                         <div class="col-md-6 border-end border-secondary border-opacity-25">
                                             <div class="small text-muted text-uppercase fw-semibold mb-1">Installed Version</div>
                                             <div class="d-flex align-items-baseline gap-2">
-                                                <h2 class="fw-extrabold mb-0 text-white mono" id="installedVersionText">v2.0.1</h2>
+                                                <h2 class="fw-extrabold mb-0 text-white mono" id="installedVersionText">v2.2.0</h2>
                                                 <span class="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-25">Current</span>
                                             </div>
                                             <div class="small text-muted mt-2">Architecture: <span class="mono text-white">x64 (Windows NSIS)</span></div>
@@ -444,7 +444,7 @@
                                 <div>
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <label class="small text-muted text-uppercase fw-semibold mb-0">Release Notes &amp; Changelog</label>
-                                        <span class="small text-muted" id="releaseNotesVersionTag">v2.0.1 Production</span>
+                                        <span class="small text-muted" id="releaseNotesVersionTag">v2.2.0 Production</span>
                                     </div>
                                     <div class="p-3 rounded-3 bg-dark border border-secondary border-opacity-25 font-monospace small" style="max-height: 180px; overflow-y: auto;" id="releaseNotesContent">
                                         <p class="text-muted mb-0">Click "Check for Updates" to pull the latest changelog directly from GitHub.</p>
@@ -532,7 +532,7 @@
                                     The Cloudflare backend microservice queries GitHub API securely to deliver updates even behind restricted firewalls.
                                 </p>
                                 <div class="p-2 rounded bg-dark border border-secondary border-opacity-25 small mono text-truncate mb-3 text-info">
-                                    /api/updater/check?current=2.0.1
+                                    /api/updater/check?current=2.2.0
                                 </div>
                                 <button class="btn btn-outline-info btn-sm w-100 d-flex align-items-center justify-content-center gap-2" id="testUpdaterApiBtn">
                                     <i class="bi bi-broadcast"></i> Test Backend Updater Relay
@@ -740,7 +740,7 @@
     <script type="module">
         import { fetchAPI } from './script/api.js';
 
-        let appCurrentVersion = '2.0.1';
+        let appCurrentVersion = '2.2.0';
         let latestInstallerDownloadUrl = '';
 
         window.showAlert = function(title, message, type = 'success') {
