@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <script>
+        if (localStorage.getItem('isAuthenticated') !== 'true' || !localStorage.getItem('sessionId') || !localStorage.getItem('sessionPort')) {
+            window.location.replace('index.html');
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Supplier | BCS Enterprise POS</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+    <link rel="apple-touch-icon" href="assets/icon.png">
+    <!-- Portable Enterprise Neon Laser Loader (Auto-pushes immediately on load) -->
+    <script src="template/loader/loader-1.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bs-primary: #6366f1;
+            --bs-body-font-family: 'Inter', sans-serif;
+            --glass-bg: rgba(30, 30, 30, 0.55);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --glass-blur: blur(16px);
+            --page-bg: #0f172a;
+            --orb-1: rgba(99, 102, 241, 0.15);
+            --orb-2: rgba(0, 229, 255, 0.12);
+        }
+
+        body {
+            font-family: var(--bs-body-font-family);
+            background: var(--page-bg) !important;
+            background-attachment: fixed !important;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            position: relative;
+            z-index: 0;
+            overflow-x: hidden;
+            color: #f8fafc;
+        }
+
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            z-index: -1;
+            filter: blur(90px);
+            pointer-events: none;
+        }
+
+        body::before {
+            width: 520px;
+            height: 520px;
+            background: var(--orb-1);
+            top: -160px;
+            left: -120px;
+        }
+
+        body::after {
+            width: 440px;
+            height: 440px;
+            background: var(--orb-2);
+            bottom: -60px;
+            right: -60px;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 80px 30px 40px 30px;
+            flex-grow: 1;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg) !important;
+            backdrop-filter: var(--glass-blur);
+            border: var(--glass-border) !important;
+            box-shadow: var(--glass-shadow) !important;
+            border-radius: 16px;
+        }
+
+        .form-control, .form-select {
+            background-color: rgba(15, 23, 42, 0.6) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            color: #f8fafc !important;
+            border-radius: 8px;
+            padding: 10px 14px;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #6366f1 !important;
+            box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25) !important;
+        }
+
+        .form-control::placeholder {
+            color: rgba(148, 163, 184, 0.55);
+        }
+
+        .input-group-text {
+            background-color: rgba(15, 23, 42, 0.8) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            color: #94a3b8 !important;
+            border-radius: 8px 0 0 8px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .section-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+        }
+
+        .recent-supplier-card {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .recent-supplier-card:hover {
+            background: rgba(15, 23, 42, 0.8);
+            border-color: rgba(99, 102, 241, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Custom Alert Floating Cards */
+        #custom-alert-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 1090;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 400px;
+        }
+
+        .custom-alert {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            padding: 14px 18px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #f8fafc;
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .custom-alert.success { border-left: 4px solid #10b981; }
+        .custom-alert.error { border-left: 4px solid #ef4444; }
+        .custom-alert.info { border-left: 4px solid #06b6d4; }
+
+        .custom-alert .title { font-weight: 600; font-size: 0.92rem; margin-bottom: 2px; }
+        .custom-alert .message { font-size: 0.82rem; color: #94a3b8; line-height: 1.35; }
+        .custom-alert .close-btn { background: none; border: none; color: #64748b; cursor: pointer; padding: 0; font-size: 1.2rem; }
+        .custom-alert .close-btn:hover { color: #f8fafc; }
+
+        @keyframes slideIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { to { transform: translateX(110%); opacity: 0; } }
+
+        .stat-badge {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="template/layout.js"></script>
+    <script>
+        protectRoute('add_supplier');
+        renderTopbar();
+        renderSidebar('people', 'add-supplier');
+    </script>
+
+    <main class="main-content">
+        <div class="container-fluid px-0">
+            <!-- Header Section -->
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 pb-3 mb-4 border-bottom border-secondary border-opacity-25">
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <span class="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-25 px-2 py-1" style="font-size: 0.72rem;">
+                            <i class="bi bi-people-fill me-1"></i> VENDOR DIRECTORY
+                        </span>
+                        <span class="text-muted small">&bull; Enterprise Inventory Sourcing</span>
+                    </div>
+                    <h2 class="fw-bold mb-1 d-flex align-items-center gap-2">
+                        <i class="bi bi-person-plus-fill text-info"></i> Add New Supplier
+                    </h2>
+                    <p class="text-muted mb-0 small">Register vendors, wholesale merchants, and distributors with unified shop identity and contact tracking.</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="all-suppliers.html" class="btn btn-outline-info d-flex align-items-center gap-2 px-3 py-2">
+                        <i class="bi bi-person-lines-fill"></i> View All Suppliers
+                    </a>
+                    <a href="add-purchase.html" class="btn btn-outline-secondary d-flex align-items-center gap-2 px-3 py-2">
+                        <i class="bi bi-bag-plus"></i> New Purchase Invoice
+                    </a>
+                </div>
+            </div>
+
+            <!-- Main Layout Grid -->
+            <div class="row g-4">
+                <!-- Left Column: Add Supplier Form -->
+                <div class="col-xl-8">
+                    <form id="addSupplierForm" autocomplete="off">
+                        <!-- Card 1: Supplier Personal & Primary Identity -->
+                        <div class="glass-panel p-4 mb-4">
+                            <div class="section-header">
+                                <div class="section-icon bg-info bg-opacity-20 text-info border border-info border-opacity-25">
+                                    <i class="bi bi-person-vcard"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold mb-0 text-white">Supplier Identity &amp; Contact</h5>
+                                    <div class="text-muted small">Personal representation, primary contact details, and assigned supplier code</div>
+                                </div>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-7">
+                                    <label class="form-label small text-muted text-uppercase fw-semibold" for="supplierName">
+                                        Supplier Name <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                        <input type="text" class="form-control" id="supplierName" placeholder="e.g. Rahim Uddin / Walton Distribution" required autofocus>
+                                    </div>
+                                    <div class="form-text text-muted small">Official business representative or vendor contact person.</div>
+                                </div>
+
+                                <div class="col-md-5">
+                                    <label class="form-label small text-muted text-uppercase fw-semibold" for="phoneNumber">
+                                        Phone Number <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                                        <input type="tel" class="form-control font-monospace" id="phoneNumber" placeholder="e.g. 01712-345678" required>
+                                    </div>
+                                    <div class="form-text text-muted small">Primary personal / WhatsApp mobile number.</div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label small text-muted text-uppercase fw-semibold" for="supplierCode">
+                                        Supplier Code / ID
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-hash"></i></span>
+                                        <input type="text" class="form-control font-monospace text-info fw-bold" id="supplierCode" placeholder="SUP-XXXX">
+                                        <button class="btn btn-outline-secondary" type="button" id="btnGenCode" title="Generate New Code">
+                                            <i class="bi bi-arrow-repeat"></i>
+                                        </button>
+                                    </div>
+                                    <div class="form-text text-muted small">Unique vendor tracking code for invoices and purchase orders.</div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label small text-muted text-uppercase fw-semibold" for="email">
+                                        Email Address <span class="text-muted fw-normal">(Optional)</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                        <input type="email" class="form-control" id="email" placeholder="vendor@example.com">
+                                    </div>
+                                    <div class="form-text text-muted small">For electronic purchase orders and payment receipts.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Shop & Business Details -->
+                        <div class="glass-panel p-4 mb-4">
+                            <div class="section-header">
+                                <div class="section-icon bg-primary bg-opacity-20 text-primary border border-primary border-opacity-25">
+                                    <i class="bi bi-shop"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold mb-0 text-white">Shop &amp; Establishment Details</h5>
+                                    <div class="text-muted small">Vendor commercial entity, physical shop address, and dedicated shop helpline</div>
+                                </div>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-7">
+                                    <label class="form-label small text-muted text-uppercase fw-semibold" for="shopName">
+                                        Shop Name <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-building"></i></span>
+                                        <input type="text" class="form-control" id="shopName" placeholder="e.g. Baroda Computer Wholesale Center" required>
+                                    </div>
+                                    <div class="form-text text-muted small">Commercial trade name or warehouse entity.</div>
+                                </div>
+
+                                <div class="col-md-5">
+                                    <label class="form-label small text-muted text-uppercase fw-semibold" for="shopMobileNumber">
+                                        Shop Mobile Number <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-phone"></i></span>
+                                        <input type="tel" class="form-control font-monospace" id="shopMobileNumber" placeholder="e.g. 01800-112233" required>
+                                    </div>
+                                    <div class="form-text text-muted small">Official store or order dispatch phone line.</div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label small text-muted text-uppercase fw-semibold" for="location">
+                                        Location / Shop Address <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                                        <textarea class="form-control" id="location" rows="2" placeholder="e.g. Shop #42, BCS Computer City, IDB Bhaban, Agargaon, Dhaka" required></textarea>
+                                    </div>
+                                    <div class="form-text text-muted small">Complete physical address, market name, floor, or delivery warehouse point.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Financial & Operational Profile -->
+                        <div class="glass-panel p-4 mb-4">
+                            <div class="section-header">
+                                <div class="section-icon bg-success bg-opacity-20 text-success border border-success border-opacity-25">
+                                    <i class="bi bi-wallet2"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold mb-0 text-white">Financial &amp; Operational Profile</h5>
+                                    <div class="text-muted small">Opening credit/due balance, vendor active status, and custom payment remarks</div>
+                                </div>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small text-muted text-uppercase fw-semibold" for="openingBalance">
+                                        Opening Due / Balance (৳)
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text font-monospace text-muted">৳</span>
+                                        <input type="number" class="form-control font-monospace text-end fs-6 fw-bold text-danger" id="openingBalance" value="0" min="0" step="any">
+                                    </div>
+                                    <div class="form-text text-muted small">Existing outstanding balance owed to this supplier (if any).</div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label small text-muted text-uppercase fw-semibold" for="status">
+                                        Supplier Status
+                                    </label>
+                                    <select class="form-select" id="status">
+                                        <option value="Active" selected>🟢 Active (Available for purchase)</option>
+                                        <option value="Inactive">🔴 Inactive (Suspended / Closed)</option>
+                                    </select>
+                                    <div class="form-text text-muted small">Inactive suppliers are suppressed from purchase autocomplete lists.</div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label small text-muted text-uppercase fw-semibold" for="notes">
+                                        Vendor Notes &amp; Payment Terms <span class="text-muted fw-normal">(Optional)</span>
+                                    </label>
+                                    <textarea class="form-control" id="notes" rows="2" placeholder="e.g. 15-day credit period, returns accepted within 7 days, RMA contact details..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions Bar -->
+                        <div class="glass-panel p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <div class="text-muted small">
+                                <i class="bi bi-shield-check text-success me-1"></i> Data automatically syncs with Cloudflare D1 central database and local cache.
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-outline-secondary px-3 py-2" id="resetBtn">
+                                    <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Form
+                                </button>
+                                <button type="button" class="btn btn-outline-info px-4 py-2 fw-semibold" id="saveAndNewBtn">
+                                    <i class="bi bi-plus-circle me-1"></i> Save &amp; Add Another
+                                </button>
+                                <button type="submit" class="btn btn-primary px-4 py-2 fw-semibold d-flex align-items-center gap-2" id="saveSupplierBtn">
+                                    <i class="bi bi-check2-circle fs-5"></i> Save Supplier
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Right Column: Quick Stats & Recent Suppliers Widget -->
+                <div class="col-xl-4">
+                    <div class="sticky-top" style="top: 100px;">
+                        <!-- Quick KPI Cards -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-6">
+                                <div class="stat-badge">
+                                    <div class="text-muted small text-uppercase fw-semibold mb-1" style="font-size: 0.72rem;">Total Suppliers</div>
+                                    <div class="fs-3 fw-bold text-white font-monospace" id="statTotalSuppliers">0</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="stat-badge">
+                                    <div class="text-muted small text-uppercase fw-semibold mb-1" style="font-size: 0.72rem;">Active Vendors</div>
+                                    <div class="fs-3 fw-bold text-success font-monospace" id="statActiveSuppliers">0</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Suppliers Directory Preview -->
+                        <div class="glass-panel p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="fw-bold mb-0 text-white d-flex align-items-center gap-2">
+                                    <i class="bi bi-clock-history text-info"></i> Recent Suppliers
+                                </h5>
+                                <span class="badge bg-secondary bg-opacity-25 text-info border border-secondary border-opacity-25 small" id="badgeRecentCount">0 registered</span>
+                            </div>
+
+                            <!-- Search Filter for Quick Directory -->
+                            <div class="input-group mb-3">
+                                <span class="input-group-text bg-transparent border-secondary border-opacity-25"><i class="bi bi-search"></i></span>
+                                <input type="text" class="form-control form-control-sm border-secondary border-opacity-25" id="recentSearchInput" placeholder="Quick filter by name, shop, or phone...">
+                            </div>
+
+                            <!-- List Container -->
+                            <div id="recentSuppliersList" class="d-flex flex-column gap-2" style="max-height: 480px; overflow-y: auto;">
+                                <div class="text-center py-4 text-muted small">
+                                    <div class="spinner-border spinner-border-sm text-info mb-2" role="status"></div>
+                                    <div>Loading registered suppliers...</div>
+                                </div>
+                            </div>
+
+                            <div class="pt-3 mt-3 border-top border-secondary border-opacity-25 text-center">
+                                <a href="all-suppliers.html" class="btn btn-outline-info btn-sm w-100 py-2 d-flex align-items-center justify-content-center gap-2">
+                                    <i class="bi bi-list-ul"></i> Manage All Suppliers Directory
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Custom Alert Container -->
+    <div id="custom-alert-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { getCollection, addDocument, deleteDocument } from './script/api.js';
+
+        let registeredSuppliers = [];
+
+        // Custom Notification Alert Helper
+        window.showCustomAlert = function(title, message, type = 'success') {
+            const container = document.getElementById('custom-alert-container');
+            const alert = document.createElement('div');
+            alert.className = `custom-alert ${type}`;
+            const iconSvg = type === 'success' 
+                ? '<i class="bi bi-check-circle-fill text-success fs-5"></i>' 
+                : type === 'info'
+                    ? '<i class="bi bi-info-circle-fill text-info fs-5"></i>'
+                    : '<i class="bi bi-exclamation-octagon-fill text-danger fs-5"></i>';
+
+            alert.innerHTML = `
+                <div>${iconSvg}</div>
+                <div class="flex-grow-1">
+                    <div class="title">${title}</div>
+                    <div class="message">${message}</div>
+                </div>
+                <button class="close-btn" onclick="this.closest('.custom-alert').remove()">&times;</button>
+            `;
+
+            container.appendChild(alert);
+            setTimeout(() => {
+                alert.style.animation = 'slideOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+                setTimeout(() => alert.remove(), 300);
+            }, 4500);
+        };
+
+        // Unique Supplier Code Generator
+        function generateSupplierCode() {
+            const rand = Math.floor(1000 + Math.random() * 9000);
+            return `SUP-${rand}`;
+        }
+
+        // Load Suppliers and Render KPI / Recent List
+        async function loadSuppliers() {
+            try {
+                const res = await getCollection('suppliers', true);
+                registeredSuppliers = (res.docs || []).map(d => ({ id: d.id, ...d.data() })).filter(s => !s.deleteScheduledAt);
+                
+                // Sort by createdAt descending
+                registeredSuppliers.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+                updateKPIs();
+                renderRecentList(registeredSuppliers);
+            } catch (err) {
+                console.error("Failed to load suppliers:", err);
+                const listEl = document.getElementById('recentSuppliersList');
+                if (listEl) {
+                    listEl.innerHTML = `
+                        <div class="text-center py-4 text-muted small">
+                            <i class="bi bi-cloud-slash text-danger fs-3 d-block mb-2"></i>
+                            <div>Unable to load suppliers from server.</div>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        function updateKPIs() {
+            const total = registeredSuppliers.length;
+            const active = registeredSuppliers.filter(s => (s.status || 'Active').toLowerCase() === 'active').length;
+
+            const totalEl = document.getElementById('statTotalSuppliers');
+            const activeEl = document.getElementById('statActiveSuppliers');
+            const badgeEl = document.getElementById('badgeRecentCount');
+
+            if (totalEl) totalEl.textContent = total;
+            if (activeEl) activeEl.textContent = active;
+            if (badgeEl) badgeEl.textContent = `${total} registered`;
+        }
+
+        function renderRecentList(list) {
+            const container = document.getElementById('recentSuppliersList');
+            if (!container) return;
+
+            if (list.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-5 text-muted small">
+                        <i class="bi bi-people text-secondary fs-2 d-block mb-2 opacity-50"></i>
+                        <div>No suppliers registered yet.</div>
+                        <div class="small text-muted mt-1">Fill in the form on the left to add your first supplier.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Display top 8 recent
+            const displayItems = list.slice(0, 8);
+            container.innerHTML = displayItems.map(s => {
+                const isActive = (s.status || 'Active').toLowerCase() === 'active';
+                const statusBadge = isActive 
+                    ? `<span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25" style="font-size: 0.65rem;">Active</span>`
+                    : `<span class="badge bg-secondary bg-opacity-25 text-muted border border-secondary border-opacity-25" style="font-size: 0.65rem;">Inactive</span>`;
+
+                const dueAmt = Number(s.openingBalance || 0);
+                const dueDisplay = dueAmt > 0 ? `<div class="small font-monospace text-danger mt-1">Due: ৳${dueAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</div>` : '';
+
+                return `
+                    <div class="recent-supplier-card">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <div>
+                                <strong class="text-white d-block" style="font-size: 0.9rem;">${escapeHtml(s.supplierName || 'Unnamed')}</strong>
+                                <small class="text-info font-monospace">${escapeHtml(s.supplierCode || 'SUP')}</small>
+                            </div>
+                            ${statusBadge}
+                        </div>
+
+                        <div class="small text-muted mb-1 d-flex align-items-center gap-1">
+                            <i class="bi bi-shop text-primary"></i>
+                            <span class="text-light fw-medium">${escapeHtml(s.shopName || 'N/A')}</span>
+                        </div>
+
+                        <div class="small text-muted d-flex align-items-center justify-content-between">
+                            <span class="d-flex align-items-center gap-1">
+                                <i class="bi bi-telephone text-success"></i>
+                                <a href="tel:${escapeHtml(s.phoneNumber || '')}" class="text-muted text-decoration-none font-monospace">${escapeHtml(s.phoneNumber || 'N/A')}</a>
+                            </span>
+                            <span class="d-flex align-items-center gap-1" title="Shop Mobile">
+                                <i class="bi bi-phone text-warning"></i>
+                                <span class="font-monospace">${escapeHtml(s.shopMobileNumber || 'N/A')}</span>
+                            </span>
+                        </div>
+
+                        <div class="small text-muted mt-1 text-truncate" title="${escapeHtml(s.location || '')}">
+                            <i class="bi bi-geo-alt text-secondary me-1"></i>${escapeHtml(s.location || 'No location specified')}
+                        </div>
+
+                        ${dueDisplay}
+
+                        <div class="d-flex justify-content-end gap-1 mt-2 pt-2 border-top border-secondary border-opacity-25">
+                            <a href="add-purchase.html?supplier=${encodeURIComponent(s.supplierName || '')}" class="btn btn-sm btn-outline-info py-0 px-2" style="font-size: 0.72rem;" title="Create Purchase with Supplier">
+                                <i class="bi bi-bag-plus"></i> Purchase
+                            </a>
+                            <button class="btn btn-sm btn-outline-danger py-0 px-2 btn-delete-supplier" data-id="${s.id}" data-name="${escapeHtml(s.supplierName || '')}" style="font-size: 0.72rem;" title="Delete Supplier">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Bind delete buttons
+            container.querySelectorAll('.btn-delete-supplier').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const id = btn.getAttribute('data-id');
+                    const name = btn.getAttribute('data-name');
+                    if (confirm(`Are you sure you want to delete supplier "${name}"? This action cannot be undone.`)) {
+                        try {
+                            if (window.showBcsLoader) window.showBcsLoader("Deleting Supplier...");
+                            await deleteDocument('suppliers', id);
+                            showCustomAlert("Supplier Deleted", `Supplier "${name}" has been removed.`, "info");
+                            await loadSuppliers();
+                        } catch (err) {
+                            showCustomAlert("Error", err.message || "Failed to delete supplier.", "error");
+                        } finally {
+                            if (window.hideBcsLoader) window.hideBcsLoader();
+                        }
+                    }
+                });
+            });
+        }
+
+        function escapeHtml(str) {
+            return String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // Live Search Filter
+        const searchInput = document.getElementById('recentSearchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase().trim();
+                if (!term) {
+                    renderRecentList(registeredSuppliers);
+                    return;
+                }
+                const filtered = registeredSuppliers.filter(s => 
+                    (s.supplierName || '').toLowerCase().includes(term) ||
+                    (s.shopName || '').toLowerCase().includes(term) ||
+                    (s.phoneNumber || '').toLowerCase().includes(term) ||
+                    (s.shopMobileNumber || '').toLowerCase().includes(term) ||
+                    (s.location || '').toLowerCase().includes(term) ||
+                    (s.supplierCode || '').toLowerCase().includes(term)
+                );
+                renderRecentList(filtered);
+            });
+        }
+
+        // Generate Code Trigger
+        const btnGen = document.getElementById('btnGenCode');
+        const codeInput = document.getElementById('supplierCode');
+        if (btnGen && codeInput) {
+            btnGen.addEventListener('click', () => {
+                codeInput.value = generateSupplierCode();
+            });
+        }
+
+        // Reset Form
+        const resetBtn = document.getElementById('resetBtn');
+        const addForm = document.getElementById('addSupplierForm');
+        if (resetBtn && addForm) {
+            resetBtn.addEventListener('click', () => {
+                addForm.reset();
+                codeInput.value = generateSupplierCode();
+                document.getElementById('openingBalance').value = '0';
+                document.getElementById('status').value = 'Active';
+                document.getElementById('supplierName').focus();
+            });
+        }
+
+        // Save Supplier Handler
+        async function handleSaveSupplier(stayOnPage = false) {
+            const supplierName = document.getElementById('supplierName').value.trim();
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+            const location = document.getElementById('location').value.trim();
+            const shopName = document.getElementById('shopName').value.trim();
+            const shopMobileNumber = document.getElementById('shopMobileNumber').value.trim();
+
+            if (!supplierName) {
+                showCustomAlert("Validation Error", "Please provide the Supplier Name.", "error");
+                document.getElementById('supplierName').focus();
+                return false;
+            }
+
+            if (!phoneNumber) {
+                showCustomAlert("Validation Error", "Please provide the Supplier Phone Number.", "error");
+                document.getElementById('phoneNumber').focus();
+                return false;
+            }
+
+            if (!shopName) {
+                showCustomAlert("Validation Error", "Please provide the Shop Name.", "error");
+                document.getElementById('shopName').focus();
+                return false;
+            }
+
+            if (!shopMobileNumber) {
+                showCustomAlert("Validation Error", "Please provide the Shop Mobile Number.", "error");
+                document.getElementById('shopMobileNumber').focus();
+                return false;
+            }
+
+            if (!location) {
+                showCustomAlert("Validation Error", "Please enter the Location or Shop Address.", "error");
+                document.getElementById('location').focus();
+                return false;
+            }
+
+            // Check duplicate phone or shop mobile
+            const exists = registeredSuppliers.find(s => 
+                (s.phoneNumber && s.phoneNumber === phoneNumber) || 
+                (s.shopMobileNumber && s.shopMobileNumber === shopMobileNumber)
+            );
+            if (exists) {
+                if (!confirm(`Notice: A supplier named "${exists.supplierName}" (${exists.shopName}) is already registered with this phone number. Do you still wish to register?`)) {
+                    return false;
+                }
+            }
+
+            const supplierCode = document.getElementById('supplierCode').value.trim() || generateSupplierCode();
+            const email = document.getElementById('email').value.trim();
+            const openingBalance = parseFloat(document.getElementById('openingBalance').value) || 0;
+            const status = document.getElementById('status').value;
+            const notes = document.getElementById('notes').value.trim();
+
+            const supplierData = {
+                supplierName,
+                phoneNumber,
+                location,
+                shopName,
+                shopMobileNumber,
+                supplierCode,
+                email,
+                openingBalance,
+                status,
+                notes,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+
+            const submitBtn = document.getElementById('saveSupplierBtn');
+            const origHtml = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Saving to Cloudflare D1...`;
+
+            if (window.showBcsLoader) window.showBcsLoader("Registering Supplier in Cloudflare D1...");
+
+            try {
+                await addDocument('suppliers', supplierData);
+                showCustomAlert("Supplier Registered", `Supplier "${supplierName}" at "${shopName}" saved successfully.`, "success");
+
+                // Reset form
+                addForm.reset();
+                codeInput.value = generateSupplierCode();
+                document.getElementById('openingBalance').value = '0';
+                document.getElementById('status').value = 'Active';
+
+                await loadSuppliers();
+
+                if (!stayOnPage) {
+                    setTimeout(() => {
+                        window.location.href = 'all-suppliers.html';
+                    }, 1200);
+                } else {
+                    document.getElementById('supplierName').focus();
+                }
+                return true;
+            } catch (err) {
+                console.error("Save supplier failed:", err);
+                showCustomAlert("Save Failed", err.message || "Failed to persist supplier to backend.", "error");
+                return false;
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = origHtml;
+                if (window.hideBcsLoader) window.hideBcsLoader();
+            }
+        }
+
+        // Form Submit
+        addForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            handleSaveSupplier(false);
+        });
+
+        // Save & Add Another Button
+        const saveAndNewBtn = document.getElementById('saveAndNewBtn');
+        if (saveAndNewBtn) {
+            saveAndNewBtn.addEventListener('click', () => {
+                handleSaveSupplier(true);
+            });
+        }
+
+        // Initial setup on DOM ready
+        document.addEventListener('DOMContentLoaded', () => {
+            codeInput.value = generateSupplierCode();
+            loadSuppliers();
+        });
+    </script>
+</body>
+</html>

@@ -462,8 +462,20 @@
                 const res = await getCollection('products');
                 allProducts = (res.docs || []).map(d => ({ id: d.id, ...d.data() })).filter(p => !p.deleteScheduledAt);
 
-                // Fetch past purchases to populate supplier list
+                // Fetch registered suppliers from suppliers collection & past purchases
                 try {
+                    const registeredSuppliersMap = {};
+                    try {
+                        const supRes = await getCollection('suppliers');
+                        (supRes.docs || []).forEach(doc => {
+                            const s = doc.data();
+                            if (s && s.supplierName && (s.status || 'Active').toLowerCase() === 'active') {
+                                allSuppliers.add(s.supplierName);
+                                registeredSuppliersMap[s.supplierName.toLowerCase()] = s;
+                            }
+                        });
+                    } catch(e) {}
+
                     const purRes = await getCollection('purchases');
                     (purRes.docs || []).forEach(doc => {
                         const data = doc.data();
@@ -471,12 +483,28 @@
                     });
                     const datalist = document.getElementById('supplierDatalist');
                     datalist.innerHTML = Array.from(allSuppliers).map(s => `<option value="${s}">`).join('');
+
+                    // Autofill phone when supplier name matches a registered supplier
+                    document.getElementById('supplierName').addEventListener('input', (e) => {
+                        const val = e.target.value.toLowerCase().trim();
+                        if (registeredSuppliersMap[val]) {
+                            const sup = registeredSuppliersMap[val];
+                            if (sup.phoneNumber && !document.getElementById('supplierPhone').value) {
+                                document.getElementById('supplierPhone').value = sup.phoneNumber;
+                            }
+                        }
+                    });
                 } catch(e) {
                     console.warn("Could not preload suppliers list:", e);
                 }
 
-                // Check if a pre-selected product was passed via URL (?product=...)
+                // Check if a pre-selected product or supplier was passed via URL
                 const urlParams = new URLSearchParams(window.location.search);
+                const targetSupplier = urlParams.get('supplier');
+                if (targetSupplier) {
+                    document.getElementById('supplierName').value = targetSupplier;
+                    document.getElementById('supplierName').dispatchEvent(new Event('input'));
+                }
                 const targetProductId = urlParams.get('product');
 
                 if (targetProductId) {

@@ -10,7 +10,7 @@
  */
 
 (function() {
-    let currentAppVersion = '2.2.5';
+    let currentAppVersion = '2.2.6';
     let availableRemoteInfo = null;
     let downloadedUpdateInfo = null;
     let isIpcBound = false;
@@ -593,6 +593,11 @@
         }
 
         const fallbackMap = {
+            '2.2.6': `
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Dedicated People &amp; Supplier Management</strong>: Interactive supplier directory under new People submenu with live search, direct dialing, and CSV export.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Real-Time Sourcing Profile</strong>: Tracks Supplier Name, Phone Number, Shop Name, Shop Mobile, Location, and Opening Due Balance.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Seamless Purchase Autocomplete</strong>: Automatically integrates registered suppliers into purchase invoices with instant phone and shop autofill.</div></div>
+            `,
             '2.2.5': `
                 <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Bulletproof Auto-Updater Engine</strong>: Hardened direct binary streaming eliminating blockmap and signature verification stalls.</div></div>
                 <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Direct Full NSIS Swapping</strong>: Enforced clean standalone installer streaming with instant cryptographic SHA-512 validation.</div></div>

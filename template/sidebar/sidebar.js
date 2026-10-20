@@ -85,6 +85,25 @@ window._renderSidebarImpl = function(activeMenu, activeSubMenu = null) {
                     </div>
                 </div>
             </div>
+
+            <!-- People Menu Group -->
+            <div class="menu-group ${activeMenu === 'people' ? 'open' : ''}">
+                <button class="menu-item has-submenu ${activeMenu === 'people' ? 'active' : ''}">
+                    <i class="bi bi-people-fill"></i>
+                    <span>People</span>
+                    <i class="bi bi-chevron-down chevron"></i>
+                </button>
+                <div class="submenu">
+                    <div class="submenu-inner">
+                        <a href="add-supplier.html" class="submenu-item ${activeSubMenu === 'add-supplier' ? 'active' : ''}" data-permission="add_supplier">
+                            <div class="submenu-dot"></div> Add Supplier
+                        </a>
+                        <a href="all-suppliers.html" class="submenu-item ${activeSubMenu === 'all-suppliers' ? 'active' : ''}" data-permission="view_suppliers">
+                            <div class="submenu-dot"></div> All Suppliers
+                        </a>
+                    </div>
+                </div>
+            </div>
             
             <div class="menu-label mt-4">MANAGEMENT</div>
             <a href="settings.html" class="menu-item ${activeMenu === 'settings' ? 'active' : ''}" data-permission="manage_settings">
