@@ -152,8 +152,33 @@
                                 <input type="number" class="form-control bg-dark text-light border-secondary" id="alertQuantity" min="1" value="1">
                             </div>
                             <div class="col-12">
-                                <label for="productImageUrl" class="form-label">8. Product Image (URL)</label>
-                                <input type="url" class="form-control bg-dark text-light border-secondary" id="productImageUrl" placeholder="images\no_image_--product.png">
+                                <label class="form-label d-flex justify-content-between align-items-center">
+                                    <span>8. Product Image</span>
+                                    <small id="imageCompressionBadge" style="display:none;"></small>
+                                </label>
+                                
+                                <div class="d-flex flex-column flex-md-row gap-3 align-items-start">
+                                    <div id="imagePreviewContainer" class="rounded-3 border border-secondary bg-black d-flex align-items-center justify-content-center p-2" style="width: 130px; height: 130px; overflow: hidden; flex-shrink: 0; position: relative;">
+                                        <i id="imagePlaceholderIcon" class="bi bi-card-image text-muted" style="font-size: 2.5rem;"></i>
+                                        <img id="imagePreview" src="" alt="Preview" style="display: none; max-width: 100%; max-height: 100%; object-fit: contain;">
+                                    </div>
+
+                                    <div class="flex-grow-1 w-100">
+                                        <div class="input-group mb-2">
+                                            <input type="file" class="form-control bg-dark text-light border-secondary" id="productImageFileInput" accept="image/png, image/jpeg, image/webp, image/bmp">
+                                            <button type="button" class="btn btn-outline-danger" id="clearImageBtn" style="display: none;" title="Remove image">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-dark text-muted border-secondary small">URL</span>
+                                            <input type="url" class="form-control bg-dark text-light border-secondary" id="productImageUrl" placeholder="https://bcs.bcsdeveloper.com/{barcode}_1.webp">
+                                        </div>
+                                        <div class="form-text text-muted small mt-1">
+                                            Photos are automatically compressed to high-efficiency WebP and saved directly to your private image store.
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             
                             <div id="standardPriceFields" class="row g-3 border-top border-secondary pt-3 mt-3">
@@ -260,7 +285,7 @@
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
-        import { getCollection, getDocument, addDocument, updateDocument } from './script/api.js';
+        import { getCollection, getDocument, addDocument, updateDocument, compressImageToWebP, uploadProductImage } from './script/api.js';
 
         document.addEventListener('DOMContentLoaded', function () {
             const addProductForm = document.getElementById('addProductForm');
@@ -268,6 +293,70 @@
             let currentUser = null;
             let allProducts = [];
             let editProductId = null;
+
+            // --- Modern Client WebP Image Pipeline ---
+            let pendingWebPBase64 = null;
+            let pendingWebPBlob = null;
+            const fileInput = document.getElementById('productImageFileInput');
+            const imgPreview = document.getElementById('imagePreview');
+            const placeholderIcon = document.getElementById('imagePlaceholderIcon');
+            const clearImgBtn = document.getElementById('clearImageBtn');
+            const badge = document.getElementById('imageCompressionBadge');
+            const urlInput = document.getElementById('productImageUrl');
+
+            if (fileInput) {
+                fileInput.addEventListener('change', async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    try {
+                        badge.style.display = 'inline';
+                        badge.innerHTML = '<span class="badge bg-secondary">Compressing to WebP...</span>';
+
+                        const compressed = await compressImageToWebP(file, 1920, 0.85);
+                        pendingWebPBlob = compressed.blob;
+                        pendingWebPBase64 = compressed.base64;
+
+                        imgPreview.src = compressed.base64;
+                        imgPreview.style.display = 'block';
+                        placeholderIcon.style.display = 'none';
+                        clearImgBtn.style.display = 'inline-block';
+
+                        const origSizeKB = (file.size / 1024).toFixed(1);
+                        badge.innerHTML = `<span class="badge bg-success-subtle text-success border border-success">${origSizeKB} KB &rarr; ${compressed.sizeKB} KB WebP</span>`;
+                    } catch (err) {
+                        showCustomAlert('Image Error', err.message, 'failed');
+                        badge.style.display = 'none';
+                    }
+                });
+
+                clearImgBtn.addEventListener('click', () => {
+                    fileInput.value = '';
+                    pendingWebPBlob = null;
+                    pendingWebPBase64 = null;
+                    imgPreview.src = '';
+                    imgPreview.style.display = 'none';
+                    placeholderIcon.style.display = 'block';
+                    clearImgBtn.style.display = 'none';
+                    badge.style.display = 'none';
+                    urlInput.value = '';
+                });
+
+                urlInput.addEventListener('input', () => {
+                    const url = urlInput.value.trim();
+                    if (url) {
+                        imgPreview.src = url;
+                        imgPreview.style.display = 'block';
+                        placeholderIcon.style.display = 'none';
+                        clearImgBtn.style.display = 'inline-block';
+                    } else if (!pendingWebPBase64) {
+                        imgPreview.src = '';
+                        imgPreview.style.display = 'none';
+                        placeholderIcon.style.display = 'block';
+                        clearImgBtn.style.display = 'none';
+                    }
+                });
+            }
 
             window.showCustomAlert = function(title, message, type = 'success') {
                 const container = document.getElementById('custom-alert-container');
@@ -438,6 +527,26 @@
                 btn.innerHTML = 'Saving...';
                 btn.disabled = true;
 
+                // Seamless WebP upload to private image store
+                if (pendingWebPBase64 && productData.barcode) {
+                    btn.innerHTML = 'Uploading Image...';
+                    try {
+                        const uploadRes = await uploadProductImage({
+                            barcode: productData.barcode,
+                            image: pendingWebPBase64,
+                            index: 1,
+                            isPrimary: true
+                        });
+                        if (uploadRes && uploadRes.url) {
+                            productData.imageUrl = uploadRes.url;
+                            if (urlInput) urlInput.value = uploadRes.url;
+                        }
+                    } catch (uploadErr) {
+                        console.warn("Background image upload notice:", uploadErr.message);
+                    }
+                    btn.innerHTML = 'Saving Product...';
+                }
+
                 if (editProductId) {
                     try {
                         productData.updatedAt = new Date().toISOString();
@@ -522,6 +631,12 @@
                 document.getElementById('category').value = productToEdit.category || '';
                 document.getElementById('alertQuantity').value = productToEdit.alertQuantity || 1;
                 document.getElementById('productImageUrl').value = productToEdit.imageUrl || '';
+                if (productToEdit.imageUrl && imgPreview) {
+                    imgPreview.src = productToEdit.imageUrl;
+                    imgPreview.style.display = 'block';
+                    if (placeholderIcon) placeholderIcon.style.display = 'none';
+                    if (clearImgBtn) clearImgBtn.style.display = 'inline-block';
+                }
                 document.getElementById('description').value = productToEdit.description || '';
 
                 unitSelect.dispatchEvent(new Event('change'));

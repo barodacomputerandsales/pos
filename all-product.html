@@ -457,7 +457,30 @@
     <!-- Bootstrap & Logic -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
-        import { getCollection, addDocument, updateDocument, deleteDocument, fetchAPI } from './script/api.js';
+        import { getCollection, addDocument, updateDocument, deleteDocument, fetchAPI, downloadImageAsJpeg } from './script/api.js';
+
+        // Direct in-memory WebP to JPEG download handler
+        window.handleDownloadProductJpeg = async function(imageUrl, barcode) {
+            if (!imageUrl) return;
+            const btn = window.event ? window.event.currentTarget : null;
+            let origHtml = '';
+            if (btn) {
+                origHtml = btn.innerHTML;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Converting...';
+                btn.disabled = true;
+            }
+            try {
+                await downloadImageAsJpeg(imageUrl, barcode || 'product-image', 0.95);
+                if (btn) {
+                    btn.innerHTML = '<i class="bi bi-check-circle me-1"></i> Downloaded!';
+                    setTimeout(() => { btn.innerHTML = origHtml; btn.disabled = false; }, 2000);
+                }
+            } catch (err) {
+                console.error('JPEG download failed:', err);
+                if (btn) { btn.innerHTML = origHtml; btn.disabled = false; }
+                alert('Could not convert image to JPEG: ' + err.message);
+            }
+        };
         
         window.onerror = function(msg, url, lineNo, columnNo, error) {
             alert(`JS Error: ${msg}\nLine: ${lineNo}:${columnNo}`);
@@ -1102,9 +1125,13 @@
             document.getElementById('productDetailsContainer').innerHTML = `
                 <div class="row">
                     <div class="col-md-4 text-center">
-                        <div class="bg-dark rounded-4 p-4 d-flex align-items-center justify-content-center h-100 border border-secondary" style="overflow: hidden;">
-                            ${p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.name}" style="max-width: 100%; max-height: 250px; object-fit: contain;">` : `<i class="bi bi-box-seam" style="font-size: 6rem; color: rgba(255,255,255,0.2);"></i>`}
+                        <div class="bg-dark rounded-4 p-4 d-flex align-items-center justify-content-center border border-secondary" style="overflow: hidden; height: 230px;">
+                            ${p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.name}" style="max-width: 100%; max-height: 210px; object-fit: contain;">` : `<i class="bi bi-box-seam" style="font-size: 6rem; color: rgba(255,255,255,0.2);"></i>`}
                         </div>
+                        ${p.imageUrl ? `
+                        <button type="button" class="btn btn-outline-info btn-sm mt-2 w-100 d-flex align-items-center justify-content-center gap-1 shadow-sm" onclick="handleDownloadProductJpeg('${p.imageUrl}', '${p.barcode || p.name}')">
+                            <i class="bi bi-download"></i> Download as JPEG
+                        </button>` : ''}
                     </div>
                     <div class="col-md-8 mt-3 mt-md-0">
                         <h3 class="fw-bold mb-1">${p.name}</h3>
