@@ -3,7 +3,12 @@
 <head>
     <!-- Authentication Session Pre-Check: Redirect if already logged in -->
     <script>
-        if (localStorage.getItem('isAuthenticated') === 'true' && localStorage.getItem('sessionId') && localStorage.getItem('sessionPort')) {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('logout') === 'true' || urlParams.get('login') === 'true') {
+            localStorage.removeItem('isAuthenticated');
+            localStorage.removeItem('sessionId');
+            localStorage.removeItem('sessionPort');
+        } else if (localStorage.getItem('isAuthenticated') === 'true' && localStorage.getItem('sessionId') && localStorage.getItem('sessionPort')) {
             window.location.replace('dashboard.html');
         }
     </script>

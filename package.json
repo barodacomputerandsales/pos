@@ -6,6 +6,7 @@
     "main": "main.js",
     "scripts": {
         "start": "electron .",
+        "start:login": "electron . --login",
         "build": "electron-builder --win",
         "release": "electron-builder --win --publish always"
     },

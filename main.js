@@ -4,7 +4,8 @@ const os = require('os');
 const fs = require('fs');
 const { autoUpdater } = require('electron-updater');
 
-const APP_ID = 'com.bcsdeveloper.pos';
+const isDev = !app.isPackaged;
+const APP_ID = isDev ? 'com.bcsdeveloper.pos.dev' : 'com.bcsdeveloper.pos';
 if (process.platform === 'win32') {
   app.setAppUserModelId(APP_ID);
 }
@@ -23,27 +24,52 @@ function createWindow() {
     minHeight: 768,
     backgroundColor: '#06080f',
     icon: iconPath,
+    show: false,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
     }
   });
 
-  mainWindow.loadFile('index.html');
+  const shouldForceLogin = process.argv.includes('--login') || process.argv.includes('--logout');
+  mainWindow.loadFile('index.html', {
+    query: shouldForceLogin ? { logout: 'true' } : {}
+  });
+
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show();
+    mainWindow.focus();
+  });
   
-  // After the app loads, silently check for updates in the background
+  // After the app loads, silently check for updates in the background (production builds)
   mainWindow.webContents.once('did-finish-load', () => {
-    autoUpdater.checkForUpdatesAndNotify();
+    if (app.isPackaged) {
+      autoUpdater.checkForUpdatesAndNotify();
+    }
   });
 }
 
-app.whenReady().then(() => {
-  createWindow();
-
-  app.on('activate', function () {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+// Single Instance Lock: Prevents duplicate conflicting background processes
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.show();
+      mainWindow.focus();
+    }
   });
-});
+
+  app.whenReady().then(() => {
+    createWindow();
+
+    app.on('activate', function () {
+      if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    });
+  });
+}
 
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit();
