@@ -442,6 +442,130 @@
     padding: 30px;
 }
 
+/* Signature Portable Neon Laser Loader for Relaunch HUD */
+.bcs-relaunch-box .bcs-l1-logo-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bcs-relaunch-box .bcs-l1-svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    filter: drop-shadow(0 0 16px rgba(0, 240, 255, 0.85)) drop-shadow(0 0 38px rgba(0, 240, 255, 0.45));
+}
+
+.bcs-relaunch-box .bcs-l1-stroke-guide {
+    stroke: rgba(0, 240, 255, 0.16);
+    stroke-width: 3px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.bcs-relaunch-box .bcs-l1-stroke-outer {
+    stroke: #00f0ff;
+    stroke-width: 6.5px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 10060;
+    stroke-dashoffset: 10060;
+    animation: bcsL1LaserDrawOuter 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.bcs-relaunch-box .bcs-l1-stroke-top {
+    stroke: #00f0ff;
+    stroke-width: 5.5px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1180;
+    stroke-dashoffset: 1180;
+    animation: bcsL1LaserDrawTop 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.bcs-relaunch-box .bcs-l1-stroke-bottom {
+    stroke: #00f0ff;
+    stroke-width: 5.5px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1160;
+    stroke-dashoffset: 1160;
+    animation: bcsL1LaserDrawBottom 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes bcsL1LaserDrawOuter {
+    0% {
+        stroke-dashoffset: 10060;
+        opacity: 0.3;
+    }
+    45% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+        filter: drop-shadow(0 0 10px #ffffff) drop-shadow(0 0 25px #00f0ff);
+    }
+    62% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+        filter: drop-shadow(0 0 14px #ffffff) drop-shadow(0 0 32px #00f0ff);
+    }
+    95% {
+        stroke-dashoffset: -10060;
+        opacity: 0.3;
+    }
+    100% {
+        stroke-dashoffset: -10060;
+        opacity: 0;
+    }
+}
+
+@keyframes bcsL1LaserDrawTop {
+    0%, 15% {
+        stroke-dashoffset: 1180;
+        opacity: 0;
+    }
+    20% {
+        opacity: 1;
+    }
+    50%, 65% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+    }
+    95% {
+        stroke-dashoffset: -1180;
+        opacity: 0.3;
+    }
+    100% {
+        stroke-dashoffset: -1180;
+        opacity: 0;
+    }
+}
+
+@keyframes bcsL1LaserDrawBottom {
+    0%, 25% {
+        stroke-dashoffset: 1160;
+        opacity: 0;
+    }
+    30% {
+        opacity: 1;
+    }
+    55%, 70% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+    }
+    95% {
+        stroke-dashoffset: -1160;
+        opacity: 0.3;
+    }
+    100% {
+        stroke-dashoffset: -1160;
+        opacity: 0;
+    }
+}
+
 .bcs-laser-spinner {
     width: 88px;
     height: 88px;
