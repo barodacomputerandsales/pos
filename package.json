@@ -1,8 +1,8 @@
 {
     "name": "bcs-enterprise-pos",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "description": "BCS Enterprise POS PRO Max",
-    "author": "bcsdeveloper",
+    "author": "BCS Developer",
     "main": "main.js",
     "scripts": {
         "start": "electron .",
@@ -25,7 +25,7 @@
     "build": {
         "appId": "com.bcsdeveloper.pos",
         "productName": "BCS Enterprise POS PRO Max",
-        "copyright": "Copyright © 2026 bcsdeveloper. All rights reserved.",
+        "copyright": "Copyright © 2026 BCS Developer. All rights reserved.",
         "directories": {
             "output": "dist",
             "buildResources": "assets"
@@ -46,11 +46,11 @@
                 }
             ],
             "icon": "assets/icon.ico",
-            "legalTrademarks": "BCS Enterprise POS is a trademark of bcsdeveloper",
+            "legalTrademarks": "BCS Enterprise POS is engineered by BCS Developer (https://www.bcsdeveloper.com)",
             "requestedExecutionLevel": "asInvoker",
             "verifyUpdateCodeSignature": false,
             "signtoolOptions": {
-                "publisherName": "bcsdeveloper",
+                "publisherName": "BCS Developer",
                 "rfc3161TimeStampServer": "http://timestamp.digicert.com"
             }
         },

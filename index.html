@@ -24,6 +24,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="template/animations.css">
     
     <!-- Modern Web Polyfill for Electron Context -->
     <script>
@@ -661,6 +662,42 @@
     <div class="plasma-orb orb-2"></div>
     <div class="plasma-orb orb-3"></div>
 
+    <!-- Branded Pure Neon Laser Splash Loader (Embedded for instant paint on initial load / refresh) -->
+    <div id="bcs-global-loader-overlay" class="active">
+        <div class="bcs-loader-container">
+            <div class="bcs-loader-wrapper">
+                <div class="bcs-loader-orbit"></div>
+                <div class="bcs-logo-container anim-laser">
+                    <svg viewBox="460 380 1120 1280" class="bcs-logo-svg" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <filter id="neonGlowLoginOverlay" x="-35%" y="-35%" width="170%" height="170%">
+                                <feGaussianBlur stdDeviation="8" result="blur1" />
+                                <feGaussianBlur stdDeviation="22" result="blur2" />
+                                <feMerge>
+                                    <feMergeNode in="blur2" />
+                                    <feMergeNode in="blur1" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
+                        <g filter="url(#neonGlowLoginOverlay)">
+                            <path d="M 640 450 L 1260 450 C 1380 450 1480 550 1480 670 C 1480 770 1410 855 1315 880 C 1435 910 1520 1010 1520 1140 C 1520 1270 1410 1380 1275 1380 L 640 1380 Z" 
+                                  fill="none" stroke="rgba(0, 229, 255, 0.12)" stroke-width="65" stroke-linejoin="round" class="bcs-stroke-guide" />
+                            <path d="M 640 450 L 1260 450 C 1380 450 1480 550 1480 670 C 1480 770 1410 855 1315 880 C 1435 910 1520 1010 1520 1140 C 1520 1270 1410 1380 1275 1380 L 640 1380 Z" 
+                                  fill="none" stroke="#00e5ff" stroke-width="70" stroke-linecap="round" stroke-linejoin="round" class="bcs-stroke-outer" />
+                            <path d="M 850 630 L 1190 630 C 1245 630 1290 675 1290 730 C 1290 785 1245 830 1190 830 L 850 830 Z" 
+                                  fill="none" stroke="#00e5ff" stroke-width="60" stroke-linecap="round" stroke-linejoin="round" class="bcs-stroke-top" />
+                            <path d="M 850 990 L 1210 990 C 1270 990 1320 1040 1320 1100 C 1320 1160 1270 1210 1210 1210 L 850 1210 Z" 
+                                  fill="none" stroke="#00e5ff" stroke-width="60" stroke-linecap="round" stroke-linejoin="round" class="bcs-stroke-bottom" />
+                        </g>
+                    </svg>
+                </div>
+                <div class="bcs-loader-icon"><i class="bi bi-shield-lock-fill"></i></div>
+            </div>
+            <div class="bcs-loader-text" id="bcs-global-loader-msg">Initializing BCS Enterprise Terminal...</div>
+        </div>
+    </div>
+
     <!-- Layout Engine Scripts (Loads showBcsLoader / hideBcsLoader & Animations) -->
     <script src="template/layout.js"></script>
 
@@ -704,7 +741,7 @@
 
                 <!-- Footer Signature -->
                 <div class="hero-signature">
-                    Developed by <strong>BCSdeveloper™</strong>.
+                    Manufactured &amp; Developed by <a href="https://www.bcsdeveloper.com" target="_blank" rel="noopener" style="color: #00f0ff; text-decoration: underline; text-decoration-color: rgba(0, 240, 255, 0.4); font-weight: 700;">BCS Developer</a>
                 </div>
             </div>
 
@@ -775,14 +812,75 @@
         <div id="loginUpdateContainer" class="text-center mt-3 d-none"></div>
     </div>
 
-    <!-- Bottom Page Credit Footer (Version 2.0.0) -->
+    <!-- Bottom Page Credit Footer (Version 2.0.1) -->
     <footer class="fixed-page-footer">
-        Made with care in <strong>Bangladesh 🇧🇩</strong> | Developed by: <span class="highlight-purple">BCSdeveloper™</span> | Version: <strong id="loginVersionDisplay">2.0.0</strong> | Powered by: <strong>Cloudflare D1</strong>.
+        Made with care in <strong>Bangladesh 🇧🇩</strong> | Manufacturer: <a href="https://www.bcsdeveloper.com" target="_blank" rel="noopener" class="highlight-purple" style="text-decoration: none; border-bottom: 1px dotted var(--brand-purple);"><strong>BCS Developer</strong></a> | Version: <strong id="loginVersionDisplay">2.0.1</strong> | Powered by: <strong>Cloudflare D1</strong>.
     </footer>
 
-    <!-- Login Authentication Handler -->
+    <!-- Login Authentication Handler & Splash Sequence -->
     <script type="module">
         import { loginUser } from "./script/auth.js";
+
+        // Terminal Bootstrapping & Initial Splash Transition
+        function initLoginTerminal() {
+            const overlay = document.getElementById('bcs-global-loader-overlay');
+            if (overlay) {
+                try {
+                    const elOuter = overlay.querySelector('.bcs-stroke-outer');
+                    const elTop = overlay.querySelector('.bcs-stroke-top');
+                    const elBottom = overlay.querySelector('.bcs-stroke-bottom');
+                    if (elOuter && elOuter.getTotalLength) {
+                        elOuter.style.strokeDasharray = Math.ceil(elOuter.getTotalLength() || 10060);
+                        elTop.style.strokeDasharray = Math.ceil(elTop.getTotalLength() || 1180);
+                        elBottom.style.strokeDasharray = Math.ceil(elBottom.getTotalLength() || 1160);
+                    }
+                } catch(e) {}
+            }
+
+            // Sync dynamic version from Electron runtime
+            if (typeof require !== 'undefined') {
+                try {
+                    const { ipcRenderer } = require('electron');
+                    ipcRenderer.invoke('get_app_version').then(ver => {
+                        if (ver) {
+                            const verEl = document.getElementById('loginVersionDisplay');
+                            if (verEl) verEl.textContent = ver;
+                        }
+                    }).catch(() => {});
+                } catch(e) {}
+            }
+
+            // Check if active session already exists in terminal storage
+            const isAuth = localStorage.getItem('isAuthenticated') === 'true';
+            const sessId = localStorage.getItem('sessionId');
+            const sessPort = localStorage.getItem('sessionPort');
+
+            if (isAuth && sessId && sessPort) {
+                const msgEl = document.getElementById('bcs-global-loader-msg');
+                if (msgEl) msgEl.textContent = "Restoring active session...";
+                setTimeout(() => {
+                    window.location.replace("dashboard.html");
+                }, 400);
+                return;
+            }
+
+            // Smooth laser splash transition on initial load or page refresh
+            setTimeout(() => {
+                if (window.hideBcsLoader) {
+                    window.hideBcsLoader();
+                } else if (overlay) {
+                    overlay.classList.remove('active');
+                }
+                const userInput = document.getElementById("loginUser");
+                if (userInput) userInput.focus();
+            }, 600);
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initLoginTerminal);
+        } else {
+            initLoginTerminal();
+        }
 
         // Password Visibility Toggle
         const toggleBtn = document.getElementById("togglePasswordBtn");
