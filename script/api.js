@@ -170,3 +170,6 @@ export async function deleteDocument(collectionName, id) {
     await deleteCache(collectionName);
     return result;
 }
+
+// Re-export Image Processing & Storage Pipeline Utilities
+export { compressImageToWebP, uploadProductImage, downloadImageAsJpeg } from './image-utils.js';

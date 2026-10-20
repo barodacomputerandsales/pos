@@ -8,17 +8,12 @@ const isDev = !app.isPackaged;
 const APP_ID = isDev ? 'com.bcsdeveloper.pos.dev' : 'com.bcsdeveloper.pos';
 if (process.platform === 'win32') {
   app.setAppUserModelId(APP_ID);
-} else if (process.platform === 'linux') {
-  // Bypass Ubuntu 24.04/25.04 restricted unprivileged user namespaces
-  app.commandLine.appendSwitch('no-sandbox');
 }
 
 let mainWindow;
 
 function createWindow() {
-  const iconPath = process.platform === 'win32' 
-    ? path.join(__dirname, 'assets/icon.ico') 
-    : path.join(__dirname, 'assets/icon.png');
+  const iconPath = path.join(__dirname, 'assets/icon.ico');
 
   mainWindow = new BrowserWindow({
     width: 1280,

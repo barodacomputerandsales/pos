@@ -1,4 +1,4 @@
-name: Build & Release Multi-Platform POS App (Windows & Linux)
+name: Build & Release Windows POS App
 
 on:
   push:
@@ -11,11 +11,7 @@ permissions:
 
 jobs:
   release:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [windows-latest, ubuntu-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
 
     steps:
       - name: Checkout Repository
@@ -34,15 +30,8 @@ jobs:
         run: npm install
 
       - name: Build and Publish Windows App
-        if: matrix.os == 'windows-latest'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_LINK: ${{ secrets.CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
         run: npx electron-builder --win --publish always
-
-      - name: Build and Publish Linux App (AppImage & DEB)
-        if: matrix.os == 'ubuntu-latest'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx electron-builder --linux --publish always

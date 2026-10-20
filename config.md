@@ -31,6 +31,7 @@
 - **Key Modules**:
   - `auth/`: Handles session, login, and registration.
   - `database/`: Dynamic microservices (`add.js`, `read.js`, `update.js`, `delete.js`, `data-manager.js`).
+  - `image/`: Asset upload gateway (`upload.js`) to private GitHub image store with `register.json` tracking.
   - `mail/`: Email logic queue.
   - `cron/`: Scheduled tasks (11:55 PM daily report, 48h purge of soft-deleted products).
 - **more details**: [see](backend/before-action-read-me.md)
@@ -40,6 +41,11 @@
 - **Features**: 11:55 PM IST daily revenue & store report trigger, soft-delete cleanup, event-driven customer emails.
 - **Stack**: Node.js, GitHub Actions workflows.
 
+**6. Dedicated Asset & Image Store (`imagestore`)**
+- **Type**: Private Encrypted GitHub Asset Store (`cdn-barodacomputerandsales/imagestore`).
+- **Public Dynamic CDN Domain**: `https://bcs.bcsdeveloper.com/{barcode}_{index}.webp` (or `/img/{file}`).
+- **Features**: WebP compression, multi-image support (`{barcode}_{index}.webp`), `register.json` manifest synchronization, and in-memory on-the-fly JPEG client downloads (zero DB/GitHub storage footprint).
+
 ---
 ---
 ## SYSTEM mails
@@ -47,12 +53,13 @@
 -  **sysrtem** = `no-reply@bcs.bcsdeveloper.com`
 ---
 ---
-## Official GitHub Repositories (`barodacomputerandsales`)
+## Official GitHub Repositories
 - **1. Desktop POS App (`app/`)**: https://github.com/barodacomputerandsales/pos
 - **2. Customer Portal & E-Commerce (`customer+e-com/`)**: https://github.com/barodacomputerandsales/e-com-customer-portal
 - **3. Delivery Portal (`delivery/`)**: https://github.com/barodacomputerandsales/delivery
 - **4. Backend Serverless API (`backend/`)**: https://github.com/barodacomputerandsales/backend
 - **5. Automated Cron & Event Caller (`automation/`)**: https://github.com/barodacomputerandsales/automation
+- **6. Dedicated Asset & Image Store (`imagestore`)**: https://github.com/cdn-barodacomputerandsales/imagestore
 - **Live Backend Serverless API**: https://backend.bcs.bcsdeveloper.com/api
 - **API Master Key**: `backend-bcs-pos` (`x-api-key` header)
 
@@ -114,11 +121,11 @@ When collaborating on this project, please adhere to the following rules:
     - `update_not_available`: Confirms latest version status.
     - `update_error`: Displays retry alerts.
 - **Publishing a New App Version**:
-  1. Increment version in `package.json` (e.g. `1.9.6`).
+  1. Increment version in `package.json` (e.g. `2.2.1`).
   2. Commit and tag:
      ```bash
-     git commit -am "chore: release v1.9.6"
-     git tag v1.9.6
+     git commit -am "chore: release v2.2.1"
+     git tag v2.2.1
      git push origin main --tags
      ```
   3. GitHub Actions (`.github/workflows/build-release.yml`) builds Windows binaries and publishes the release on GitHub.

@@ -7,10 +7,9 @@
     "scripts": {
         "start": "electron .",
         "start:login": "electron . --login",
-        "build": "electron-builder --win --linux",
+        "build": "electron-builder --win",
         "build:win": "electron-builder --win",
-        "build:linux": "electron-builder --linux",
-        "release": "electron-builder --win --linux --publish always"
+        "release": "electron-builder --win --publish always"
     },
     "dependencies": {
         "acorn": "^8.19.0",
@@ -67,21 +66,6 @@
             "runAfterFinish": true,
             "differentialPackage": false,
             "deleteAppDataOnUninstall": false
-        },
-        "linux": {
-            "target": [
-                {
-                    "target": "AppImage",
-                    "arch": [
-                        "x64"
-                    ]
-                }
-            ],
-            "executableName": "bcs-enterprise-pos",
-            "icon": "assets/icon.png",
-            "category": "Office",
-            "synopsis": "BCS Enterprise POS PRO Max",
-            "description": "Next-Gen Retail POS & Shop Management Platform by BCS Developer"
         },
         "publish": [
             {
