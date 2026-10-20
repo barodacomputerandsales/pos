@@ -257,7 +257,11 @@
         }
 
         // Initialize
-        document.addEventListener('DOMContentLoaded', loadDashboardData);
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadDashboardData);
+        } else {
+            loadDashboardData();
+        }
     </script>
 </body>
 </html>

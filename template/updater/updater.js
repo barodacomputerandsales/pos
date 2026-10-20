@@ -10,7 +10,7 @@
  */
 
 (function() {
-    let currentAppVersion = '1.9.8';
+    let currentAppVersion = '2.0.0';
     let downloadedUpdateInfo = null;
     let isIpcBound = false;
     let lastUserActivityTime = Date.now();
@@ -160,7 +160,7 @@
                 }
 
                 // Show welcome toast on current page
-                showPostUpdateWelcomeToast(snapshot.targetVersion || '1.9.8', snapshot.fromVersion);
+                showPostUpdateWelcomeToast(snapshot.targetVersion || '2.0.0', snapshot.fromVersion);
             }
         } catch (e) {}
     }
@@ -400,7 +400,7 @@
                 </div>
                 <div class="flex-grow-1">
                     <div class="d-flex justify-content-between align-items-center mb-1">
-                        <strong class="text-white small">New Version Ready: v${ver || '1.9.8'}</strong>
+                        <strong class="text-white small">New Version Ready: v${ver || '2.0.0'}</strong>
                         <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25" style="font-size: 0.68rem;">Verified</span>
                     </div>
                     <div class="text-muted small mb-3" style="font-size: 0.76rem; line-height: 1.35;">
@@ -445,6 +445,13 @@
         }
 
         const fallbackMap = {
+            '2.0.0': `
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Atomic Port Bonding</strong>: Single-shot operator session registration and port trust eliminated edge race conditions.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Self-Healing Admin Auth</strong>: Instant fallback recovery ensuring uninterrupted terminal sign-in out of the box.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Universal RBAC Gateway</strong>: Standardized edge authentication across all inventory, sales, and catalog microservices.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Resilient Error Interceptor</strong>: Refined API gateway preventing disruptive reloads on credential retries.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">UI Polish &amp; Glow Effects</strong>: Smooth cyber sign-in transitions and clear security feedback banners.</div></div>
+            `,
             '1.9.9': `
                 <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Active Checkout &amp; Cart Shield</strong>: Automatically suppresses update popups while cashier is typing, scanning, or processing sales.</div></div>
                 <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Shift-End &amp; Logout Smart Update</strong>: Convenient 1-click option to apply pending updates when ending the shift or logging out.</div></div>

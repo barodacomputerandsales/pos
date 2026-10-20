@@ -356,7 +356,7 @@
                                         <div class="col-md-6 border-end border-secondary border-opacity-25">
                                             <div class="small text-muted text-uppercase fw-semibold mb-1">Installed Version</div>
                                             <div class="d-flex align-items-baseline gap-2">
-                                                <h2 class="fw-extrabold mb-0 text-white mono" id="installedVersionText">v1.9.8</h2>
+                                                <h2 class="fw-extrabold mb-0 text-white mono" id="installedVersionText">v2.0.0</h2>
                                                 <span class="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-25">Current</span>
                                             </div>
                                             <div class="small text-muted mt-2">Architecture: <span class="mono text-white">x64 (Windows NSIS)</span></div>
@@ -444,7 +444,7 @@
                                 <div>
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <label class="small text-muted text-uppercase fw-semibold mb-0">Release Notes &amp; Changelog</label>
-                                        <span class="small text-muted" id="releaseNotesVersionTag">v1.9.8 Production</span>
+                                        <span class="small text-muted" id="releaseNotesVersionTag">v2.0.0 Production</span>
                                     </div>
                                     <div class="p-3 rounded-3 bg-dark border border-secondary border-opacity-25 font-monospace small" style="max-height: 180px; overflow-y: auto;" id="releaseNotesContent">
                                         <p class="text-muted mb-0">Click "Check for Updates" to pull the latest changelog directly from GitHub.</p>
@@ -532,7 +532,7 @@
                                     The Cloudflare backend microservice queries GitHub API securely to deliver updates even behind restricted firewalls.
                                 </p>
                                 <div class="p-2 rounded bg-dark border border-secondary border-opacity-25 small mono text-truncate mb-3 text-info">
-                                    /api/updater/check?current=1.9.8
+                                    /api/updater/check?current=2.0.0
                                 </div>
                                 <button class="btn btn-outline-info btn-sm w-100 d-flex align-items-center justify-content-center gap-2" id="testUpdaterApiBtn">
                                     <i class="bi bi-broadcast"></i> Test Backend Updater Relay
@@ -731,7 +731,7 @@
     <script type="module">
         import { fetchAPI } from './script/api.js';
 
-        let appCurrentVersion = '1.9.8';
+        let appCurrentVersion = '2.0.0';
         let latestInstallerDownloadUrl = '';
 
         window.showAlert = function(title, message, type = 'success') {
@@ -761,43 +761,64 @@
 
         // Query Backend GitHub Updater Check
         async function checkBackendUpdater(currentVer) {
+            const latestEl = document.getElementById('latestRemoteVersionText');
+            const statusTag = document.getElementById('remoteStatusTag');
+            const publishDateEl = document.getElementById('remotePublishDate');
+            const notesEl = document.getElementById('releaseNotesContent');
+            const verTag = document.getElementById('releaseNotesVersionTag');
+            const dlBtn = document.getElementById('directDownloadBtn');
+
             try {
+                if (latestEl) latestEl.textContent = 'Checking...';
                 const data = await fetchAPI(`updater/check?current=${currentVer}`);
                 if (data && data.success) {
-                    document.getElementById('latestRemoteVersionText').textContent = `v${data.latestVersion}`;
-                    document.getElementById('remoteStatusTag').textContent = data.updateAvailable ? 'Update Available' : 'Latest Release';
-                    document.getElementById('remoteStatusTag').className = `badge ${data.updateAvailable ? 'bg-warning text-dark' : 'bg-success bg-opacity-25 text-success'}`;
+                    if (latestEl) latestEl.textContent = `v${data.latestVersion}`;
+                    if (statusTag) {
+                        statusTag.textContent = data.updateAvailable ? 'Update Available' : 'Latest Release';
+                        statusTag.className = `badge ${data.updateAvailable ? 'bg-warning text-dark' : 'bg-success bg-opacity-25 text-success'}`;
+                    }
                     
-                    if (data.publishedAt) {
+                    if (data.publishedAt && publishDateEl) {
                         const dateFormatted = new Date(data.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-                        document.getElementById('remotePublishDate').textContent = `Published on GitHub: ${dateFormatted}`;
+                        publishDateEl.textContent = `Published on GitHub: ${dateFormatted}`;
                     }
 
                     if (data.installer && data.installer.downloadUrl) {
                         latestInstallerDownloadUrl = data.installer.downloadUrl;
-                        document.getElementById('directDownloadBtn').disabled = false;
+                        if (dlBtn) dlBtn.disabled = false;
                     }
 
-                    if (data.releaseNotes) {
+                    if (data.releaseNotes && notesEl) {
                         let formatted = data.releaseNotes
                             .replace(/^### (.*$)/gim, '<h6 class="fw-bold text-info mb-2 mt-2">$1</h6>')
                             .replace(/^## (.*$)/gim, '<h6 class="fw-bold text-white mb-2 mt-2">$1</h6>')
                             .replace(/^• (.*$)/gim, '<div class="mb-2 d-flex align-items-start gap-2"><span class="text-primary fw-bold">•</span><div>$1</div></div>')
                             .replace(/\*\*(.*?)\*\*/gim, '<strong class="text-white">$1</strong>')
                             .replace(/\n/g, '<br>');
-                        document.getElementById('releaseNotesContent').innerHTML = `<div class="text-light" style="font-size: 0.82rem; line-height: 1.5;">${formatted}</div>`;
-                        document.getElementById('releaseNotesVersionTag').textContent = `v${data.latestVersion} Production`;
+                        notesEl.innerHTML = `<div class="text-light" style="font-size: 0.82rem; line-height: 1.5;">${formatted}</div>`;
+                        if (verTag) verTag.textContent = `v${data.latestVersion} Production`;
                     }
 
                     return data;
+                } else {
+                    if (latestEl) latestEl.textContent = `v${currentVer}`;
+                    if (statusTag) {
+                        statusTag.textContent = 'Up to Date';
+                        statusTag.className = 'badge bg-success bg-opacity-25 text-success';
+                    }
                 }
             } catch (e) {
                 console.warn('Backend updater check warning:', e);
+                if (latestEl) latestEl.textContent = `v${currentVer}`;
+                if (statusTag) {
+                    statusTag.textContent = 'Relay Online';
+                    statusTag.className = 'badge bg-info bg-opacity-25 text-info';
+                }
             }
             return null;
         }
 
-        document.addEventListener('DOMContentLoaded', async () => {
+        async function initSettingsPage() {
             let ipcRenderer = null;
             if (typeof require !== 'undefined') {
                 try {
@@ -808,13 +829,14 @@
 
             // 1. Fetch App Version & Host Specs
             if (ipcRenderer) {
-                ipcRenderer.invoke('get_app_version').then(ver => {
+                try {
+                    const ver = await ipcRenderer.invoke('get_app_version');
                     if (ver) {
                         appCurrentVersion = ver;
-                        document.getElementById('installedVersionText').textContent = `v${ver}`;
+                        const installedEl = document.getElementById('installedVersionText');
+                        if (installedEl) installedEl.textContent = `v${ver}`;
                     }
-                    checkBackendUpdater(appCurrentVersion);
-                }).catch(() => checkBackendUpdater('1.9.8'));
+                } catch(e) {}
 
                 ipcRenderer.invoke('get_system_info').then(info => {
                     if (!info) return;
@@ -835,9 +857,10 @@
                     document.getElementById('runtimeChrome').textContent = info.chrome || '126.x';
                     document.getElementById('runtimeNode').textContent = info.node || '20.x';
                 }).catch(() => {});
-            } else {
-                checkBackendUpdater('1.9.8');
             }
+
+            // Execute backend updater check
+            checkBackendUpdater(appCurrentVersion);
 
             // Smart Policy Toggles (Sync with localStorage)
             const shieldToggle = document.getElementById('smartCheckoutShieldToggle');
@@ -1007,7 +1030,7 @@
                     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Querying...';
 
                     try {
-                        const res = await fetchAPI('updater/check?current=1.9.8');
+                        const res = await fetchAPI(`updater/check?current=${appCurrentVersion}`);
                     showAlert('Backend Relay Healthy', `Received response from ${res.source}. Latest tag: ${res.latestVersion}`, 'success');
                 } catch(e) {
                     showAlert('Relay Error', e.message, 'error');
@@ -1057,7 +1080,13 @@
                     }, 1000);
                 }
             });
-        });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initSettingsPage);
+        } else {
+            initSettingsPage();
+        }
     </script>
 </body>
 </html>
