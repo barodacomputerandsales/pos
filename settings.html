@@ -779,8 +779,14 @@
                     }
 
                     if (data.releaseNotes) {
-                        document.getElementById('releaseNotesContent').innerHTML = `<div class="text-white">${data.releaseNotes.replace(/\n/g, '<br>')}</div>`;
-                        document.getElementById('releaseNotesVersionTag').textContent = `v${data.latestVersion} Notes`;
+                        let formatted = data.releaseNotes
+                            .replace(/^### (.*$)/gim, '<h6 class="fw-bold text-info mb-2 mt-2">$1</h6>')
+                            .replace(/^## (.*$)/gim, '<h6 class="fw-bold text-white mb-2 mt-2">$1</h6>')
+                            .replace(/^• (.*$)/gim, '<div class="mb-2 d-flex align-items-start gap-2"><span class="text-primary fw-bold">•</span><div>$1</div></div>')
+                            .replace(/\*\*(.*?)\*\*/gim, '<strong class="text-white">$1</strong>')
+                            .replace(/\n/g, '<br>');
+                        document.getElementById('releaseNotesContent').innerHTML = `<div class="text-light" style="font-size: 0.82rem; line-height: 1.5;">${formatted}</div>`;
+                        document.getElementById('releaseNotesVersionTag').textContent = `v${data.latestVersion} Production`;
                     }
 
                     return data;

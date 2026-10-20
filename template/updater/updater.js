@@ -432,6 +432,41 @@
     }
 
     /**
+     * Format Markdown / Release Notes for Changelog Views
+     */
+    function formatReleaseNotes(version, raw) {
+        if (raw && typeof raw === 'string' && raw.trim().length > 15 && !raw.includes('No release notes provided')) {
+            return raw
+                .replace(/^### (.*$)/gim, '<div class="fw-bold text-info mt-1 mb-1">$1</div>')
+                .replace(/^## (.*$)/gim, '<div class="fw-bold text-white mt-1 mb-1">$1</div>')
+                .replace(/^• (.*$)/gim, '<div class="d-flex align-items-start gap-2 mb-1"><span class="text-primary">•</span><div>$1</div></div>')
+                .replace(/\*\*(.*?)\*\*/gim, '<strong class="text-white">$1</strong>')
+                .replace(/\n/g, '<br>');
+        }
+
+        const fallbackMap = {
+            '1.9.9': `
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Active Checkout &amp; Cart Shield</strong>: Automatically suppresses update popups while cashier is typing, scanning, or processing sales.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Shift-End &amp; Logout Smart Update</strong>: Convenient 1-click option to apply pending updates when ending the shift or logging out.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">State &amp; Session Auto-Restore</strong>: Safely preserves operator authentication, permissions, and active screen routes across restarts.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Overnight Idle Auto-Sync</strong>: Silently applies updates between 10:00 PM and 6:00 AM when the terminal is idle for 15+ minutes.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Pre-Flight Diagnostics</strong>: Checks local storage (&gt;500MB free) and monitors power status with exponential retry on WiFi drops.</div></div>
+            `,
+            '1.9.8': `
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-info fw-bold">•</span><div><strong class="text-white">1-Click Silent Engine</strong>: Instant background update without Windows installer wizards (~3s restart).</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-info fw-bold">•</span><div><strong class="text-white">Holographic Cyber Modal</strong>: Custom dark glassmorphism UI replacing browser alert/confirm popups.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-info fw-bold">•</span><div><strong class="text-white">Fullscreen Relaunch HUD</strong>: Laser spinner and live countdown during binary handoff.</div></div>
+            `,
+            '1.9.7': `
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-purple fw-bold">•</span><div><strong class="text-white">RBAC Permissions</strong>: Granular employee permissions with Admin bypass.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-purple fw-bold">•</span><div><strong class="text-white">Animated Cyber Sign-In</strong>: Floating plasma orbs and squircle branding.</div></div>
+            `
+        };
+
+        return fallbackMap[version] || `<div class="text-muted">Production release v${version} with enterprise performance and security optimizations.</div>`;
+    }
+
+    /**
      * Open Modern Holographic Update Modal Dialog
      */
     window.openBcsUpdateModal = function(info) {
@@ -439,6 +474,7 @@
         if (existing) existing.remove();
 
         const targetVer = info && info.version ? info.version : currentAppVersion;
+        const notesHtml = formatReleaseNotes(targetVer, info ? (info.releaseNotes || info.notes) : '');
 
         const modalHtml = `
         <div id="bcsModernUpdateModal" class="bcs-modal-backdrop">
@@ -474,6 +510,16 @@
                     <div class="text-center">
                         <div class="text-muted small" style="font-size: 0.7rem;">TARGET RELEASE</div>
                         <span class="bcs-version-tag new">v${targetVer}</span>
+                    </div>
+                </div>
+
+                <!-- Dynamic Release Changelog Box -->
+                <div class="p-3 rounded-3 bg-dark bg-opacity-70 border border-secondary border-opacity-25 small mb-3 text-start" style="max-height: 150px; overflow-y: auto;">
+                    <div class="text-uppercase fw-bold text-info mb-2 d-flex align-items-center gap-1" style="font-size: 0.72rem; letter-spacing: 0.05em;">
+                        <i class="bi bi-file-earmark-text-fill"></i> Release Notes &amp; Changelog (v${targetVer})
+                    </div>
+                    <div class="text-light" style="font-size: 0.76rem; line-height: 1.45;">
+                        ${notesHtml}
                     </div>
                 </div>
 
