@@ -10,7 +10,7 @@
  */
 
 (function() {
-    let currentAppVersion = '2.3.5';
+    let currentAppVersion = '2.3.6';
     let availableRemoteInfo = null;
     let downloadedUpdateInfo = null;
     let isIpcBound = false;
