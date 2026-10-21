@@ -85,7 +85,7 @@
         return getLocalRateState();
     }
 
-    async function callDirectGroqWithFailover({ messages, model = 'llama-3.3-70b-versatile', temperature = 0.5, max_tokens = 1024, jsonMode = false }) {
+    async function callDirectGroqWithFailover({ messages, model = 'openai/gpt-oss-120b', temperature = 0.5, max_tokens = 1024, jsonMode = false }) {
         const payload = {
             model,
             messages,
@@ -132,10 +132,10 @@
                     primaryError: primaryErr.message
                 };
             } catch (backupErr) {
-                const data = await attemptKey(BACKUP_GROQ_KEY, 'llama-3.1-8b-instant');
+                const data = await attemptKey(BACKUP_GROQ_KEY, 'openai/gpt-oss-20b');
                 return {
                     reply: data?.choices?.[0]?.message?.content || '',
-                    model: data?.model || 'llama-3.1-8b-instant',
+                    model: data?.model || 'openai/gpt-oss-20b',
                     keySlotUsed: 'backup',
                     failoverTriggered: true,
                     primaryError: primaryErr.message
@@ -194,7 +194,7 @@
             return this.getRateStatus();
         },
 
-        async ask({ prompt = '', task = 'chat', contextData = null, model = 'llama-3.3-70b-versatile', temperature = 0.5 }) {
+        async ask({ prompt = '', task = 'chat', contextData = null, model = 'openai/gpt-oss-120b', temperature = 0.5 }) {
             const rateBefore = this.getRateStatus();
             if (rateBefore.isRateLimited) {
                 throw new Error(`Hourly AI Rate Limit reached (${rateBefore.hourlyLimit}/${rateBefore.hourlyLimit} requests this hour). Quota resets in ${rateBefore.resetInMinutes} min.`);
@@ -525,7 +525,7 @@ Analyze the provided live POS store metrics and provide:
                         <div>${formatMarkdownSimple(res.reply)}</div>
                         <div class="bcs-ai-msg-meta">
                             ${keyBadge}
-                            <span>• ${res.model || 'llama-3.3-70b'}</span>
+                            <span>• ${res.model || 'openai/gpt-oss-120b'}</span>
                             <span>• ${this.getRateStatus().remainingThisHour} reqs left/hr</span>
                         </div>
                     `;

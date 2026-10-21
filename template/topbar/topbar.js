@@ -4,7 +4,7 @@ window._renderTopbarImpl = function() {
         <div class="d-flex align-items-center gap-2">
             <img src="assets/icon.png" onerror="this.src='template/bcs-logo.svg'" alt="BCS" style="width: 40px; height: 40px; border-radius: 9px; object-fit: contain; filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.45));">
             <h4 class="mb-0 fw-bold" style="background: linear-gradient(135deg, #00e5ff, var(--win-accent, #6366f1)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">BCS Enterprise</h4>
-            <span id="topbarVersionBadge" class="badge bg-secondary bg-opacity-25 text-muted border border-secondary border-opacity-25 small" style="font-size: 0.75rem;">v2.3.0</span>
+            <span id="topbarVersionBadge" class="badge bg-secondary bg-opacity-25 text-muted border border-secondary border-opacity-25 small" style="font-size: 0.75rem;">v2.3.1</span>
             <div id="topbarUpdateContainer" class="d-inline-flex align-items-center ms-2"></div>
         </div>
         <div class="d-flex align-items-center gap-3">
