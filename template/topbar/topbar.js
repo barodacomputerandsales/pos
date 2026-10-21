@@ -3,13 +3,20 @@ window._renderTopbarImpl = function() {
     <header class="topbar">
         <div class="d-flex align-items-center gap-2">
             <img src="assets/icon.png" onerror="this.src='template/bcs-logo.svg'" alt="BCS" style="width: 40px; height: 40px; border-radius: 9px; object-fit: contain; filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.45));">
-            <h4 class="mb-0 fw-bold" style="background: linear-gradient(135deg, #00e5ff, #6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">BCS Enterprise</h4>
-            <span id="topbarVersionBadge" class="badge bg-secondary bg-opacity-25 text-muted border border-secondary border-opacity-25 small" style="font-size: 0.75rem;">v2.2.7</span>
+            <h4 class="mb-0 fw-bold" style="background: linear-gradient(135deg, #00e5ff, var(--win-accent, #6366f1)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">BCS Enterprise</h4>
+            <span id="topbarVersionBadge" class="badge bg-secondary bg-opacity-25 text-muted border border-secondary border-opacity-25 small" style="font-size: 0.75rem;">v2.2.8</span>
             <div id="topbarUpdateContainer" class="d-inline-flex align-items-center ms-2"></div>
         </div>
         <div class="d-flex align-items-center gap-3">
+            <!-- Windows 11 OS Theme & Accent Color Sync Pill -->
+            <button type="button" id="topbarThemeSyncBtn" class="btn btn-sm d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill" style="background: rgba(var(--win-accent-rgb, 99, 102, 241), 0.12); border: 1px solid rgba(var(--win-accent-rgb, 99, 102, 241), 0.3); color: inherit; font-size: 0.78rem; font-weight: 600;" onclick="if(window.BCSTheme) window.BCSTheme.cycleTheme();" title="Click to toggle Theme Mode: Windows 11 System Sync / Dark / Light">
+                <span id="topbarAccentDot" style="width: 8px; height: 8px; border-radius: 50%; background: var(--win-accent, #6366f1); box-shadow: 0 0 8px var(--win-accent, #6366f1); display: inline-block;"></span>
+                <i id="topbarThemeIcon" class="bi bi-windows" style="color: var(--win-accent, #6366f1);"></i>
+                <span id="topbarThemeLabel">Win11 Sync</span>
+            </button>
+
             <div class="user-profile">
-                <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #a855f7); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;" id="topbarUserInitial">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--win-accent, #6366f1), #a855f7); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;" id="topbarUserInitial">
                     A
                 </div>
                 <div>
@@ -36,6 +43,11 @@ window._renderTopbarImpl = function() {
         if (nameEl) nameEl.textContent = userName;
         if (roleEl) roleEl.textContent = String(userRole).charAt(0).toUpperCase() + String(userRole).slice(1);
         if (initEl) initEl.textContent = userName.charAt(0).toUpperCase();
+
+        // Sync Topbar Theme Pill with current BCSTheme state
+        if (window.BCSTheme && window.BCSTheme.state) {
+            window.BCSTheme.apply(window.BCSTheme.state);
+        }
     }
 
     // Load active version and bind updater listeners

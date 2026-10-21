@@ -358,7 +358,7 @@
                                         <div class="col-md-6 border-end border-secondary border-opacity-25">
                                             <div class="small text-muted text-uppercase fw-semibold mb-1">Installed Version</div>
                                             <div class="d-flex align-items-baseline gap-2">
-                                                <h2 class="fw-extrabold mb-0 text-white mono" id="installedVersionText">v2.2.7</h2>
+                                                <h2 class="fw-extrabold mb-0 text-white mono" id="installedVersionText">v2.2.8</h2>
                                                 <span class="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-25">Current</span>
                                             </div>
                                             <div class="small text-muted mt-2">Architecture: <span class="mono text-white">x64 (Windows NSIS)</span></div>
@@ -381,7 +381,7 @@
                                                 <button class="btn btn-lg w-100 py-3 bcs-big-update-btn rounded-3 fw-bold d-flex align-items-center justify-content-center gap-3" id="bigUpdateNowBtn">
                                                     <i class="bi bi-rocket-takeoff-fill fs-3"></i>
                                                     <div class="text-start">
-                                                        <div class="fw-black lh-1" style="font-size: 1.15rem;">UPDATE NOW TO <span id="bigUpdateTargetVer">v2.2.7</span></div>
+                                                        <div class="fw-black lh-1" style="font-size: 1.15rem;">UPDATE NOW TO <span id="bigUpdateTargetVer">v2.2.8</span></div>
                                                         <small class="opacity-80 fw-normal" style="font-size: 0.75rem;">1-Click Fast Instant Handoff (~3s Silent Restart)</small>
                                                     </div>
                                                 </button>
@@ -470,7 +470,7 @@
                                 <div>
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <label class="small text-muted text-uppercase fw-semibold mb-0">Release Notes &amp; Changelog</label>
-                                        <span class="small text-muted" id="releaseNotesVersionTag">v2.2.7 Production</span>
+                                        <span class="small text-muted" id="releaseNotesVersionTag">v2.2.8 Production</span>
                                     </div>
                                     <div class="p-3 rounded-3 bg-dark border border-secondary border-opacity-25 font-monospace small" style="max-height: 180px; overflow-y: auto;" id="releaseNotesContent">
                                         <p class="text-muted mb-0">Click "Check for Updates" to pull the latest changelog directly from GitHub.</p>
@@ -558,7 +558,7 @@
                                     The Cloudflare backend microservice queries GitHub API securely to deliver updates even behind restricted firewalls.
                                 </p>
                                 <div class="p-2 rounded bg-dark border border-secondary border-opacity-25 small mono text-truncate mb-3 text-info">
-                                    /api/updater/check?current=2.2.7
+                                    /api/updater/check?current=2.2.8
                                 </div>
                                 <button class="btn btn-outline-info btn-sm w-100 d-flex align-items-center justify-content-center gap-2" id="testUpdaterApiBtn">
                                     <i class="bi bi-broadcast"></i> Test Backend Updater Relay
@@ -668,6 +668,87 @@
                                 </ul>
                             </div>
                         </div>
+
+                        <!-- Windows 11 OS Theme, Accent Color & Window Geometry Sync Card -->
+                        <div class="col-12">
+                            <div class="glass-card p-4">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+                                    <div>
+                                        <h5 class="fw-bold text-white mb-1 d-flex align-items-center gap-2">
+                                            <i class="bi bi-windows text-primary"></i> Windows 11 OS Integration &amp; Appearance Sync
+                                        </h5>
+                                        <p class="text-muted small mb-0">Live synchronization with your Windows 11 System Dark/Light Mode, OS Accent Color, and persistent window size &amp; position.</p>
+                                    </div>
+                                    <span class="badge-chip bg-primary bg-opacity-20 text-primary border border-primary border-opacity-25" id="win11SyncStatusBadge">
+                                        <i class="bi bi-check2-circle"></i> Windows 11 Synced
+                                    </span>
+                                </div>
+
+                                <div class="row g-4">
+                                    <!-- 1. Theme Mode Selector (System / Dark / Light) -->
+                                    <div class="col-12 col-md-4">
+                                        <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25 h-100">
+                                            <div class="text-muted small text-uppercase fw-semibold mb-2">App Theme Mode</div>
+                                            <div class="d-flex gap-2 mb-3">
+                                                <button type="button" class="btn btn-sm flex-fill fw-semibold py-2 theme-mode-btn" data-theme-source="system" id="themeBtnSystem">
+                                                    <i class="bi bi-windows me-1"></i> System
+                                                </button>
+                                                <button type="button" class="btn btn-sm flex-fill fw-semibold py-2 theme-mode-btn" data-theme-source="dark" id="themeBtnDark">
+                                                    <i class="bi bi-moon-stars-fill me-1"></i> Dark
+                                                </button>
+                                                <button type="button" class="btn btn-sm flex-fill fw-semibold py-2 theme-mode-btn" data-theme-source="light" id="themeBtnLight">
+                                                    <i class="bi bi-sun-fill me-1"></i> Light
+                                                </button>
+                                            </div>
+                                            <div class="d-flex justify-content-between align-items-center small">
+                                                <span class="text-muted">Active Mode:</span>
+                                                <span class="fw-bold mono text-primary" id="activeThemeModeDisplay">Syncing with Windows...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 2. Windows 11 Accent Color Sync -->
+                                    <div class="col-12 col-md-4">
+                                        <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25 h-100">
+                                            <div class="text-muted small text-uppercase fw-semibold mb-2">Windows 11 Accent Color</div>
+                                            <div class="d-flex align-items-center gap-3 mb-3">
+                                                <div id="osAccentPreviewSwatch" style="width: 42px; height: 42px; border-radius: 10px; background: var(--win-accent, #6366f1); box-shadow: 0 0 16px rgba(var(--win-accent-rgb, 99, 102, 241), 0.5); border: 2px solid rgba(255,255,255,0.2); flex-shrink: 0;"></div>
+                                                <div>
+                                                    <div class="fw-bold text-white mono" id="osAccentHexText">#6366f1</div>
+                                                    <div class="small text-muted">Live OS Personalization Color</div>
+                                                </div>
+                                            </div>
+                                            <div class="form-check form-switch mb-0">
+                                                <input class="form-check-input" type="checkbox" id="syncOsAccentToggle" checked>
+                                                <label class="form-check-label text-white small fw-semibold" for="syncOsAccentToggle">
+                                                    Auto-Catch Windows Accent Color
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 3. Persistent Window Size & Geometry -->
+                                    <div class="col-12 col-md-4">
+                                        <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25 h-100 d-flex flex-column justify-content-between">
+                                            <div>
+                                                <div class="text-muted small text-uppercase fw-semibold mb-2">Saved Window Geometry</div>
+                                                <div class="d-flex justify-content-between align-items-center mb-1 small">
+                                                    <span class="text-muted">Last Saved Size:</span>
+                                                    <span class="fw-bold text-white mono" id="savedWindowSizeText">1280 &times; 800 px</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between align-items-center mb-3 small">
+                                                    <span class="text-muted">Window State:</span>
+                                                    <span class="badge bg-info bg-opacity-25 text-info mono" id="savedWindowModeBadge">Normal</span>
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn btn-outline-secondary btn-sm w-100 d-flex align-items-center justify-content-center gap-2" id="resetWindowSizeBtn">
+                                                <i class="bi bi-aspect-ratio"></i> Reset to Default (1280&times;800)
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -766,7 +847,7 @@
     <script type="module">
         import { fetchAPI } from './script/api.js';
 
-        let appCurrentVersion = '2.2.7';
+        let appCurrentVersion = '2.2.8';
         let latestInstallerDownloadUrl = '';
 
         window.showAlert = function(title, message, type = 'success') {
@@ -917,6 +998,116 @@
                     document.getElementById('runtimeChrome').textContent = info.chrome || '126.x';
                     document.getElementById('runtimeNode').textContent = info.node || '20.x';
                 }).catch(() => {});
+
+                // Fetch & Display Saved Window Geometry State
+                const refreshWindowGeometryUI = async () => {
+                    try {
+                        const winState = await ipcRenderer.invoke('get_window_state');
+                        if (!winState) return;
+                        const sizeEl = document.getElementById('savedWindowSizeText');
+                        const badgeEl = document.getElementById('savedWindowModeBadge');
+                        const w = winState.currentWidth || winState.width || 1280;
+                        const h = winState.currentHeight || winState.height || 800;
+                        if (sizeEl) sizeEl.textContent = `${w} × ${h} px`;
+                        if (badgeEl) {
+                            if (winState.isFullScreen) {
+                                badgeEl.textContent = 'Full Screen';
+                            } else if (winState.isMaximized) {
+                                badgeEl.textContent = 'Maximized';
+                            } else {
+                                badgeEl.textContent = 'Restored (Saved)';
+                            }
+                        }
+                    } catch (e) {}
+                };
+                refreshWindowGeometryUI();
+                window.addEventListener('resize', () => setTimeout(refreshWindowGeometryUI, 300));
+            }
+
+            // Windows 11 OS Theme & Accent Color Interactive Controls
+            const updateWin11ThemeUI = (state) => {
+                if (!state && window.BCSTheme) state = window.BCSTheme.state;
+                if (!state) return;
+
+                const source = state.themeSource || 'system';
+                const mode = state.themeMode || 'dark';
+                const accent = state.accentColor || '#6366f1';
+
+                document.querySelectorAll('.theme-mode-btn').forEach(btn => {
+                    const isSelected = btn.getAttribute('data-theme-source') === source;
+                    btn.className = isSelected
+                        ? 'btn btn-sm flex-fill fw-semibold py-2 theme-mode-btn btn-primary'
+                        : 'btn btn-sm flex-fill fw-semibold py-2 theme-mode-btn btn-outline-secondary';
+                });
+
+                const modeDisplay = document.getElementById('activeThemeModeDisplay');
+                if (modeDisplay) {
+                    modeDisplay.textContent = source === 'system'
+                        ? `Windows 11 System (${mode === 'dark' ? 'Dark' : 'Light'})`
+                        : `${mode === 'dark' ? 'Dark' : 'Light'} Mode (Manual)`;
+                }
+
+                const swatch = document.getElementById('osAccentPreviewSwatch');
+                const hexText = document.getElementById('osAccentHexText');
+                if (swatch) {
+                    swatch.style.background = accent;
+                    swatch.style.boxShadow = `0 0 16px ${accent}`;
+                }
+                if (hexText) hexText.textContent = accent.toUpperCase();
+            };
+
+            updateWin11ThemeUI();
+            window.addEventListener('bcs-theme-changed', (e) => updateWin11ThemeUI(e.detail));
+
+            document.querySelectorAll('.theme-mode-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const targetSource = btn.getAttribute('data-theme-source');
+                    if (window.BCSTheme) {
+                        const updated = await window.BCSTheme.setSource(targetSource);
+                        updateWin11ThemeUI(updated);
+                        showAlert(
+                            'Windows 11 Theme Sync',
+                            targetSource === 'system'
+                                ? 'Theme mode is now automatically synced with your Windows 11 OS settings.'
+                                : `Application theme locked to ${targetSource.toUpperCase()} mode.`,
+                            'info'
+                        );
+                    }
+                });
+            });
+
+            const syncAccentToggle = document.getElementById('syncOsAccentToggle');
+            if (syncAccentToggle) {
+                syncAccentToggle.checked = localStorage.getItem('bcs_sync_os_accent') !== 'false';
+                syncAccentToggle.addEventListener('change', async () => {
+                    localStorage.setItem('bcs_sync_os_accent', syncAccentToggle.checked ? 'true' : 'false');
+                    if (!syncAccentToggle.checked) {
+                        localStorage.setItem('bcs_custom_accent_color', '#6366f1');
+                    }
+                    if (ipcRenderer) {
+                        const osTheme = await ipcRenderer.invoke('get_os_theme');
+                        if (window.BCSTheme) window.BCSTheme.apply(osTheme);
+                    } else if (window.BCSTheme) {
+                        window.BCSTheme.apply(window.BCSTheme.state);
+                    }
+                    showAlert(
+                        'Accent Color Sync Updated',
+                        syncAccentToggle.checked
+                            ? 'Now catching live Windows 11 OS Accent Color automatically.'
+                            : 'Using default BCS Indigo accent color (#6366F1).',
+                        'info'
+                    );
+                });
+            }
+
+            const resetWinBtn = document.getElementById('resetWindowSizeBtn');
+            if (resetWinBtn) {
+                resetWinBtn.addEventListener('click', async () => {
+                    if (ipcRenderer) {
+                        await ipcRenderer.invoke('reset_window_size');
+                        showAlert('Window Size Reset', 'Window restored to default 1280 × 800 px and centered on screen.', 'success');
+                    }
+                });
             }
 
             // Execute backend updater check

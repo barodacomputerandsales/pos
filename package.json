@@ -1,6 +1,6 @@
 {
     "name": "bcs-enterprise-pos",
-    "version": "2.2.7",
+    "version": "2.2.8",
     "description": "BCS Enterprise POS PRO Max",
     "author": "BCS Developer",
     "main": "main.js",

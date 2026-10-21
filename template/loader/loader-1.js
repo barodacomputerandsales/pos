@@ -452,4 +452,27 @@
     window.showBcsLoader = show;
     window.hideBcsLoader = hide;
 
+    // ------------------------------------------------------------------------
+    // 7. Early Windows 11 OS Theme & Accent Pre-Sync (Zero FOUC)
+    // ------------------------------------------------------------------------
+    try {
+        const cachedMode = localStorage.getItem('bcs_os_theme_mode');
+        const cachedAccent = localStorage.getItem('bcs_os_accent_color');
+        const cachedRgb = localStorage.getItem('bcs_os_accent_rgb');
+        const root = document.documentElement;
+        if (root) {
+            const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const initialMode = cachedMode || (systemDark ? 'dark' : 'light');
+            root.setAttribute('data-bs-theme', initialMode);
+            root.setAttribute('data-theme', initialMode);
+            if (cachedAccent && cachedRgb) {
+                root.style.setProperty('--bs-primary', cachedAccent);
+                root.style.setProperty('--bs-primary-rgb', cachedRgb);
+                root.style.setProperty('--win-accent', cachedAccent);
+                root.style.setProperty('--win-accent-rgb', cachedRgb);
+                root.style.setProperty('--sidebar-accent', cachedAccent);
+            }
+        }
+    } catch (e) {}
+
 })(window, document);

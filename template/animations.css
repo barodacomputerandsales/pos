@@ -869,3 +869,339 @@ body::after {
     opacity: 1;
     pointer-events: auto;
 }
+
+/* ==========================================================================
+   14. Windows 11 OS Theme & Accent Color Synchronization Engine
+   (Seamless Dark / Light Mode & Dynamic System Accent Adaptation)
+   ========================================================================== */
+
+:root {
+    --win-accent: #6366f1;
+    --win-accent-rgb: 99, 102, 241;
+    --bs-primary: var(--win-accent) !important;
+    --bs-primary-rgb: var(--win-accent-rgb) !important;
+    --bcs-glow-primary: 0 4px 20px rgba(var(--win-accent-rgb), 0.38);
+}
+
+/* Dynamic Windows 11 Accent Color bindings across primary UI components */
+.btn-primary {
+    background-color: var(--win-accent) !important;
+    border-color: var(--win-accent) !important;
+    color: #ffffff !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    filter: brightness(1.08);
+    box-shadow: 0 4px 20px rgba(var(--win-accent-rgb), 0.42) !important;
+}
+
+.btn-outline-primary {
+    color: var(--win-accent) !important;
+    border-color: var(--win-accent) !important;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+    background-color: var(--win-accent) !important;
+    border-color: var(--win-accent) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 16px rgba(var(--win-accent-rgb), 0.35) !important;
+}
+
+.text-primary {
+    color: var(--win-accent) !important;
+}
+
+.bg-primary:not(.bg-opacity-10):not(.bg-opacity-15):not(.bg-opacity-20):not(.bg-opacity-25) {
+    background-color: var(--win-accent) !important;
+}
+
+.bg-primary.bg-opacity-10 {
+    background-color: rgba(var(--win-accent-rgb), 0.1) !important;
+}
+
+.bg-primary.bg-opacity-15 {
+    background-color: rgba(var(--win-accent-rgb), 0.15) !important;
+}
+
+.bg-primary.bg-opacity-20 {
+    background-color: rgba(var(--win-accent-rgb), 0.2) !important;
+}
+
+.bg-primary.bg-opacity-25 {
+    background-color: rgba(var(--win-accent-rgb), 0.25) !important;
+}
+
+.border-primary {
+    border-color: rgba(var(--win-accent-rgb), 0.45) !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--win-accent) !important;
+    box-shadow: 0 0 0 3px rgba(var(--win-accent-rgb), 0.25), 0 4px 14px rgba(var(--win-accent-rgb), 0.15) !important;
+}
+
+.form-check-input:checked {
+    background-color: var(--win-accent) !important;
+    border-color: var(--win-accent) !important;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(var(--win-accent-rgb), 0.08) !important;
+    box-shadow: inset 3px 0 0 var(--win-accent);
+}
+
+.stat-card:hover,
+.glass-panel:hover,
+.glass-card:hover {
+    border-color: rgba(var(--win-accent-rgb), 0.35) !important;
+}
+
+.sidebar .menu-item.active {
+    color: var(--win-accent) !important;
+    background: rgba(var(--win-accent-rgb), 0.15) !important;
+    border-right: 3px solid var(--win-accent) !important;
+    box-shadow: inset -4px 0 12px rgba(var(--win-accent-rgb), 0.35);
+}
+
+.sidebar .submenu-item.active .submenu-dot {
+    background: var(--win-accent) !important;
+    box-shadow: 0 0 8px var(--win-accent) !important;
+}
+
+.sidebar .user-avatar {
+    background: rgba(var(--win-accent-rgb), 0.15) !important;
+    color: var(--win-accent) !important;
+    border-color: rgba(var(--win-accent-rgb), 0.35) !important;
+}
+
+.nav-settings .nav-link.active {
+    background: linear-gradient(135deg, var(--win-accent), #06b6d4) !important;
+    box-shadow: 0 4px 18px rgba(var(--win-accent-rgb), 0.4) !important;
+}
+
+/* ==========================================================================
+   Windows 11 Light Mode Overrides ([data-bs-theme="light"])
+   Clean Mica / Acrylic Light Surfaces with High-Contrast Crisp Typography
+   ========================================================================== */
+html[data-bs-theme="light"] {
+    --page-bg: #f3f5f9 !important;
+    --glass-bg: rgba(255, 255, 255, 0.85) !important;
+    --glass-bg-hover: rgba(255, 255, 255, 0.96) !important;
+    --glass-border: 1px solid rgba(15, 23, 42, 0.1) !important;
+    --glass-shadow: 0 10px 30px rgba(15, 23, 42, 0.06) !important;
+    --glass-shadow-hover: 0 15px 38px rgba(15, 23, 42, 0.1) !important;
+    --card-bg: #ffffff !important;
+    --card-border: #cbd5e1 !important;
+    --input-bg: #ffffff !important;
+    --input-border: #cbd5e1 !important;
+    --text-primary: #0f172a !important;
+    --text-secondary: #334155 !important;
+    --text-muted: #64748b !important;
+    --sidebar-bg: rgba(255, 255, 255, 0.88) !important;
+    --sidebar-border: rgba(15, 23, 42, 0.09) !important;
+    --sidebar-text: #475569 !important;
+    --sidebar-text-hover: #0f172a !important;
+    --orb-1: rgba(var(--win-accent-rgb), 0.12) !important;
+    --orb-2: rgba(6, 182, 212, 0.1) !important;
+}
+
+html[data-bs-theme="light"] body {
+    background: var(--page-bg) !important;
+    background-color: #f3f5f9 !important;
+    color: #0f172a !important;
+}
+
+/* Light Mode Sidebar & Topbar */
+html[data-bs-theme="light"] .sidebar {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-right: 1px solid rgba(15, 23, 42, 0.09) !important;
+    color: #0f172a !important;
+    box-shadow: 4px 0 24px rgba(15, 23, 42, 0.05) !important;
+}
+
+html[data-bs-theme="light"] .sidebar .sidebar-header h5,
+html[data-bs-theme="light"] .sidebar .user-name,
+html[data-bs-theme="light"] .sidebar .submenu-item.active,
+html[data-bs-theme="light"] .sidebar .submenu-item:hover {
+    color: #0f172a !important;
+}
+
+html[data-bs-theme="light"] .sidebar .menu-item:hover {
+    color: #0f172a !important;
+    background: rgba(15, 23, 42, 0.05) !important;
+}
+
+html[data-bs-theme="light"] .sidebar .menu-label {
+    color: #64748b !important;
+}
+
+html[data-bs-theme="light"] .sidebar .submenu {
+    background: rgba(15, 23, 42, 0.03) !important;
+}
+
+html[data-bs-theme="light"] .sidebar .submenu-item:hover .submenu-dot {
+    background: #0f172a !important;
+}
+
+html[data-bs-theme="light"] .topbar {
+    background: rgba(255, 255, 255, 0.85) !important;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.09) !important;
+    color: #0f172a !important;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04) !important;
+}
+
+/* Light Mode Cards, Glass Panels, and Containers */
+html[data-bs-theme="light"] .glass-card,
+html[data-bs-theme="light"] .glass-panel,
+html[data-bs-theme="light"] .stat-card,
+html[data-bs-theme="light"] .solid-panel,
+html[data-bs-theme="light"] .product-card,
+html[data-bs-theme="light"] .card,
+html[data-bs-theme="light"] .stat-badge {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid rgba(15, 23, 42, 0.1) !important;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05) !important;
+    color: #0f172a !important;
+}
+
+html[data-bs-theme="light"] .recent-supplier-card {
+    background: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+}
+
+html[data-bs-theme="light"] .recent-supplier-card:hover {
+    background: #f1f5f9 !important;
+    border-color: var(--win-accent) !important;
+}
+
+/* Remap hardcoded dark utility classes inside main content when in Light Mode */
+html[data-bs-theme="light"] .main-content .bg-dark,
+html[data-bs-theme="light"] .modal-content .bg-dark {
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+    border-color: #cbd5e1 !important;
+}
+
+html[data-bs-theme="light"] .main-content .text-white:not(.btn):not(.badge):not(.stat-icon):not(.radar-core),
+html[data-bs-theme="light"] .modal-content .text-white:not(.btn):not(.badge) {
+    color: #0f172a !important;
+}
+
+html[data-bs-theme="light"] .main-content .text-light,
+html[data-bs-theme="light"] .main-content .text-white-50,
+html[data-bs-theme="light"] .main-content .text-secondary,
+html[data-bs-theme="light"] .section-title {
+    color: #334155 !important;
+}
+
+/* Light Mode Tables */
+html[data-bs-theme="light"] .table,
+html[data-bs-theme="light"] .table-dark,
+html[data-bs-theme="light"] .table-custom,
+html[data-bs-theme="light"] .glass-table {
+    --bs-table-bg: transparent !important;
+    --bs-table-color: #0f172a !important;
+    --bs-table-striped-color: #0f172a !important;
+    --bs-table-hover-color: #0f172a !important;
+    color: #0f172a !important;
+}
+
+html[data-bs-theme="light"] .table thead th,
+html[data-bs-theme="light"] .table-custom thead th,
+html[data-bs-theme="light"] .glass-table th {
+    background: #f1f5f9 !important;
+    color: #334155 !important;
+    border-bottom: 2px solid #cbd5e1 !important;
+}
+
+html[data-bs-theme="light"] .table tbody td,
+html[data-bs-theme="light"] .table-custom tbody td,
+html[data-bs-theme="light"] .glass-table td {
+    background: transparent !important;
+    color: #0f172a !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+
+html[data-bs-theme="light"] .table-custom tbody tr:hover td {
+    background: rgba(var(--win-accent-rgb), 0.06) !important;
+}
+
+/* Light Mode Form Controls & Inputs */
+html[data-bs-theme="light"] .form-control,
+html[data-bs-theme="light"] .form-select {
+    background-color: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+}
+
+html[data-bs-theme="light"] .form-control:focus,
+html[data-bs-theme="light"] .form-select:focus {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: var(--win-accent) !important;
+}
+
+html[data-bs-theme="light"] .input-group-text {
+    background-color: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+    color: var(--win-accent) !important;
+}
+
+/* Light Mode Modals, Alerts & Nav Pills */
+html[data-bs-theme="light"] .modal-content,
+html[data-bs-theme="light"] .modal-content.glass-modal {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.15) !important;
+}
+
+html[data-bs-theme="light"] .nav-settings {
+    background: #e2e8f0 !important;
+    border-color: #cbd5e1 !important;
+}
+
+html[data-bs-theme="light"] .nav-settings .nav-link {
+    color: #475569 !important;
+}
+
+html[data-bs-theme="light"] .nav-settings .nav-link.active {
+    color: #ffffff !important;
+}
+
+html[data-bs-theme="light"] .custom-alert {
+    background: rgba(255, 255, 255, 0.96) !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12) !important;
+}
+
+html[data-bs-theme="light"] .custom-alert .message {
+    color: #475569 !important;
+}
+
+/* Login Page (index.html) Light Mode Support */
+html[data-bs-theme="light"] .auth-split-card {
+    background: rgba(255, 255, 255, 0.94) !important;
+    border: 1px solid rgba(15, 23, 42, 0.1) !important;
+    box-shadow: 0 25px 60px rgba(15, 23, 42, 0.12), 0 0 40px rgba(var(--win-accent-rgb), 0.15) !important;
+}
+
+html[data-bs-theme="light"] .auth-form-pane {
+    color: #0f172a !important;
+}
+
+html[data-bs-theme="light"] .auth-form-pane .form-title {
+    color: #0f172a !important;
+}
+
+html[data-bs-theme="light"] .auth-form-pane .input-wrapper input {
+    background: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+}
+

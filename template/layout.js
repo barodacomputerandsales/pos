@@ -207,6 +207,149 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ==========================================================================
+// Windows 11 OS Theme & Accent Color Live Synchronization Engine
+// Automatically tracks Windows Dark/Light Mode + System Accent Color
+// ==========================================================================
+window.BCSTheme = {
+    state: {
+        themeMode: localStorage.getItem('bcs_os_theme_mode') || 'dark',
+        themeSource: localStorage.getItem('bcs_os_theme_source') || 'system',
+        accentColor: localStorage.getItem('bcs_os_accent_color') || '#6366f1',
+        accentRgb: localStorage.getItem('bcs_os_accent_rgb') || '99, 102, 241'
+    },
+
+    apply(themeState) {
+        if (!themeState) return;
+        const mode = themeState.themeMode || (themeState.isDark ? 'dark' : 'light');
+        const source = themeState.themeSource || 'system';
+        const customAccent = localStorage.getItem('bcs_custom_accent_color');
+        const useOsAccent = localStorage.getItem('bcs_sync_os_accent') !== 'false';
+
+        const accent = (!useOsAccent && customAccent) ? customAccent : (themeState.accentColor || '#6366f1');
+        let rgb = themeState.accentRgb || '99, 102, 241';
+        if (!useOsAccent && customAccent && /^#[0-9a-fA-F]{6}$/.test(customAccent)) {
+            const r = parseInt(customAccent.slice(1, 3), 16);
+            const g = parseInt(customAccent.slice(3, 5), 16);
+            const b = parseInt(customAccent.slice(5, 7), 16);
+            rgb = `${r}, ${g}, ${b}`;
+        }
+
+        this.state = {
+            themeMode: mode,
+            themeSource: source,
+            accentColor: accent,
+            osAccentColor: themeState.accentColor || '#6366f1',
+            accentRgb: rgb
+        };
+
+        try {
+            localStorage.setItem('bcs_os_theme_mode', mode);
+            localStorage.setItem('bcs_os_theme_source', source);
+            localStorage.setItem('bcs_os_accent_color', accent);
+            localStorage.setItem('bcs_os_accent_rgb', rgb);
+        } catch (e) {}
+
+        const root = document.documentElement;
+        if (root) {
+            root.setAttribute('data-bs-theme', mode);
+            root.setAttribute('data-theme', mode);
+            root.style.setProperty('--win-accent', accent);
+            root.style.setProperty('--win-accent-rgb', rgb);
+            root.style.setProperty('--bs-primary', accent);
+            root.style.setProperty('--bs-primary-rgb', rgb);
+            root.style.setProperty('--sidebar-accent', accent);
+            root.style.setProperty('--sidebar-accent-bg', `rgba(${rgb}, 0.15)`);
+        }
+
+        // Update Topbar OS Sync Pill if mounted
+        const pillIcon = document.getElementById('topbarThemeIcon');
+        const pillLabel = document.getElementById('topbarThemeLabel');
+        const pillDot = document.getElementById('topbarAccentDot');
+        if (pillIcon) {
+            pillIcon.className = source === 'system'
+                ? 'bi bi-windows'
+                : (mode === 'dark' ? 'bi bi-moon-stars-fill' : 'bi bi-sun-fill');
+        }
+        if (pillLabel) {
+            pillLabel.textContent = source === 'system'
+                ? `Win11 (${mode === 'dark' ? 'Dark' : 'Light'})`
+                : (mode === 'dark' ? 'Dark' : 'Light');
+        }
+        if (pillDot) {
+            pillDot.style.backgroundColor = accent;
+            pillDot.style.boxShadow = `0 0 8px ${accent}`;
+        }
+
+        window.dispatchEvent(new CustomEvent('bcs-theme-changed', { detail: this.state }));
+    },
+
+    async setSource(source) {
+        if (typeof require !== 'undefined') {
+            try {
+                const { ipcRenderer } = require('electron');
+                const updated = await ipcRenderer.invoke('set_theme_source', source);
+                this.apply(updated);
+                return updated;
+            } catch (e) {}
+        }
+        // Web fallback
+        const sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const mode = source === 'system' ? (sysDark ? 'dark' : 'light') : source;
+        this.apply({
+            themeMode: mode,
+            themeSource: source,
+            accentColor: this.state.osAccentColor || this.state.accentColor,
+            accentRgb: this.state.accentRgb
+        });
+    },
+
+    async cycleTheme() {
+        const order = ['system', 'dark', 'light'];
+        const current = this.state.themeSource || 'system';
+        const next = order[(order.indexOf(current) + 1) % order.length];
+        await this.setSource(next);
+    },
+
+    init() {
+        // Apply cached state immediately so there is zero flash
+        this.apply(this.state);
+
+        if (typeof require !== 'undefined') {
+            try {
+                const { ipcRenderer } = require('electron');
+                ipcRenderer.invoke('get_os_theme').then(state => {
+                    if (state) this.apply(state);
+                }).catch(() => {});
+
+                ipcRenderer.on('os_theme_updated', (event, state) => {
+                    if (state) this.apply(state);
+                });
+            } catch (e) {}
+        }
+
+        // Also listen to Chromium matchMedia for instant OS dark/light detection
+        if (window.matchMedia) {
+            const mq = window.matchMedia('(prefers-color-scheme: dark)');
+            const handleMqChange = (e) => {
+                if (this.state.themeSource === 'system') {
+                    this.apply({
+                        ...this.state,
+                        themeMode: e.matches ? 'dark' : 'light',
+                        isDark: e.matches
+                    });
+                }
+            };
+            if (mq.addEventListener) {
+                mq.addEventListener('change', handleMqChange);
+            } else if (mq.addListener) {
+                mq.addListener(handleMqChange);
+            }
+        }
+    }
+};
+
+window.BCSTheme.init();
+
 // ==========================================================================
 // Global BCS Custom Animated Logo Loader Component (Portable Neon Laser Engine)
 // ==========================================================================

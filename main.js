@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, shell, powerMonitor } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, powerMonitor, nativeTheme, systemPreferences, screen } = require('electron');
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
@@ -12,15 +12,166 @@ if (process.platform === 'win32') {
 
 let mainWindow;
 
-function createWindow() {
-  const iconPath = path.join(__dirname, 'assets/icon.ico');
+// --- WINDOWS 11 WINDOW STATE PERSISTENCE & OS THEME ENGINE ---
+function getWindowStatePath() {
+  return path.join(app.getPath('userData'), 'window-state.json');
+}
 
-  mainWindow = new BrowserWindow({
+function loadWindowState() {
+  const defaults = {
     width: 1280,
     height: 800,
+    isMaximized: false,
+    isFullScreen: false,
+    themeSource: 'system'
+  };
+  try {
+    const statePath = getWindowStatePath();
+    if (fs.existsSync(statePath)) {
+      const raw = fs.readFileSync(statePath, 'utf-8');
+      const parsed = JSON.parse(raw);
+      return { ...defaults, ...parsed };
+    }
+  } catch (e) {
+    console.warn('[WindowState] Failed to load window state:', e.message);
+  }
+  return defaults;
+}
+
+let saveStateTimer = null;
+function saveWindowState(immediate = false) {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+
+  const doSave = () => {
+    if (!mainWindow || mainWindow.isDestroyed()) return;
+    try {
+      const currentSaved = loadWindowState();
+      const isMaximized = mainWindow.isMaximized();
+      const isFullScreen = mainWindow.isFullScreen();
+      const isMinimized = mainWindow.isMinimized();
+
+      let bounds = {
+        x: currentSaved.x,
+        y: currentSaved.y,
+        width: currentSaved.width || 1280,
+        height: currentSaved.height || 800
+      };
+
+      if (!isMaximized && !isFullScreen && !isMinimized) {
+        bounds = mainWindow.getBounds();
+      } else if (mainWindow.getNormalBounds) {
+        try {
+          bounds = mainWindow.getNormalBounds();
+        } catch (e) {}
+      }
+
+      const state = {
+        ...currentSaved,
+        x: bounds.x,
+        y: bounds.y,
+        width: Math.max(bounds.width || 1280, 1024),
+        height: Math.max(bounds.height || 800, 768),
+        isMaximized,
+        isFullScreen,
+        themeSource: nativeTheme.themeSource || 'system'
+      };
+
+      fs.writeFileSync(getWindowStatePath(), JSON.stringify(state, null, 2), 'utf-8');
+    } catch (e) {
+      console.warn('[WindowState] Failed to save window state:', e.message);
+    }
+  };
+
+  if (immediate) {
+    if (saveStateTimer) clearTimeout(saveStateTimer);
+    doSave();
+  } else {
+    if (saveStateTimer) clearTimeout(saveStateTimer);
+    saveStateTimer = setTimeout(doSave, 250);
+  }
+}
+
+function ensureBoundsVisible(state) {
+  if (typeof state.x !== 'number' || typeof state.y !== 'number') {
+    return { width: state.width, height: state.height };
+  }
+  try {
+    const displays = screen.getAllDisplays();
+    const isVisible = displays.some(display => {
+      const b = display.bounds;
+      return (
+        state.x + state.width > b.x + 50 &&
+        state.x < b.x + b.width - 50 &&
+        state.y + state.height > b.y + 50 &&
+        state.y < b.y + b.height - 50
+      );
+    });
+    if (isVisible) {
+      return { x: state.x, y: state.y, width: state.width, height: state.height };
+    }
+  } catch (e) {}
+  return { width: state.width, height: state.height };
+}
+
+function getOsThemeState() {
+  let rawAccent = '6366f1ff';
+  try {
+    if (systemPreferences && typeof systemPreferences.getAccentColor === 'function') {
+      rawAccent = systemPreferences.getAccentColor() || '6366f1ff';
+    }
+  } catch (e) {}
+
+  const cleanHex = String(rawAccent).replace('#', '').slice(0, 6);
+  const accentHex = /^[0-9a-fA-F]{6}$/.test(cleanHex) ? `#${cleanHex.toLowerCase()}` : '#6366f1';
+  const r = parseInt(accentHex.slice(1, 3), 16) || 99;
+  const g = parseInt(accentHex.slice(3, 5), 16) || 102;
+  const b = parseInt(accentHex.slice(5, 7), 16) || 241;
+
+  const isDark = nativeTheme ? nativeTheme.shouldUseDarkColors : true;
+  const themeMode = isDark ? 'dark' : 'light';
+  const themeSource = nativeTheme ? nativeTheme.themeSource : 'system';
+
+  return {
+    themeMode,
+    isDark,
+    themeSource,
+    accentColor: accentHex,
+    accentRgb: `${r}, ${g}, ${b}`,
+    r,
+    g,
+    b
+  };
+}
+
+function broadcastOsThemeUpdate() {
+  const themeState = getOsThemeState();
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    try {
+      mainWindow.setBackgroundColor(themeState.isDark ? '#0b0f19' : '#f3f4f6');
+    } catch (e) {}
+    mainWindow.webContents.send('os_theme_updated', themeState);
+  }
+}
+
+function createWindow() {
+  const iconPath = path.join(__dirname, 'assets/icon.ico');
+  const savedState = loadWindowState();
+
+  if (savedState.themeSource && ['system', 'dark', 'light'].includes(savedState.themeSource)) {
+    nativeTheme.themeSource = savedState.themeSource;
+  } else {
+    nativeTheme.themeSource = 'system';
+  }
+
+  const initialBounds = ensureBoundsVisible(savedState);
+  const initialTheme = getOsThemeState();
+
+  mainWindow = new BrowserWindow({
+    ...initialBounds,
     minWidth: 1024,
     minHeight: 768,
-    backgroundColor: '#06080f',
+    backgroundColor: initialTheme.isDark ? '#0b0f19' : '#f3f4f6',
+    autoHideMenuBar: true,
     icon: iconPath,
     show: false,
     webPreferences: {
@@ -29,14 +180,33 @@ function createWindow() {
     }
   });
 
+  // Bind Window State Persistence Events
+  mainWindow.on('resize', () => saveWindowState(false));
+  mainWindow.on('move', () => saveWindowState(false));
+  mainWindow.on('maximize', () => saveWindowState(true));
+  mainWindow.on('unmaximize', () => saveWindowState(true));
+  mainWindow.on('enter-full-screen', () => saveWindowState(true));
+  mainWindow.on('leave-full-screen', () => saveWindowState(true));
+  mainWindow.on('close', () => saveWindowState(true));
+
   const shouldForceLogin = process.argv.includes('--login') || process.argv.includes('--logout');
   mainWindow.loadFile('index.html', {
     query: shouldForceLogin ? { logout: 'true' } : {}
   });
 
   mainWindow.once('ready-to-show', () => {
+    if (savedState.isMaximized) {
+      mainWindow.maximize();
+    } else if (savedState.isFullScreen) {
+      mainWindow.setFullScreen(true);
+    }
     mainWindow.show();
     mainWindow.focus();
+    broadcastOsThemeUpdate();
+  });
+
+  mainWindow.webContents.on('did-finish-load', () => {
+    broadcastOsThemeUpdate();
   });
   
   // After the app loads, silently check for updates in the background (production builds or dev update test)
@@ -64,6 +234,21 @@ if (!gotTheLock) {
 
   app.whenReady().then(() => {
     createWindow();
+
+    // Listen to Windows 11 OS Dark/Light Mode & Accent Color Changes in Real Time
+    if (nativeTheme) {
+      nativeTheme.on('updated', () => {
+        broadcastOsThemeUpdate();
+      });
+    }
+    if (systemPreferences && typeof systemPreferences.on === 'function') {
+      systemPreferences.on('accent-color-changed', () => {
+        broadcastOsThemeUpdate();
+      });
+      systemPreferences.on('color-changed', () => {
+        broadcastOsThemeUpdate();
+      });
+    }
 
     app.on('activate', function () {
       if (BrowserWindow.getAllWindows().length === 0) createWindow();
@@ -221,6 +406,49 @@ ipcMain.on('check_for_updates', () => {
 // Get current application version
 ipcMain.handle('get_app_version', () => {
   return app.getVersion();
+});
+
+// Windows 11 OS Theme & Accent Color Sync IPC
+ipcMain.handle('get_os_theme', () => {
+  return getOsThemeState();
+});
+
+ipcMain.handle('set_theme_source', (event, source) => {
+  if (['system', 'dark', 'light'].includes(source)) {
+    nativeTheme.themeSource = source;
+    saveWindowState(true);
+    broadcastOsThemeUpdate();
+  }
+  return getOsThemeState();
+});
+
+// Window State & Geometry Controls IPC
+ipcMain.handle('get_window_state', () => {
+  const saved = loadWindowState();
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    const b = mainWindow.getBounds();
+    return {
+      ...saved,
+      currentWidth: b.width,
+      currentHeight: b.height,
+      currentX: b.x,
+      currentY: b.y,
+      isMaximized: mainWindow.isMaximized(),
+      isFullScreen: mainWindow.isFullScreen()
+    };
+  }
+  return saved;
+});
+
+ipcMain.handle('reset_window_size', () => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    if (mainWindow.isMaximized()) mainWindow.unmaximize();
+    if (mainWindow.isFullScreen()) mainWindow.setFullScreen(false);
+    mainWindow.setSize(1280, 800);
+    mainWindow.center();
+    saveWindowState(true);
+  }
+  return loadWindowState();
 });
 
 // Get cached downloaded update info
