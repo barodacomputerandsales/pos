@@ -32,7 +32,11 @@ function loadGlobalUpdater() {
 
 function loadGlobalAICopilot() {
     loadCss('ai-copilot');
-    loadScript('ai-copilot').catch(() => {});
+    loadScript('ai-copilot/agentic-executor').then(() => {
+        loadScript('ai-copilot');
+    }).catch(() => {
+        loadScript('ai-copilot').catch(() => {});
+    });
 }
 
 function loadGlobalLoader() {

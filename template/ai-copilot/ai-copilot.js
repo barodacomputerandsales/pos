@@ -421,8 +421,16 @@
                     contextData: window.BCS_LIVE_DASHBOARD_CONTEXT || null
                 });
 
+                // Check if the reply contains agentic actions
+                let cleanReply = res.reply;
+                let actionBlocks = [];
+                if (window.BCSAgenticExecutor) {
+                    actionBlocks = window.BCSAgenticExecutor.parseActionsFromText(res.reply);
+                    cleanReply = window.BCSAgenticExecutor.cleanTextResponse(res.reply);
+                }
+
                 this.history.push({ role: 'user', content: text });
-                this.history.push({ role: 'assistant', content: res.reply });
+                this.history.push({ role: 'assistant', content: cleanReply });
 
                 const loaderEl = document.getElementById(loadingId);
                 const keyBadge = res.keySlotUsed === 'backup'
@@ -430,9 +438,45 @@
                     : '<span class="badge bg-info bg-opacity-25 text-info">Primary Key</span>';
                 const tokCount = res.usage?.total_tokens ? `${res.usage.total_tokens} tok` : 'low-token';
 
+                let actionHtml = '';
+                if (actionBlocks.length > 0) {
+                    actionHtml = actionBlocks.map((act, idx) => {
+                        const actId = `bcs-action-btn-${Date.now()}-${idx}`;
+                        setTimeout(() => {
+                            document.getElementById(actId)?.addEventListener('click', async function() {
+                                const btn = this;
+                                btn.disabled = true;
+                                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Executing...';
+                                try {
+                                    const actRes = await window.BCSAgenticExecutor.executeAction(act);
+                                    btn.className = 'btn btn-sm btn-success w-100 mt-2 text-start py-2';
+                                    btn.innerHTML = `<i class="bi bi-check-circle-fill me-1"></i> ${actRes.message}`;
+                                    window.dispatchEvent(new CustomEvent('bcs-agentic-action-completed', { detail: actRes }));
+                                } catch (e) {
+                                    btn.className = 'btn btn-sm btn-danger w-100 mt-2 text-start py-2';
+                                    btn.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-1"></i> Error: ${e.message}`;
+                                }
+                            });
+                        }, 50);
+
+                        return `
+                            <div class="mt-2 p-2 rounded-3 border border-info border-opacity-30 bg-info bg-opacity-10">
+                                <div class="d-flex align-items-center gap-1 small text-info fw-bold">
+                                    <i class="bi bi-lightning-charge-fill"></i> Agentic Action Prepared: ${act.action.replace('_', ' ').toUpperCase()}
+                                </div>
+                                <div class="small text-muted mt-1">${act.summary || JSON.stringify(act.data)}</div>
+                                <button type="button" id="${actId}" class="btn btn-sm btn-info text-white fw-semibold w-100 mt-2">
+                                    <i class="bi bi-play-circle-fill me-1"></i> Execute "${act.action.replace('_', ' ')}" Now
+                                </button>
+                            </div>
+                        `;
+                    }).join('');
+                }
+
                 if (loaderEl) {
                     loaderEl.innerHTML = `
-                        <div>${formatMarkdownSimple(res.reply)}</div>
+                        <div>${formatMarkdownSimple(cleanReply)}</div>
+                        ${actionHtml}
                         <div class="bcs-ai-msg-meta">
                             ${keyBadge}
                             <span>• ${res.model || DEFAULT_LOW_TOKEN_MODEL} (${tokCount})</span>

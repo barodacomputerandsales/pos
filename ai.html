@@ -288,24 +288,24 @@
                         <p class="text-muted small mb-3">Execute high-speed intelligence analyses on your live store database:</p>
 
                         <div class="d-flex flex-column gap-2 mb-4">
+                            <div class="prompt-card" data-prompt="Add a new product named 'Logitech G102 Lightsync RGB Mouse', category 'Computer Accessories', brand 'Logitech', unit 'Pcs', buy price 1650, sell price 2150, wholesale price 1850, quantity 15.">
+                                <div class="fw-semibold text-white small"><i class="bi bi-plus-circle-fill text-success me-2"></i>Agent: Add Product</div>
+                                <div class="text-muted" style="font-size: 0.75rem;">Instruct AI to add a new product directly into D1.</div>
+                            </div>
+
+                            <div class="prompt-card" data-prompt="Change the sell price of product 'Logitech' to 2200 and add 10 to its stock.">
+                                <div class="fw-semibold text-white small"><i class="bi bi-pencil-square text-warning me-2"></i>Agent: Update Product / Stock</div>
+                                <div class="text-muted" style="font-size: 0.75rem;">Modify pricing, category, or stock levels for any product.</div>
+                            </div>
+
+                            <div class="prompt-card" data-prompt="Add a new supplier named 'Star Tech Computer Ltd', phone '01711223344', shop name 'Star Tech Wholesale Hub', location 'IDB Bhaban Dhaka', opening balance 0.">
+                                <div class="fw-semibold text-white small"><i class="bi bi-person-plus-fill text-info me-2"></i>Agent: Add Supplier</div>
+                                <div class="text-muted" style="font-size: 0.75rem;">Register a new vendor/supplier into the database.</div>
+                            </div>
+
                             <div class="prompt-card" data-prompt="Analyze our current store inventory and give me an immediate low-stock alert list with restock priorities in ৳ BDT.">
-                                <div class="fw-semibold text-white small"><i class="bi bi-box-seam text-info me-2"></i>Stock Restock Check</div>
+                                <div class="fw-semibold text-white small"><i class="bi bi-box-seam text-primary me-2"></i>Inventory &amp; Restock Analysis</div>
                                 <div class="text-muted" style="font-size: 0.75rem;">Detects low stock items and restock suggestions.</div>
-                            </div>
-
-                            <div class="prompt-card" data-prompt="What are optimal profit margins for computer accessories (Keyboards, Mice, SSDs, Cables) for Wholesale vs Retail customers in Bangladesh?">
-                                <div class="fw-semibold text-white small"><i class="bi bi-tag text-success me-2"></i>Margin &amp; Pricing Advisor</div>
-                                <div class="text-muted" style="font-size: 0.75rem;">Normal vs Shop customer tier margin calculation.</div>
-                            </div>
-
-                            <div class="prompt-card" data-prompt="Give me 3 concrete, high-impact strategies to increase retail and wholesale daily revenue this week.">
-                                <div class="fw-semibold text-white small"><i class="bi bi-graph-up-arrow text-primary me-2"></i>Revenue Boost Strategies</div>
-                                <div class="text-muted" style="font-size: 0.75rem;">Tactical steps to accelerate store turnover.</div>
-                            </div>
-
-                            <div class="prompt-card" data-prompt="Write a professional Bangla/English greeting and promotion text message for our regular shop customers.">
-                                <div class="fw-semibold text-white small"><i class="bi bi-megaphone text-warning me-2"></i>Customer Promo Message</div>
-                                <div class="text-muted" style="font-size: 0.75rem;">SMS or WhatsApp broadcast template.</div>
                             </div>
                         </div>
                     </div>
@@ -417,8 +417,15 @@
                     contextData: window.BCS_LIVE_DASHBOARD_CONTEXT || null
                 });
 
+                let cleanReply = res.reply;
+                let actionBlocks = [];
+                if (window.BCSAgenticExecutor) {
+                    actionBlocks = window.BCSAgenticExecutor.parseActionsFromText(res.reply);
+                    cleanReply = window.BCSAgenticExecutor.cleanTextResponse(res.reply);
+                }
+
                 const loaderEl = document.getElementById(loadingId);
-                const formatted = String(res.reply || '')
+                const formatted = String(cleanReply || '')
                     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                     .replace(/`([^`]+)`/g, '<code class="px-1 rounded bg-dark text-info">$1</code>')
@@ -429,9 +436,48 @@
                     : '<span class="badge bg-info bg-opacity-25 text-info ms-1">Primary Key</span>';
                 const tokText = res.usage?.total_tokens ? `${res.usage.total_tokens} tokens` : 'low-token';
 
+                let actionHtml = '';
+                if (actionBlocks.length > 0) {
+                    actionHtml = actionBlocks.map((act, idx) => {
+                        const actId = `ai-page-act-${Date.now()}-${idx}`;
+                        setTimeout(() => {
+                            document.getElementById(actId)?.addEventListener('click', async function() {
+                                const btn = this;
+                                btn.disabled = true;
+                                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Executing Action in Cloudflare D1...';
+                                try {
+                                    const actRes = await window.BCSAgenticExecutor.executeAction(act);
+                                    btn.className = 'btn btn-sm btn-success w-100 mt-2 text-start py-2';
+                                    btn.innerHTML = `<i class="bi bi-check-circle-fill me-1"></i> ${actRes.message}`;
+                                    showAlert('Agentic Action Executed', actRes.message, 'success');
+                                    loadStoreContext();
+                                } catch (e) {
+                                    btn.className = 'btn btn-sm btn-danger w-100 mt-2 text-start py-2';
+                                    btn.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-1"></i> Error: ${e.message}`;
+                                    showAlert('Action Error', e.message, 'error');
+                                }
+                            });
+                        }, 50);
+
+                        return `
+                            <div class="mt-3 p-3 rounded-3 border border-info border-opacity-30 bg-info bg-opacity-10">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="small text-info fw-bold"><i class="bi bi-lightning-charge-fill me-1"></i>Agentic Action Prepared: ${act.action.replace('_', ' ').toUpperCase()}</span>
+                                    <span class="badge bg-info bg-opacity-25 text-info border border-info border-opacity-25">Ready to Commit</span>
+                                </div>
+                                <div class="small text-white opacity-85 mt-2">${act.summary || JSON.stringify(act.data)}</div>
+                                <button type="button" id="${actId}" class="btn btn-sm btn-info text-white fw-semibold w-100 mt-2 py-2">
+                                    <i class="bi bi-play-circle-fill me-1"></i> Execute "${act.action.replace('_', ' ')}" Now
+                                </button>
+                            </div>
+                        `;
+                    }).join('');
+                }
+
                 if (loaderEl) {
                     loaderEl.innerHTML = `
                         <div>${formatted}</div>
+                        ${actionHtml}
                         <div class="mt-2 pt-2 border-top border-secondary border-opacity-25 small opacity-75 d-flex align-items-center gap-2" style="font-size: 0.72rem;">
                             ${keyBadge}
                             <span>• ${res.model || 'openai/gpt-oss-20b'}</span>
