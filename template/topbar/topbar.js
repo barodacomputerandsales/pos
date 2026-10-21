@@ -4,14 +4,20 @@ window._renderTopbarImpl = function() {
         <div class="d-flex align-items-center gap-2">
             <img src="assets/icon.png" onerror="this.src='template/bcs-logo.svg'" alt="BCS" style="width: 40px; height: 40px; border-radius: 9px; object-fit: contain; filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.45));">
             <h4 class="mb-0 fw-bold" style="background: linear-gradient(135deg, #00e5ff, var(--win-accent, #6366f1)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">BCS Enterprise</h4>
-            <span id="topbarVersionBadge" class="badge bg-secondary bg-opacity-25 text-muted border border-secondary border-opacity-25 small" style="font-size: 0.75rem;">v2.3.2</span>
+            <span id="topbarVersionBadge" class="badge bg-secondary bg-opacity-25 text-muted border border-secondary border-opacity-25 small" style="font-size: 0.75rem;">v2.3.3</span>
             <div id="topbarUpdateContainer" class="d-inline-flex align-items-center ms-2"></div>
         </div>
         <div class="d-flex align-items-center gap-3">
-            <!-- BCS Groq AI Copilot Pill with Live Hourly Quota -->
-            <button type="button" id="topbarAiCopilotBtn" class="btn btn-sm d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill" style="background: linear-gradient(135deg, rgba(0, 229, 255, 0.14), rgba(var(--win-accent-rgb, 99, 102, 241), 0.18)); border: 1px solid rgba(0, 229, 255, 0.38); color: inherit; font-size: 0.78rem; font-weight: 600;" onclick="if(window.BCSAICopilot) window.BCSAICopilot.toggle();" title="Open BCS Groq AI Copilot (Backend Dual-Key Vault • 150 Reqs/Hr Per User)">
-                <i class="bi bi-stars" style="color: #00e5ff;"></i>
-                <span>AI Copilot</span>
+            <!-- Dedicated AI Studio Page Link -->
+            <a href="ai.html" id="topbarAiPageLink" class="btn btn-sm d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill" style="background: linear-gradient(135deg, rgba(0, 229, 255, 0.16), rgba(var(--win-accent-rgb, 99, 102, 241), 0.22)); border: 1px solid rgba(0, 229, 255, 0.45); color: #00e5ff; font-size: 0.78rem; font-weight: 700; text-decoration: none;" title="Open BCS AI Intelligence Studio (Full Page)">
+                <i class="bi bi-stars"></i>
+                <span style="color: #ffffff;">AI Studio</span>
+            </a>
+
+            <!-- BCS Groq AI Copilot Quick Drawer Trigger -->
+            <button type="button" id="topbarAiCopilotBtn" class="btn btn-sm d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill" style="background: rgba(var(--win-accent-rgb, 99, 102, 241), 0.12); border: 1px solid rgba(var(--win-accent-rgb, 99, 102, 241), 0.32); color: inherit; font-size: 0.78rem; font-weight: 600;" onclick="if(window.BCSAICopilot) window.BCSAICopilot.toggle();" title="Toggle Quick AI Copilot Drawer (Ctrl+Shift+A)">
+                <i class="bi bi-robot" style="color: var(--win-accent, #6366f1);"></i>
+                <span>Copilot</span>
                 <span id="topbarAiQuotaBadge" class="badge rounded-pill bg-dark bg-opacity-50 text-info border border-info border-opacity-25" style="font-size: 0.68rem;">150/hr</span>
             </button>
 

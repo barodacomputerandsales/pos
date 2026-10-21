@@ -26,6 +26,11 @@ window._renderSidebarImpl = function(activeMenu, activeSubMenu = null) {
                 <span>Dashboard</span>
             </a>
 
+            <a href="ai.html" class="menu-item ${activeMenu === 'ai' ? 'active' : ''}">
+                <i class="bi bi-stars" style="color: #00e5ff;"></i>
+                <span>AI Studio</span>
+            </a>
+
             <!-- Products Menu Group -->
             <div class="menu-group ${isProductsActive ? 'open' : ''}">
                 <button class="menu-item has-submenu ${isProductsActive ? 'active' : ''}">

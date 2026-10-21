@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Intelligence Studio | BCS Enterprise POS</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+    <link rel="apple-touch-icon" href="assets/icon.png">
+    <!-- Portable Enterprise Neon Laser Loader -->
+    <script src="template/loader/loader-1.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bs-primary: #6366f1;
+            --win-accent: #6366f1;
+            --win-accent-rgb: 99, 102, 241;
+            --glass-bg: rgba(22, 27, 34, 0.72);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+            --page-bg: #0d1117;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--page-bg) !important;
+            min-height: 100vh;
+            color: #f0f6fc;
+        }
+
+        .main-content {
+            margin-left: 240px;
+            padding-top: 86px;
+            padding-left: 2rem;
+            padding-right: 2rem;
+            padding-bottom: 2.5rem;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: var(--glass-border);
+            border-radius: 18px;
+            box-shadow: var(--glass-shadow);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .hero-banner {
+            background: linear-gradient(135deg, rgba(var(--win-accent-rgb), 0.22) 0%, rgba(0, 229, 255, 0.12) 100%);
+            border: 1px solid rgba(0, 229, 255, 0.25);
+            border-radius: 20px;
+            padding: 1.75rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-banner::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 320px;
+            height: 320px;
+            background: radial-gradient(circle, rgba(0, 229, 255, 0.18) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .chat-container {
+            height: 520px;
+            display: flex;
+            flex-direction: column;
+            border-radius: 16px;
+            overflow: hidden;
+            border: var(--glass-border);
+            background: rgba(13, 17, 23, 0.85);
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .msg-bubble {
+            max-width: 82%;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 0.88rem;
+            line-height: 1.55;
+            word-wrap: break-word;
+        }
+
+        .msg-bubble.assistant {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #f0f6fc;
+            border-bottom-left-radius: 4px;
+        }
+
+        .msg-bubble.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, var(--win-accent), #4f46e5);
+            color: #ffffff;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 14px rgba(var(--win-accent-rgb), 0.35);
+        }
+
+        .prompt-card {
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 12px 14px;
+            transition: all 0.2s ease;
+        }
+
+        .prompt-card:hover {
+            background: rgba(var(--win-accent-rgb), 0.12);
+            border-color: rgba(var(--win-accent-rgb), 0.35);
+            transform: translateY(-2px);
+        }
+
+        .quota-ring {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Custom Notification Toast */
+        #custom-alert-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .custom-alert {
+            min-width: 320px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(15px);
+            border-left: 4px solid #10b981;
+            color: #fff;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+        .custom-alert.error { border-left-color: #ef4444; }
+        .custom-alert.info { border-left-color: #00e5ff; }
+    </style>
+</head>
+<body>
+    <script>
+        if (localStorage.getItem('isAuthenticated') !== 'true' || !localStorage.getItem('sessionId') || !localStorage.getItem('sessionPort')) {
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <script src="template/layout.js"></script>
+    <script>
+        renderTopbar();
+        renderSidebar('ai');
+    </script>
+
+    <main class="main-content">
+        <!-- Hero Header -->
+        <div class="hero-banner mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge rounded-pill px-3 py-1" style="background: rgba(0, 229, 255, 0.18); color: #00e5ff; border: 1px solid rgba(0, 229, 255, 0.4); font-size: 0.75rem; font-weight: 700;">
+                        <i class="bi bi-stars me-1"></i> GROQ LPU INFERENCE
+                    </span>
+                    <span class="badge rounded-pill bg-success bg-opacity-25 text-success border border-success border-opacity-25" id="aiPageModelBadge" style="font-size: 0.75rem;">
+                        openai/gpt-oss-20b (Low-Token)
+                    </span>
+                </div>
+                <h2 class="fw-bold mb-1 text-white">BCS AI Intelligence Studio</h2>
+                <p class="text-muted mb-0 small">Centralized AI control center with dual-key automatic failover, inventory analysis, price suggestions, and 150 req/hr rate limit guard.</p>
+            </div>
+            
+            <!-- Hourly Rate Quota Indicator -->
+            <div class="glass-card px-4 py-3 text-end" style="min-width: 220px;">
+                <div class="text-muted small text-uppercase fw-semibold mb-1">Your Hourly Quota</div>
+                <div class="d-flex align-items-baseline justify-content-end gap-2">
+                    <h2 class="fw-bold text-info mb-0 quota-ring" id="aiPageRemainingText">150</h2>
+                    <span class="text-muted small">/ 150 reqs</span>
+                </div>
+                <div class="progress mt-2" style="height: 6px; background: rgba(255,255,255,0.1);">
+                    <div id="aiPageQuotaBar" class="progress-bar bg-info" style="width: 100%;"></div>
+                </div>
+                <small class="text-muted mt-1 d-block" id="aiPageResetTimer" style="font-size: 0.72rem;">Resets in -- min</small>
+            </div>
+        </div>
+
+        <!-- 3 Quick Live Analytics Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="glass-card p-3 h-100 d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="text-muted small text-uppercase fw-semibold">Backend Key Vault</div>
+                        <div class="fw-bold text-white fs-6 mt-1" id="aiPageVaultStatus">Primary + Backup Active</div>
+                        <div class="small text-muted" id="aiPagePrimaryMasked">gsk_kwGL...cSNf</div>
+                    </div>
+                    <div class="rounded-3 p-3 text-info" style="background: rgba(0, 229, 255, 0.1);">
+                        <i class="bi bi-shield-lock-fill fs-3"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="glass-card p-3 h-100 d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="text-muted small text-uppercase fw-semibold">Tokens Used This Hour</div>
+                        <div class="fw-bold text-white fs-6 mt-1 quota-ring" id="aiPageTokensText">0 tokens</div>
+                        <div class="small text-success"><i class="bi bi-lightning-charge me-1"></i>Low-token reasoning optimized</div>
+                    </div>
+                    <div class="rounded-3 p-3 text-warning" style="background: rgba(245, 158, 11, 0.1);">
+                        <i class="bi bi-cpu fs-3"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="glass-card p-3 h-100 d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="text-muted small text-uppercase fw-semibold">Failover Architecture</div>
+                        <div class="fw-bold text-white fs-6 mt-1" id="aiPageFailoverState">Auto-Standby Ready</div>
+                        <div class="small text-muted">Primary (Key 1) &rarr; Backup (Key 2)</div>
+                    </div>
+                    <div class="rounded-3 p-3 text-success" style="background: rgba(16, 185, 129, 0.1);">
+                        <i class="bi bi-hdd-network-fill fs-3"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Studio Workspace: Live Interactive Chat & Smart Task Launchers -->
+        <div class="row g-4">
+            <!-- Left: Interactive Copilot Chat Window -->
+            <div class="col-lg-8">
+                <div class="glass-card p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3 px-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="p-2 rounded-2" style="background: rgba(var(--win-accent-rgb), 0.15); color: var(--win-accent);">
+                                <i class="bi bi-chat-dots-fill"></i>
+                            </span>
+                            <span class="fw-bold text-white">Full-Screen Copilot Console</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="aiPageClearChatBtn">
+                                <i class="bi bi-trash3 me-1"></i> Clear Console
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="chat-container">
+                        <div class="chat-messages" id="aiPageChatMessages">
+                            <div class="msg-bubble assistant">
+                                <div>👋 Welcome to <strong>BCS AI Intelligence Studio</strong>!</div>
+                                <div class="mt-1 small opacity-75">I am connected to your Cloudflare Backend Groq Vault with Primary & Backup failover. Ask questions about your inventory, sales, margin optimization, or use the pre-built intelligence tasks on the right.</div>
+                            </div>
+                        </div>
+
+                        <form id="aiPageChatForm" class="p-3 border-top border-secondary border-opacity-25 bg-dark bg-opacity-40">
+                            <div class="input-group">
+                                <input type="text" id="aiPageChatInput" class="form-control bg-dark text-light border-secondary" placeholder="Type a message or instruction for BCS AI..." autocomplete="off" required>
+                                <button type="submit" id="aiPageSendBtn" class="btn btn-primary px-4 fw-semibold">
+                                    <i class="bi bi-send-fill me-1"></i> Send
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Pre-Built AI Intelligence Workflows -->
+            <div class="col-lg-4">
+                <div class="glass-card p-4 h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <h5 class="fw-bold text-white mb-3 d-flex align-items-center gap-2">
+                            <i class="bi bi-lightning-charge-fill text-warning"></i> Quick Studio Tasks
+                        </h5>
+                        <p class="text-muted small mb-3">Execute high-speed intelligence analyses on your live store database:</p>
+
+                        <div class="d-flex flex-column gap-2 mb-4">
+                            <div class="prompt-card" data-prompt="Analyze our current store inventory and give me an immediate low-stock alert list with restock priorities in ৳ BDT.">
+                                <div class="fw-semibold text-white small"><i class="bi bi-box-seam text-info me-2"></i>Stock Restock Check</div>
+                                <div class="text-muted" style="font-size: 0.75rem;">Detects low stock items and restock suggestions.</div>
+                            </div>
+
+                            <div class="prompt-card" data-prompt="What are optimal profit margins for computer accessories (Keyboards, Mice, SSDs, Cables) for Wholesale vs Retail customers in Bangladesh?">
+                                <div class="fw-semibold text-white small"><i class="bi bi-tag text-success me-2"></i>Margin &amp; Pricing Advisor</div>
+                                <div class="text-muted" style="font-size: 0.75rem;">Normal vs Shop customer tier margin calculation.</div>
+                            </div>
+
+                            <div class="prompt-card" data-prompt="Give me 3 concrete, high-impact strategies to increase retail and wholesale daily revenue this week.">
+                                <div class="fw-semibold text-white small"><i class="bi bi-graph-up-arrow text-primary me-2"></i>Revenue Boost Strategies</div>
+                                <div class="text-muted" style="font-size: 0.75rem;">Tactical steps to accelerate store turnover.</div>
+                            </div>
+
+                            <div class="prompt-card" data-prompt="Write a professional Bangla/English greeting and promotion text message for our regular shop customers.">
+                                <div class="fw-semibold text-white small"><i class="bi bi-megaphone text-warning me-2"></i>Customer Promo Message</div>
+                                <div class="text-muted" style="font-size: 0.75rem;">SMS or WhatsApp broadcast template.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Direct Navigation Links -->
+                    <div class="pt-3 border-top border-secondary border-opacity-25">
+                        <div class="d-flex gap-2">
+                            <a href="settings.html" class="btn btn-outline-secondary btn-sm flex-fill">
+                                <i class="bi bi-gear-fill me-1"></i> Settings
+                            </a>
+                            <a href="dashboard.html" class="btn btn-outline-info btn-sm flex-fill">
+                                <i class="bi bi-speedometer2 me-1"></i> Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="custom-alert-container"></div>
+
+    <script type="module">
+        import { getCollection } from './script/api.js';
+
+        // Helper alert
+        function showAlert(title, message, type = 'info') {
+            const container = document.getElementById('custom-alert-container');
+            const alert = document.createElement('div');
+            alert.className = `custom-alert ${type}`;
+            alert.innerHTML = `<strong>${title}</strong>: ${message}`;
+            container.appendChild(alert);
+            setTimeout(() => alert.remove(), 4000);
+        }
+
+        // Live Context Aggregator
+        async function loadStoreContext() {
+            try {
+                const [productsRes, salesRes] = await Promise.all([
+                    getCollection('products').catch(() => ({ docs: [] })),
+                    getCollection('sales').catch(() => ({ docs: [] }))
+                ]);
+                const products = productsRes.docs ? productsRes.docs.map(d => d.data()) : [];
+                const sales = salesRes.docs ? salesRes.docs.map(d => d.data()) : [];
+                
+                window.BCS_LIVE_DASHBOARD_CONTEXT = {
+                    totalProducts: products.length,
+                    totalSales: sales.length,
+                    lowStockSample: products.filter(p => Number(p.quantity || 0) <= Number(p.alertQuantity || 5)).slice(0, 10).map(p => ({
+                        name: p.name, stock: p.quantity, sellPrice: p.sellPrice
+                    }))
+                };
+            } catch (e) {}
+        }
+
+        // Sync Rate & Vault UI
+        function syncUI() {
+            if (!window.BCSAICopilot) return;
+            const rate = window.BCSAICopilot.getRateStatus();
+            
+            const remText = document.getElementById('aiPageRemainingText');
+            const barEl = document.getElementById('aiPageQuotaBar');
+            const timerEl = document.getElementById('aiPageResetTimer');
+            const tokensEl = document.getElementById('aiPageTokensText');
+            const maskEl = document.getElementById('aiPagePrimaryMasked');
+            const modelBadge = document.getElementById('aiPageModelBadge');
+
+            if (remText) remText.textContent = rate.remainingThisHour;
+            if (timerEl) timerEl.textContent = `Resets in ${rate.resetInMinutes} min (UTC Hour Bucket)`;
+            if (tokensEl) tokensEl.textContent = `${rate.tokensUsedThisHour || 0} tokens`;
+            if (maskEl && rate.primaryMasked) maskEl.textContent = rate.primaryMasked;
+            if (modelBadge && rate.activeModel) modelBadge.textContent = `${rate.activeModel} (Low-Token)`;
+
+            if (barEl) {
+                const pct = Math.max(0, Math.min(100, Math.round((rate.remainingThisHour / rate.hourlyLimit) * 100)));
+                barEl.style.width = `${pct}%`;
+                barEl.className = `progress-bar ${pct > 35 ? 'bg-info' : (pct > 10 ? 'bg-warning' : 'bg-danger')}`;
+            }
+        }
+
+        // Chat Message Submission
+        async function handleSendMessage(text) {
+            if (!text || !window.BCSAICopilot) return;
+            const msgBox = document.getElementById('aiPageChatMessages');
+            const sendBtn = document.getElementById('aiPageSendBtn');
+            const input = document.getElementById('aiPageChatInput');
+
+            // Append User Bubble
+            const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            msgBox.insertAdjacentHTML('beforeend', `<div class="msg-bubble user">${escaped}</div>`);
+            msgBox.scrollTop = msgBox.scrollHeight;
+            if (input) input.value = '';
+
+            const loadingId = 'page-ai-loader-' + Date.now();
+            msgBox.insertAdjacentHTML('beforeend', `
+                <div id="${loadingId}" class="msg-bubble assistant">
+                    <span class="spinner-border spinner-border-sm text-info me-2"></span>
+                    Running low-token Groq inference...
+                </div>
+            `);
+            msgBox.scrollTop = msgBox.scrollHeight;
+
+            if (sendBtn) sendBtn.disabled = true;
+
+            try {
+                const res = await window.BCSAICopilot.ask({
+                    prompt: text,
+                    task: 'chat',
+                    contextData: window.BCS_LIVE_DASHBOARD_CONTEXT || null
+                });
+
+                const loaderEl = document.getElementById(loadingId);
+                const formatted = String(res.reply || '')
+                    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/`([^`]+)`/g, '<code class="px-1 rounded bg-dark text-info">$1</code>')
+                    .replace(/\n/g, '<br>');
+
+                const keyBadge = res.keySlotUsed === 'backup'
+                    ? '<span class="badge bg-warning text-dark ms-1">Backup Key Failover</span>'
+                    : '<span class="badge bg-info bg-opacity-25 text-info ms-1">Primary Key</span>';
+                const tokText = res.usage?.total_tokens ? `${res.usage.total_tokens} tokens` : 'low-token';
+
+                if (loaderEl) {
+                    loaderEl.innerHTML = `
+                        <div>${formatted}</div>
+                        <div class="mt-2 pt-2 border-top border-secondary border-opacity-25 small opacity-75 d-flex align-items-center gap-2" style="font-size: 0.72rem;">
+                            ${keyBadge}
+                            <span>• ${res.model || 'openai/gpt-oss-20b'}</span>
+                            <span>• ${tokText}</span>
+                            <span>• ${window.BCSAICopilot.getRateStatus().remainingThisHour} reqs left/hr</span>
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                const loaderEl = document.getElementById(loadingId);
+                if (loaderEl) {
+                    loaderEl.innerHTML = `<div class="text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>${err.message}</div>`;
+                }
+            } finally {
+                if (sendBtn) sendBtn.disabled = false;
+                msgBox.scrollTop = msgBox.scrollHeight;
+                syncUI();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStoreContext();
+            setTimeout(syncUI, 300);
+            window.addEventListener('bcs-ai-rate-updated', syncUI);
+
+            document.getElementById('aiPageChatForm')?.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const val = document.getElementById('aiPageChatInput')?.value.trim();
+                handleSendMessage(val);
+            });
+
+            document.querySelectorAll('.prompt-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const p = card.getAttribute('data-prompt');
+                    handleSendMessage(p);
+                });
+            });
+
+            document.getElementById('aiPageClearChatBtn')?.addEventListener('click', () => {
+                const msgBox = document.getElementById('aiPageChatMessages');
+                if (msgBox) {
+                    msgBox.innerHTML = `
+                    <div class="msg-bubble assistant">
+                        Console cleared. How can I assist you with Baroda Computers And Sales?
+                    </div>`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
