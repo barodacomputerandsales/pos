@@ -10,13 +10,40 @@
  */
 
 (function() {
-    let currentAppVersion = '2.2.7';
+    let currentAppVersion = '2.2.9';
     let availableRemoteInfo = null;
     let downloadedUpdateInfo = null;
     let isIpcBound = false;
     let lastUserActivityTime = Date.now();
     let lastTypingTime = 0;
     let retryState = null;
+
+    function isOnSettingsPage() {
+        const path = (window.location.pathname || '').toLowerCase();
+        return path.endsWith('settings.html') || path.includes('settings.html');
+    }
+
+    function redirectToSettingsUpdater(autoStart = true) {
+        if (autoStart) {
+            try {
+                sessionStorage.setItem('bcs_auto_start_update', 'true');
+            } catch (e) {}
+        }
+        if (ipcRenderer) {
+            try {
+                ipcRenderer.send('download_update');
+            } catch (e) {}
+        }
+        if (!isOnSettingsPage()) {
+            window.location.href = 'settings.html#tab-updates';
+        } else {
+            const tabBtn = document.querySelector('button[data-bs-target="#tab-updates"]');
+            if (tabBtn && typeof bootstrap !== 'undefined') {
+                new bootstrap.Tab(tabBtn).show();
+            }
+            window.dispatchEvent(new CustomEvent('bcs-trigger-settings-update'));
+        }
+    }
 
     // Track user inputs to detect active billing / typing
     ['mousemove', 'mousedown', 'touchstart', 'scroll'].forEach(evt => {
@@ -450,7 +477,7 @@
             reviewBtn.addEventListener('click', () => {
                 const toast = document.getElementById('bcsModernUpdateToast');
                 if (toast) toast.remove();
-                window.openBcsUpdateModal(downloadedUpdateInfo || availableRemoteInfo);
+                redirectToSettingsUpdater(true);
             });
         }
     }
@@ -559,18 +586,21 @@
 
         document.getElementById('bcsAlertUpdateNowBtn').addEventListener('click', () => {
             document.getElementById('bcsSystemUpdateAlertModal').remove();
+            if (!isOnSettingsPage()) {
+                redirectToSettingsUpdater(true);
+                return;
+            }
             if (isDownloaded) {
                 window.captureBcsSessionSnapshot();
                 window.applyBcsUpdateAndRestart();
             } else {
-                window.openBcsUpdateModal(info);
-                if (ipcRenderer) ipcRenderer.send('download_update');
+                redirectToSettingsUpdater(true);
             }
         });
 
         document.getElementById('bcsAlertOpenSettingsBtn').addEventListener('click', () => {
             document.getElementById('bcsSystemUpdateAlertModal').remove();
-            window.location.href = 'settings.html#tab-updates';
+            redirectToSettingsUpdater(true);
         });
 
         document.getElementById('bcsAlertReinstallBtn').addEventListener('click', () => {
@@ -593,6 +623,15 @@
         }
 
         const fallbackMap = {
+            '2.2.9': `
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Smart Updater Redirect to Settings</strong>: Clicking Update on the popup banner automatically redirects to the Settings Software Updater hub and initiates the update cleanly.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Windows 11 OS Theme &amp; Accent Sync</strong>: Live synchronization with Windows 11 Dark/Light mode and system accent color.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Persistent Window Size &amp; State</strong>: Saves and restores your exact window dimensions, coordinates, and maximized state across restarts.</div></div>
+            `,
+            '2.2.8': `
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Windows 11 OS Theme &amp; Accent Sync</strong>: Live synchronization with Windows 11 Dark/Light mode and system accent color.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Persistent Window Size &amp; State</strong>: Saves and restores your exact window dimensions, coordinates, and maximized state across restarts.</div></div>
+            `,
             '2.2.7': `
                 <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">DirectWrite High-DPI Sharpness</strong>: Eliminated GPU compositor texture traps and blurriness across all cards and typography.</div></div>
                 <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Crystal-Clear Supplier UI</strong>: High-contrast solid slate panels with sharp readable field labels and bright input contrast.</div></div>
@@ -673,7 +712,7 @@
         const existing = document.getElementById('bcsModernUpdateModal');
         if (existing) existing.remove();
 
-        const targetVer = info && info.version ? info.version : currentAppVersion;
+        const targetVer = info && (info.version || info.latestVersion) ? (info.version || info.latestVersion) : currentAppVersion;
         const notesHtml = formatReleaseNotes(targetVer, info ? (info.releaseNotes || info.notes) : '');
 
         const modalHtml = `
@@ -797,8 +836,16 @@
         if (confirmBtn) {
             confirmBtn.addEventListener('click', () => {
                 window.closeBcsUpdateModal();
-                window.captureBcsSessionSnapshot();
-                window.applyBcsUpdateAndRestart();
+                if (!isOnSettingsPage()) {
+                    redirectToSettingsUpdater(true);
+                    return;
+                }
+                if (downloadedUpdateInfo) {
+                    window.captureBcsSessionSnapshot();
+                    window.applyBcsUpdateAndRestart();
+                } else {
+                    redirectToSettingsUpdater(true);
+                }
             });
         }
     };
