@@ -1,17 +1,16 @@
 /**
  * Baroda Computers And Sales - Enterprise Groq AI Copilot Engine
  * Features:
- * 1. Backend /api/ai/chat integration + Direct Groq Primary/Backup Key Failover
- * 2. Strict Hourly Rate Limit Enforcement (D1 Backend + Local Hourly Guard)
- * 3. Slide-over AI Copilot Drawer, Product Smart Autofill, and Business Insights
+ * 1. 100% Backend-Managed API Keys (/api/ai/chat) — Zero API keys stored in client code
+ * 2. Ultra-Low-Token Model (`openai/gpt-oss-20b` with `reasoning_effort: "low"`)
+ * 3. Strict 150 Requests / Hour Per-User Rate Limit Enforcement (Cloudflare D1 + Local Guard)
  */
 (function () {
     if (window.BCSAICopilot) return;
 
     const API_BASE_URL = 'https://backend.bcs.bcsdeveloper.com/api';
-    const PRIMARY_GROQ_KEY = ['gsk', 'kwGLGnK2Q95tUaSfOUkKWGdyb3FYZnS3sVg1tzN4ty0CAV1kcSNf'].join('_');
-    const BACKUP_GROQ_KEY  = ['gsk', '9r9zyK0p1ETSna9BQrAEWGdyb3FYNr1cuVAWdkbQC0HVnykWBqYc'].join('_');
-    const DEFAULT_HOURLY_LIMIT = 40;
+    const DEFAULT_HOURLY_LIMIT = 150;
+    const DEFAULT_LOW_TOKEN_MODEL = 'openai/gpt-oss-20b';
 
     function getCurrentHourBucket() {
         const now = new Date();
@@ -26,7 +25,13 @@
 
     function getLocalRateState() {
         const currentBucket = getCurrentHourBucket();
-        const customLimit = Number(localStorage.getItem('bcs_ai_hourly_limit')) || DEFAULT_HOURLY_LIMIT;
+        let rawLimit = Number(localStorage.getItem('bcs_ai_hourly_limit'));
+        // Auto-upgrade previous 40 default to 150 requests/hour per user
+        if (!rawLimit || rawLimit === 40) {
+            rawLimit = DEFAULT_HOURLY_LIMIT;
+            localStorage.setItem('bcs_ai_hourly_limit', String(DEFAULT_HOURLY_LIMIT));
+        }
+
         let stored = null;
         try {
             stored = JSON.parse(localStorage.getItem('bcs_ai_rate_bucket') || 'null');
@@ -36,112 +41,53 @@
             stored = {
                 hourBucket: currentBucket,
                 usedThisHour: 0,
+                tokensUsedThisHour: 0,
                 primaryHits: 0,
                 backupHits: 0,
-                lastKeyUsed: 'primary'
+                lastKeyUsed: 'primary',
+                primaryMasked: 'gsk_kwGL...cSNf',
+                backupMasked: 'gsk_9r9z...BqYc',
+                activeModel: DEFAULT_LOW_TOKEN_MODEL
             };
             localStorage.setItem('bcs_ai_rate_bucket', JSON.stringify(stored));
         }
 
-        const remaining = Math.max(0, customLimit - (stored.usedThisHour || 0));
+        const remaining = Math.max(0, rawLimit - (stored.usedThisHour || 0));
         return {
             hourBucket: currentBucket,
             usedThisHour: stored.usedThisHour || 0,
-            hourlyLimit: customLimit,
+            tokensUsedThisHour: stored.tokensUsedThisHour || 0,
+            hourlyLimit: rawLimit,
             remainingThisHour: remaining,
             primaryHitsThisHour: stored.primaryHits || 0,
             backupHitsThisHour: stored.backupHits || 0,
             lastKeyUsed: stored.lastKeyUsed || 'primary',
+            primaryMasked: stored.primaryMasked || 'gsk_kwGL...cSNf',
+            backupMasked: stored.backupMasked || 'gsk_9r9z...BqYc',
+            activeModel: stored.activeModel || DEFAULT_LOW_TOKEN_MODEL,
             isRateLimited: remaining <= 0,
             resetInMinutes: getResetMinutes()
         };
     }
 
-    function incrementLocalRateState(keySlot = 'primary') {
-        const state = getLocalRateState();
-        const updated = {
-            hourBucket: state.hourBucket,
-            usedThisHour: state.usedThisHour + 1,
-            primaryHits: state.primaryHitsThisHour + (keySlot === 'primary' ? 1 : 0),
-            backupHits: state.backupHitsThisHour + (keySlot === 'backup' ? 1 : 0),
-            lastKeyUsed: keySlot
-        };
-        localStorage.setItem('bcs_ai_rate_bucket', JSON.stringify(updated));
-        return getLocalRateState();
-    }
-
-    function syncServerRateState(serverRate) {
-        if (!serverRate || !serverRate.hourBucket) return getLocalRateState();
+    function syncServerRateState(serverRate, keysConfigured, activeModel) {
         const local = getLocalRateState();
-        const used = Math.max(local.usedThisHour, Number(serverRate.usedThisHour || 0));
+        if (serverRate && serverRate.hourlyLimit) {
+            localStorage.setItem('bcs_ai_hourly_limit', String(serverRate.hourlyLimit));
+        }
         const updated = {
-            hourBucket: serverRate.hourBucket,
-            usedThisHour: used,
-            primaryHits: Math.max(local.primaryHitsThisHour, Number(serverRate.primaryHitsThisHour || 0)),
-            backupHits: Math.max(local.backupHitsThisHour, Number(serverRate.backupHitsThisHour || 0)),
-            lastKeyUsed: local.lastKeyUsed || 'primary'
+            hourBucket: (serverRate && serverRate.hourBucket) ? serverRate.hourBucket : local.hourBucket,
+            usedThisHour: (serverRate && typeof serverRate.usedThisHour === 'number') ? serverRate.usedThisHour : local.usedThisHour,
+            tokensUsedThisHour: (serverRate && typeof serverRate.tokensUsedThisHour === 'number') ? serverRate.tokensUsedThisHour : local.tokensUsedThisHour,
+            primaryHits: (serverRate && typeof serverRate.primaryHitsThisHour === 'number') ? serverRate.primaryHitsThisHour : local.primaryHitsThisHour,
+            backupHits: (serverRate && typeof serverRate.backupHitsThisHour === 'number') ? serverRate.backupHitsThisHour : local.backupHitsThisHour,
+            lastKeyUsed: local.lastKeyUsed || 'primary',
+            primaryMasked: (keysConfigured && keysConfigured.primaryMasked) ? keysConfigured.primaryMasked : local.primaryMasked,
+            backupMasked: (keysConfigured && keysConfigured.backupMasked) ? keysConfigured.backupMasked : local.backupMasked,
+            activeModel: activeModel || local.activeModel || DEFAULT_LOW_TOKEN_MODEL
         };
         localStorage.setItem('bcs_ai_rate_bucket', JSON.stringify(updated));
         return getLocalRateState();
-    }
-
-    async function callDirectGroqWithFailover({ messages, model = 'openai/gpt-oss-120b', temperature = 0.5, max_tokens = 1024, jsonMode = false }) {
-        const payload = {
-            model,
-            messages,
-            temperature,
-            max_tokens
-        };
-        if (jsonMode) {
-            payload.response_format = { type: 'json_object' };
-        }
-
-        const attemptKey = async (apiKey, targetModel) => {
-            const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${apiKey}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ ...payload, model: targetModel || payload.model })
-            });
-            const data = await res.json().catch(() => ({}));
-            if (!res.ok) {
-                throw new Error(data?.error?.message || `Groq HTTP ${res.status}`);
-            }
-            return data;
-        };
-
-        try {
-            const data = await attemptKey(PRIMARY_GROQ_KEY, model);
-            return {
-                reply: data?.choices?.[0]?.message?.content || '',
-                model: data?.model || model,
-                keySlotUsed: 'primary',
-                failoverTriggered: false
-            };
-        } catch (primaryErr) {
-            console.warn('[BCS AI Copilot] Primary Groq key failed, switching to Backup key:', primaryErr.message);
-            try {
-                const data = await attemptKey(BACKUP_GROQ_KEY, model);
-                return {
-                    reply: data?.choices?.[0]?.message?.content || '',
-                    model: data?.model || model,
-                    keySlotUsed: 'backup',
-                    failoverTriggered: true,
-                    primaryError: primaryErr.message
-                };
-            } catch (backupErr) {
-                const data = await attemptKey(BACKUP_GROQ_KEY, 'openai/gpt-oss-20b');
-                return {
-                    reply: data?.choices?.[0]?.message?.content || '',
-                    model: data?.model || 'openai/gpt-oss-20b',
-                    keySlotUsed: 'backup',
-                    failoverTriggered: true,
-                    primaryError: primaryErr.message
-                };
-            }
-        }
     }
 
     function formatMarkdownSimple(text) {
@@ -165,9 +111,37 @@
             return getLocalRateState();
         },
 
-        setHourlyLimit(newLimit) {
-            const num = Math.max(5, Math.min(500, Number(newLimit) || DEFAULT_HOURLY_LIMIT));
+        async updateBackendConfig({ primaryApiKey = '', backupApiKey = '', hourlyUserLimit = 150, defaultModel = DEFAULT_LOW_TOKEN_MODEL }) {
+            const num = Math.max(10, Math.min(2000, Number(hourlyUserLimit) || DEFAULT_HOURLY_LIMIT));
             localStorage.setItem('bcs_ai_hourly_limit', String(num));
+
+            const res = await fetch(`${API_BASE_URL}/ai/chat`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': 'backend-bcs-pos',
+                    'x-session-id': localStorage.getItem('sessionId') || '',
+                    'x-session-port': localStorage.getItem('sessionPort') || ''
+                },
+                body: JSON.stringify({
+                    primaryApiKey: primaryApiKey ? primaryApiKey.trim() : undefined,
+                    backupApiKey: backupApiKey ? backupApiKey.trim() : undefined,
+                    hourlyUserLimit: num,
+                    defaultModel
+                })
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok || !data.success) {
+                throw new Error(data.error || 'Failed to update backend AI configuration');
+            }
+            await this.fetchRemoteStatus();
+            return data;
+        },
+
+        setHourlyLimit(newLimit) {
+            const num = Math.max(10, Math.min(2000, Number(newLimit) || DEFAULT_HOURLY_LIMIT));
+            localStorage.setItem('bcs_ai_hourly_limit', String(num));
+            this.updateBackendConfig({ hourlyUserLimit: num }).catch(() => {});
             this.updateStatusUI();
             return this.getRateStatus();
         },
@@ -186,7 +160,7 @@
                 if (res.ok) {
                     const data = await res.json();
                     if (data && data.rateLimit) {
-                        syncServerRateState(data.rateLimit);
+                        syncServerRateState(data.rateLimit, data.keysConfigured, data.activeModel);
                         this.updateStatusUI();
                     }
                 }
@@ -194,117 +168,52 @@
             return this.getRateStatus();
         },
 
-        async ask({ prompt = '', task = 'chat', contextData = null, model = 'openai/gpt-oss-120b', temperature = 0.5 }) {
+        async ask({ prompt = '', task = 'chat', contextData = null, model = DEFAULT_LOW_TOKEN_MODEL, temperature = 0.3 }) {
             const rateBefore = this.getRateStatus();
             if (rateBefore.isRateLimited) {
-                throw new Error(`Hourly AI Rate Limit reached (${rateBefore.hourlyLimit}/${rateBefore.hourlyLimit} requests this hour). Quota resets in ${rateBefore.resetInMinutes} min.`);
+                throw new Error(`Hourly AI Rate Limit reached (${rateBefore.hourlyLimit}/${rateBefore.hourlyLimit} requests/hour for your account). Quota resets in ${rateBefore.resetInMinutes} min.`);
             }
 
-            let systemPrompt = `You are "BCS AI Copilot", the intelligent business & POS assistant built into Baroda Computers And Sales Enterprise POS PRO Max.
-- Help shop owners and staff manage inventory, products, multi-unit pricing (PCS, Box, Kg, Liter, Packet; Normal vs Shop customer pricing), purchases, production, suppliers, and sales.
-- Always use Bangladeshi Taka (৳ / BDT) when discussing currency.
-- Keep responses concise, accurate, and actionable.`;
-
-            if (task === 'product_autofill') {
-                systemPrompt = `You are the BCS Product Intelligence AI for Baroda Computers And Sales.
-Given a product name, category, brand, unit, or buy price, return ONLY a valid JSON object with these keys:
-{
-  "category": "Suggested category name",
-  "brand": "Suggested brand name if identifiable or empty string",
-  "description": "Concise, professional 2-sentence product description highlighting quality and use-case",
-  "suggestedMargins": {
-    "wholesaleNormalPct": 12,
-    "wholesaleShopPct": 8,
-    "sellNormalPct": 25,
-    "sellShopPct": 18
-  }
-}`;
-            } else if (task === 'business_insights') {
-                systemPrompt = `You are the BCS Executive Business Analyst AI for Baroda Computers And Sales.
-Analyze the provided live POS store metrics and provide:
-1. **Executive Summary** (1-2 sentences)
-2. **Inventory & Restock Alerts** (low-stock or high-priority items)
-3. **Revenue & Pricing Action Plan** (3 concrete recommendations in ৳ BDT).`;
-            }
-
-            // 1. Try Cloudflare D1 Backend Microservice (/api/ai/chat) first
-            try {
-                const res = await fetch(`${API_BASE_URL}/ai/chat`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-api-key': 'backend-bcs-pos',
-                        'x-session-id': localStorage.getItem('sessionId') || '',
-                        'x-session-port': localStorage.getItem('sessionPort') || ''
-                    },
-                    body: JSON.stringify({
-                        prompt,
-                        messages: task === 'chat' ? this.history.slice(-10) : [],
-                        task,
-                        contextData,
-                        model,
-                        temperature
-                    })
-                });
-
-                if (res.status === 429) {
-                    const errData = await res.json().catch(() => ({}));
-                    if (errData.rateLimit) syncServerRateState(errData.rateLimit);
-                    this.updateStatusUI();
-                    throw new Error(errData.error || 'Hourly AI Rate Limit reached.');
-                }
-
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data && data.success) {
-                        incrementLocalRateState(data.keySlotUsed || 'primary');
-                        if (data.rateLimit) syncServerRateState(data.rateLimit);
-                        this.updateStatusUI();
-                        return data;
-                    }
-                }
-            } catch (backendErr) {
-                if (String(backendErr.message || '').toLowerCase().includes('rate limit')) {
-                    throw backendErr;
-                }
-                console.warn('[BCS AI Copilot] Backend endpoint unreachable or deploying, using direct Dual-Key Groq Failover Engine:', backendErr.message);
-            }
-
-            // 2. Client-side Dual-Key Groq Failover fallback (Primary -> Backup Key)
-            const messages = [{ role: 'system', content: systemPrompt }];
-            if (contextData) {
-                messages.push({
-                    role: 'system',
-                    content: `Live BCS POS Context Data:\n${typeof contextData === 'string' ? contextData : JSON.stringify(contextData).slice(0, 10000)}`
-                });
-            }
-            if (task === 'chat' && this.history.length > 0) {
-                for (const m of this.history.slice(-10)) {
-                    messages.push({ role: m.role, content: m.content });
-                }
-            }
-            if (prompt) {
-                messages.push({ role: 'user', content: prompt });
-            }
-
-            const directResult = await callDirectGroqWithFailover({
-                messages,
-                model,
-                temperature,
-                jsonMode: task === 'product_autofill'
+            // All AI requests & API keys are strictly managed on the Cloudflare Backend (/api/ai/chat)
+            const res = await fetch(`${API_BASE_URL}/ai/chat`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': 'backend-bcs-pos',
+                    'x-session-id': localStorage.getItem('sessionId') || '',
+                    'x-session-port': localStorage.getItem('sessionPort') || ''
+                },
+                body: JSON.stringify({
+                    prompt,
+                    messages: task === 'chat' ? this.history.slice(-4) : [],
+                    task,
+                    contextData,
+                    model,
+                    temperature,
+                    max_tokens: 350
+                })
             });
 
-            const updatedRate = incrementLocalRateState(directResult.keySlotUsed);
-            this.updateStatusUI();
+            const data = await res.json().catch(() => ({}));
 
-            return {
-                success: true,
-                reply: directResult.reply,
-                model: directResult.model,
-                keySlotUsed: directResult.keySlotUsed,
-                failoverTriggered: directResult.failoverTriggered,
-                rateLimit: updatedRate
-            };
+            if (res.status === 429) {
+                if (data.rateLimit) syncServerRateState(data.rateLimit);
+                this.updateStatusUI();
+                throw new Error(data.error || 'Hourly AI Rate Limit (150 reqs/hr) reached.');
+            }
+
+            if (!res.ok || !data.success) {
+                throw new Error(data.error || `Backend AI Error (${res.status})`);
+            }
+
+            if (data.rateLimit) {
+                const local = getLocalRateState();
+                local.lastKeyUsed = data.keySlotUsed || 'primary';
+                localStorage.setItem('bcs_ai_rate_bucket', JSON.stringify(local));
+                syncServerRateState(data.rateLimit, null, data.model);
+            }
+            this.updateStatusUI();
+            return data;
         },
 
         updateStatusUI() {
@@ -320,7 +229,7 @@ Analyze the provided live POS store metrics and provide:
             if (topbarQuota) topbarQuota.textContent = `${rate.remainingThisHour}/hr`;
 
             if (drawerQuotaText) {
-                drawerQuotaText.textContent = `${rate.remainingThisHour} of ${rate.hourlyLimit} reqs left this hour (resets in ${rate.resetInMinutes}m)`;
+                drawerQuotaText.textContent = `${rate.remainingThisHour} of ${rate.hourlyLimit} reqs left/hr • ${rate.tokensUsedThisHour || 0} tok (resets in ${rate.resetInMinutes}m)`;
             }
             if (drawerQuotaBar) {
                 const pct = Math.max(0, Math.min(100, Math.round((rate.remainingThisHour / rate.hourlyLimit) * 100)));
@@ -331,8 +240,8 @@ Analyze the provided live POS store metrics and provide:
                 const isBackup = rate.lastKeyUsed === 'backup';
                 drawerKeyBadge.className = `badge ${isBackup ? 'bg-warning text-dark' : 'bg-success bg-opacity-25 text-success border border-success border-opacity-25'}`;
                 drawerKeyBadge.innerHTML = isBackup
-                    ? '<i class="bi bi-shield-check me-1"></i>Backup Key Active'
-                    : '<i class="bi bi-lightning-charge-fill me-1"></i>Primary + Backup Ready';
+                    ? '<i class="bi bi-shield-check me-1"></i>Backend Backup Key Active'
+                    : '<i class="bi bi-cloud-check-fill me-1"></i>Backend Dual-Key Vault';
             }
 
             window.dispatchEvent(new CustomEvent('bcs-ai-rate-updated', { detail: rate }));
@@ -363,10 +272,10 @@ Analyze the provided live POS store metrics and provide:
                             <div class="fw-bold d-flex align-items-center gap-2" style="font-size: 0.96rem;">
                                 BCS Groq AI Copilot
                                 <span id="bcsAiKeyStatusBadge" class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25" style="font-size: 0.65rem;">
-                                    <i class="bi bi-lightning-charge-fill me-1"></i>Primary + Backup Ready
+                                    <i class="bi bi-cloud-check-fill me-1"></i>Backend Dual-Key Vault
                                 </span>
                             </div>
-                            <div class="text-muted" style="font-size: 0.73rem;">Groq LPU • Dual-Key Failover • Hourly Rate Protected</div>
+                            <div class="text-muted" style="font-size: 0.72rem;">Low-Token Engine (<code>gpt-oss-20b</code>) • 150 Reqs/Hr Per User</div>
                         </div>
                     </div>
                     <div class="d-flex align-items-center gap-1">
@@ -381,8 +290,8 @@ Analyze the provided live POS store metrics and provide:
 
                 <div class="bcs-ai-rate-bar">
                     <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="fw-semibold"><i class="bi bi-speedometer2 me-1 text-info"></i>Hourly Rate Limit Guard</span>
-                        <span id="bcsAiDrawerQuotaText" class="text-muted">${rate.remainingThisHour} of ${rate.hourlyLimit} reqs left this hour (resets in ${rate.resetInMinutes}m)</span>
+                        <span class="fw-semibold"><i class="bi bi-speedometer2 me-1 text-info"></i>Per-User Rate Limit (150/hr)</span>
+                        <span id="bcsAiDrawerQuotaText" class="text-muted">${rate.remainingThisHour} of ${rate.hourlyLimit} reqs left/hr • ${rate.tokensUsedThisHour || 0} tok (resets in ${rate.resetInMinutes}m)</span>
                     </div>
                     <div class="progress" style="height: 5px; background: rgba(255,255,255,0.1);">
                         <div id="bcsAiDrawerQuotaBar" class="progress-bar bg-info" role="progressbar" style="width: ${Math.round((rate.remainingThisHour / rate.hourlyLimit) * 100)}%;"></div>
@@ -391,7 +300,7 @@ Analyze the provided live POS store metrics and provide:
 
                 <div id="bcsAiMessages" class="bcs-ai-messages">
                     <div class="bcs-ai-msg assistant">
-                        <div>👋 Hello! I'm <strong>BCS Groq AI Copilot</strong>. I'm connected with <strong>Primary + Automatic Backup Groq Keys</strong> and protected by an hourly rate limit guard.</div>
+                        <div>👋 Hello! I'm <strong>BCS Groq AI Copilot</strong>. My Primary &amp; Backup Groq keys are securely managed on your Cloudflare Backend using the ultra-low-token <code>openai/gpt-oss-20b</code> engine (<strong>150 requests/hour per user</strong>).</div>
                         <div class="mt-2 small opacity-75">Ask me about product pricing, inventory alerts, profit margins, or shop operations!</div>
                     </div>
                 </div>
@@ -400,7 +309,7 @@ Analyze the provided live POS store metrics and provide:
                     <button type="button" class="bcs-ai-chip" data-prompt="Analyze our current store inventory and suggest restock priorities.">📦 Inventory Check</button>
                     <button type="button" class="bcs-ai-chip" data-prompt="Suggest optimal wholesale and retail profit margins for computer & stationery items in BDT (৳).">💰 Margin Advisor</button>
                     <button type="button" class="bcs-ai-chip" data-prompt="Give me 3 actionable ideas to boost daily POS & wholesale sales this week.">📈 Boost Sales</button>
-                    <button type="button" class="bcs-ai-chip" data-prompt="Write a professional promotional message for our regular shop customers.">📣 Promo Copy</button>
+                    <button type="button" class="bcs-ai-chip" data-prompt="Write a short promotional message for our regular shop customers.">📣 Promo Copy</button>
                 </div>
 
                 <form id="bcsAiForm" class="bcs-ai-footer">
@@ -496,7 +405,7 @@ Analyze the provided live POS store metrics and provide:
                 msgBox.insertAdjacentHTML('beforeend', `
                     <div id="${loadingId}" class="bcs-ai-msg assistant">
                         <span class="spinner-border spinner-border-sm text-info me-2" role="status"></span>
-                        Thinking with Groq LPU...
+                        Running low-token Groq inference on backend...
                     </div>
                 `);
                 msgBox.scrollTop = msgBox.scrollHeight;
@@ -519,14 +428,15 @@ Analyze the provided live POS store metrics and provide:
                 const keyBadge = res.keySlotUsed === 'backup'
                     ? '<span class="badge bg-warning text-dark">Backup Key Failover</span>'
                     : '<span class="badge bg-info bg-opacity-25 text-info">Primary Key</span>';
+                const tokCount = res.usage?.total_tokens ? `${res.usage.total_tokens} tok` : 'low-token';
 
                 if (loaderEl) {
                     loaderEl.innerHTML = `
                         <div>${formatMarkdownSimple(res.reply)}</div>
                         <div class="bcs-ai-msg-meta">
                             ${keyBadge}
-                            <span>• ${res.model || 'openai/gpt-oss-120b'}</span>
-                            <span>• ${this.getRateStatus().remainingThisHour} reqs left/hr</span>
+                            <span>• ${res.model || DEFAULT_LOW_TOKEN_MODEL} (${tokCount})</span>
+                            <span>• ${this.getRateStatus().remainingThisHour} left/hr</span>
                         </div>
                     `;
                 }
