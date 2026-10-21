@@ -30,6 +30,11 @@ function loadGlobalUpdater() {
     loadScript('updater').catch(() => {});
 }
 
+function loadGlobalAICopilot() {
+    loadCss('ai-copilot');
+    loadScript('ai-copilot').catch(() => {});
+}
+
 function loadGlobalLoader() {
     if (!document.querySelector('script[src*="template/loader/loader-1.js"]')) {
         const script = document.createElement('script');
@@ -38,10 +43,11 @@ function loadGlobalLoader() {
     }
 }
 
-// Auto-inject global styling, icons, animation engine, holographic auto-updater, and neon laser loader
+// Auto-inject global styling, icons, animation engine, holographic auto-updater, Groq AI Copilot, and neon laser loader
 loadGlobalIcons();
 loadGlobalAnimations();
 loadGlobalUpdater();
+loadGlobalAICopilot();
 loadGlobalLoader();
 
 function loadScript(name) {

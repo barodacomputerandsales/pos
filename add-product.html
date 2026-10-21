@@ -101,7 +101,12 @@
             <div class="card shadow-sm border-secondary">
                 <div class="card-body p-4">
                     <form id="addProductForm">
-                        <h5 class="mb-3 text-muted">Basic Information</h5>
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                            <h5 class="mb-0 text-muted">Basic Information</h5>
+                            <button type="button" id="aiSmartFillProductBtn" class="btn btn-sm d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill text-white fw-semibold" style="background: linear-gradient(135deg, #6366f1, #00e5ff); border: none; box-shadow: 0 4px 15px rgba(0, 229, 255, 0.25);">
+                                <i class="bi bi-stars"></i> ✨ AI Smart Fill (Category, Pricing &amp; Description)
+                            </button>
+                        </div>
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label for="productName" class="form-label">1. Product Name</label>
@@ -931,6 +936,85 @@
             }
 
             init();
+
+            // --- Groq AI Smart Fill Handler ---
+            document.getElementById('aiSmartFillProductBtn')?.addEventListener('click', async function () {
+                const productName = document.getElementById('productName')?.value.trim();
+                if (!productName) {
+                    showCustomAlert('Missing Product Name', 'Please enter a Product Name first so Groq AI can suggest category, pricing & description.', 'error');
+                    document.getElementById('productName')?.focus();
+                    return;
+                }
+                if (!window.BCSAICopilot) {
+                    showCustomAlert('AI Loading', 'BCS AI Copilot is initializing, please try again in a moment.', 'error');
+                    return;
+                }
+
+                const btn = this;
+                const origHtml = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Groq AI Thinking...';
+
+                try {
+                    const unit = document.getElementById('unit')?.value || 'Pcs';
+                    const brand = document.getElementById('brand')?.value || '';
+                    const category = document.getElementById('category')?.value || '';
+                    const res = await window.BCSAICopilot.ask({
+                        prompt: `Product Name: "${productName}", Current Brand: "${brand}", Current Category: "${category}", Unit: "${unit}"`,
+                        task: 'product_autofill'
+                    });
+
+                    let parsed = {};
+                    try {
+                        const raw = String(res.reply || '').replace(/```json|```/gi, '').trim();
+                        parsed = JSON.parse(raw);
+                    } catch (e) {}
+
+                    const catInput = document.getElementById('category');
+                    const brandInput = document.getElementById('brand');
+                    const descInput = document.getElementById('description');
+
+                    if (parsed.category && catInput && !catInput.value.trim()) {
+                        catInput.value = parsed.category;
+                    }
+                    if (parsed.brand && brandInput && !brandInput.value.trim()) {
+                        brandInput.value = parsed.brand;
+                    }
+                    if (parsed.description && descInput) {
+                        descInput.value = parsed.description;
+                    }
+
+                    // If a buy price is entered, auto-calculate suggested wholesale & retail prices
+                    const margins = parsed.suggestedMargins || { wholesaleNormalPct: 12, wholesaleShopPct: 8, sellNormalPct: 25, sellShopPct: 18 };
+                    const applyMarginSet = (buyId, wnId, wsId, snId, ssId) => {
+                        const buyVal = parseFloat(document.getElementById(buyId)?.value || '0');
+                        if (buyVal > 0) {
+                            const wnEl = document.getElementById(wnId);
+                            const wsEl = document.getElementById(wsId);
+                            const snEl = document.getElementById(snId);
+                            const ssEl = document.getElementById(ssId);
+                            if (wnEl && !wnEl.value) wnEl.value = Math.round(buyVal * (1 + (margins.wholesaleNormalPct || 12) / 100));
+                            if (wsEl && !wsEl.value) wsEl.value = Math.round(buyVal * (1 + (margins.wholesaleShopPct || 8) / 100));
+                            if (snEl && !snEl.value) snEl.value = Math.round(buyVal * (1 + (margins.sellNormalPct || 25) / 100));
+                            if (ssEl && !ssEl.value) ssEl.value = Math.round(buyVal * (1 + (margins.sellShopPct || 18) / 100));
+                        }
+                    };
+
+                    if (unit === 'Box') applyMarginSet('buyPriceBox', 'wholesalePriceBoxNormal', 'wholesalePriceBoxShop', 'sellPriceBoxNormal', 'sellPriceBoxShop');
+                    else if (unit === 'Kg') applyMarginSet('buyPriceKg', 'wholesalePriceKgNormal', 'wholesalePriceKgShop', 'sellPriceKgNormal', 'sellPriceKgShop');
+                    else if (unit === 'Liter') applyMarginSet('buyPriceLiter', 'wholesalePriceLiterNormal', 'wholesalePriceLiterShop', 'sellPriceLiterNormal', 'sellPriceLiterShop');
+                    else if (unit === 'Packet') applyMarginSet('buyPricePacket', 'wholesalePricePacketNormal', 'wholesalePricePacketShop', 'sellPricePacketNormal', 'sellPricePacketShop');
+                    else applyMarginSet('buyPrice', 'wholesalePriceNormal', 'wholesalePriceShop', 'sellPriceNormal', 'sellPriceShop');
+
+                    const keyLabel = res.keySlotUsed === 'backup' ? 'Backup Groq Key Failover' : 'Primary Groq Key';
+                    showCustomAlert('Groq AI Smart Fill Complete', `Filled product metadata via ${keyLabel} (${window.BCSAICopilot.getRateStatus().remainingThisHour} reqs left this hour).`, 'success');
+                } catch (err) {
+                    showCustomAlert('AI Smart Fill Notice', err.message, 'error');
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = origHtml;
+                }
+            });
         });
     </script>
 </body>

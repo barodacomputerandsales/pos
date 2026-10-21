@@ -188,10 +188,26 @@
             <div class="col-lg-4">
                 <div class="stat-card">
                     <h5 class="fw-bold mb-3">Quick Actions</h5>
-                    <div class="d-flex flex-column gap-2">
+                    <div class="d-flex flex-column gap-2 mb-4">
                         <a href="add-product.html" class="btn btn-primary text-start" data-permission="add_product"><i class="bi bi-plus-circle me-2"></i> Add New Product</a>
                         <a href="add-purchase.html" class="btn btn-info text-start text-white" data-permission="add_purchase"><i class="bi bi-bag-check me-2"></i> Record Purchase</a>
                         <a href="add-production.html" class="btn btn-secondary text-start" data-permission="add_production"><i class="bi bi-gear-wide-connected me-2"></i> Record Production</a>
+                    </div>
+
+                    <div class="p-3 rounded-4 border" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.14), rgba(0, 229, 255, 0.08)); border-color: rgba(0, 229, 255, 0.3) !important;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-bold d-flex align-items-center gap-2"><i class="bi bi-stars text-info"></i> Groq AI Business Insights</span>
+                            <span class="badge bg-info bg-opacity-25 text-info border border-info border-opacity-25" style="font-size: 0.68rem;">Dual-Key Failover</span>
+                        </div>
+                        <p class="small text-muted mb-3" id="aiDashboardInsightOutput">Analyze live store inventory, low-stock items, and pricing opportunities with Groq LPU AI.</p>
+                        <div class="d-flex gap-2">
+                            <button type="button" id="generateAiInsightsBtn" class="btn btn-sm btn-info text-white fw-semibold flex-grow-1">
+                                <i class="bi bi-lightning-charge-fill me-1"></i> Generate Live Insights
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-light" onclick="if(window.BCSAICopilot) window.BCSAICopilot.open();" title="Open Full AI Copilot">
+                                <i class="bi bi-chat-dots-fill"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -233,6 +249,27 @@
                 document.getElementById('totalSales').textContent = sales.length;
                 document.getElementById('totalUsers').textContent = users.length;
 
+                // Expose live context for BCS Groq AI Copilot & Business Insights
+                const lowStockItems = products
+                    .filter(p => Number(p.quantity || 0) <= Number(p.alertQuantity || 5))
+                    .slice(0, 12)
+                    .map(p => ({ name: p.name, category: p.category, stock: p.quantity || 0, sellPrice: p.sellPrice || 0 }));
+
+                window.BCS_LIVE_DASHBOARD_CONTEXT = {
+                    totalProducts: products.length,
+                    totalPurchases: purchases.length,
+                    totalSales: sales.length,
+                    lowStockCount: lowStockItems.length,
+                    lowStockSample: lowStockItems,
+                    recentProductsSample: products.slice(-8).map(p => ({
+                        name: p.name,
+                        category: p.category,
+                        buyPrice: p.buyPrice,
+                        sellPrice: p.sellPrice,
+                        stock: p.quantity || 0
+                    }))
+                };
+
                 // Update Recent Products Table
                 const tbody = document.getElementById('recentProductsTable');
                 if (products.length === 0) {
@@ -264,6 +301,40 @@
         } else {
             loadDashboardData();
         }
+
+        document.getElementById('generateAiInsightsBtn')?.addEventListener('click', async function() {
+            const btn = this;
+            const outEl = document.getElementById('aiDashboardInsightOutput');
+            if (!window.BCSAICopilot || !outEl) return;
+
+            btn.disabled = true;
+            const origHtml = btn.innerHTML;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Analyzing...';
+            outEl.innerHTML = '<span class="text-info"><i class="bi bi-cpu me-1"></i>Running Groq LPU analysis on live inventory & sales...</span>';
+
+            try {
+                const res = await window.BCSAICopilot.ask({
+                    prompt: 'Generate an executive business insight summary, restock alert list, and pricing recommendations based on our live store metrics.',
+                    task: 'business_insights',
+                    contextData: window.BCS_LIVE_DASHBOARD_CONTEXT || {}
+                });
+                const formatted = String(res.reply || '')
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-light">$1</strong>')
+                    .replace(/\n/g, '<br>');
+                const keyBadge = res.keySlotUsed === 'backup'
+                    ? '<span class="badge bg-warning text-dark ms-1">Backup Key</span>'
+                    : '<span class="badge bg-success bg-opacity-25 text-success ms-1">Primary Key</span>';
+                outEl.innerHTML = `<div class="text-light" style="max-height: 220px; overflow-y: auto; font-size: 0.82rem; line-height: 1.5;">${formatted}</div><div class="mt-2 small text-muted">Completed via Groq ${keyBadge}</div>`;
+            } catch (err) {
+                outEl.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>${err.message}</span>`;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = origHtml;
+            }
+        });
     </script>
 </body>
 </html>
