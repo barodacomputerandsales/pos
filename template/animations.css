@@ -41,8 +41,28 @@
 /* High-DPI Sharp Typography: Avoid persistent will-change: transform on root container */
 .main-content {
     animation: bcsViewEntrance var(--bcs-dur-smooth) var(--bcs-ease-out-expo) forwards;
-    -webkit-font-smoothing: subpixel-antialiased;
-    text-rendering: geometricPrecision;
+    -webkit-font-smoothing: subpixel-antialiased !important;
+    text-rendering: geometricPrecision !important;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+/* Force crisp, crystal-clear text across all cards and solid containers (Never blurry) */
+.stat-card,
+.glass-card,
+.solid-panel,
+.card,
+.topbar,
+.sidebar,
+.table-custom,
+table,
+body,
+button,
+input,
+select,
+textarea {
+    -webkit-font-smoothing: subpixel-antialiased !important;
+    text-rendering: geometricPrecision !important;
 }
 
 @keyframes bcsViewEntrance {

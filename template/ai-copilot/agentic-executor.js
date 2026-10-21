@@ -1,8 +1,4 @@
-/**
- * Baroda Computers And Sales - Agentic Action Dispatcher
- * Executes database operations initiated by BCS Groq AI Copilot
- * (Add Product, Update Product, Add Supplier, Update Supplier, Restock)
- */
+
 (function() {
     if (window.BCSAgenticExecutor) return;
 

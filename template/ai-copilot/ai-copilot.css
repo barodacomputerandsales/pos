@@ -3,24 +3,7 @@
    ========================================================================== */
 
 .bcs-ai-fab {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    z-index: 9980;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 18px;
-    border-radius: 999px;
-    background: linear-gradient(135deg, var(--win-accent, #6366f1), #00e5ff);
-    color: #ffffff;
-    font-weight: 700;
-    font-size: 0.9rem;
-    border: 1px solid rgba(255, 255, 255, 0.28);
-    box-shadow: 0 10px 28px rgba(var(--win-accent-rgb, 99, 102, 241), 0.45), 0 0 18px rgba(0, 229, 255, 0.35);
-    cursor: pointer;
-    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease;
-    user-select: none;
+    display: none !important;
 }
 
 .bcs-ai-fab:hover {

@@ -254,12 +254,6 @@
             const rate = this.getRateStatus();
 
             const html = `
-            <button type="button" id="bcsAiFabBtn" class="bcs-ai-fab" title="Open BCS Groq AI Copilot (Ctrl+Shift+A)">
-                <i class="bi bi-stars fs-5"></i>
-                <span>BCS AI</span>
-                <span id="bcsAiFabQuota" class="bcs-ai-fab-quota">${rate.remainingThisHour}/${rate.hourlyLimit}/hr</span>
-            </button>
-
             <div id="bcsAiBackdrop" class="bcs-ai-drawer-backdrop"></div>
 
             <aside id="bcsAiCopilotDrawer" class="bcs-ai-drawer" aria-label="BCS Groq AI Copilot">
