@@ -35,29 +35,60 @@
     window.BCSAgenticExecutor = {
         parseActionsFromText(text) {
             if (!text || typeof text !== 'string') return [];
-            const actionRegex = /<<<ACTION\s*([\s\S]*?)\s*ACTION>>>/gi;
             const actions = [];
+
+            // Pattern 1: Exact delimiter tags <<<ACTION ... ACTION>>>
+            const tagRegex = /<<<ACTION\s*([\s\S]*?)\s*ACTION>>>/gi;
             let match;
-            while ((match = actionRegex.exec(text)) !== null) {
+            while ((match = tagRegex.exec(text)) !== null) {
                 try {
                     const rawJson = match[1].trim();
                     const parsed = JSON.parse(rawJson);
                     if (parsed && parsed.action) {
-                        actions.push({
-                            ...parsed,
-                            rawTag: match[0]
-                        });
+                        actions.push(parsed);
                     }
                 } catch (e) {
-                    console.warn('[BCS Agentic] Failed to parse action block JSON:', e);
+                    console.warn('[BCS Agentic] Delimiter JSON parse failed:', e);
                 }
             }
+
+            // Pattern 2: Markdown fenced code blocks ```json { "action": ... } ```
+            if (actions.length === 0) {
+                const fenceRegex = /```(?:json)?\s*(\{[\s\S]*?"action"[\s\S]*?\})\s*```/gi;
+                let fenceMatch;
+                while ((fenceMatch = fenceRegex.exec(text)) !== null) {
+                    try {
+                        const parsed = JSON.parse(fenceMatch[1].trim());
+                        if (parsed && parsed.action) {
+                            actions.push(parsed);
+                        }
+                    } catch (e) {}
+                }
+            }
+
+            // Pattern 3: Raw standalone JSON object containing an "action" key
+            if (actions.length === 0) {
+                const rawRegex = /(\{\s*"action"\s*:\s*"(?:add_product|update_product|add_supplier|update_supplier)"[\s\S]*?\})/gi;
+                let rawMatch;
+                while ((rawMatch = rawRegex.exec(text)) !== null) {
+                    try {
+                        const parsed = JSON.parse(rawMatch[1].trim());
+                        if (parsed && parsed.action) {
+                            actions.push(parsed);
+                        }
+                    } catch (e) {}
+                }
+            }
+
             return actions;
         },
 
         cleanTextResponse(text) {
             if (!text || typeof text !== 'string') return '';
-            return text.replace(/<<<ACTION\s*[\s\S]*?\s*ACTION>>>/gi, '').trim();
+            return text
+                .replace(/<<<ACTION\s*[\s\S]*?\s*ACTION>>>/gi, '')
+                .replace(/```(?:json)?\s*\{[\s\S]*?"action"[\s\S]*?\}\s*```/gi, '')
+                .trim();
         },
 
         async executeAction(actionObj) {

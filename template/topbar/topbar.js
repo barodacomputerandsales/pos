@@ -4,9 +4,16 @@ window._renderTopbarImpl = function() {
         <div class="d-flex align-items-center gap-2 flex-shrink-0">
             <img src="assets/icon.png" onerror="this.src='template/bcs-logo.svg'" alt="BCS" style="width: 36px; height: 36px; border-radius: 9px; object-fit: contain; filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.45));">
             <h4 class="mb-0 fw-bold fs-5 text-nowrap" style="background: linear-gradient(135deg, #00e5ff, var(--win-accent, #6366f1)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">BCS Enterprise</h4>
-            <span id="topbarVersionBadge" class="badge bg-secondary bg-opacity-25 text-muted border border-secondary border-opacity-25 small" style="font-size: 0.72rem;">v2.3.6</span>
+            <span id="topbarVersionBadge" class="badge bg-secondary bg-opacity-25 text-muted border border-secondary border-opacity-25 small" style="font-size: 0.72rem;">v2.3.7</span>
             <div id="topbarUpdateContainer" class="d-inline-flex align-items-center ms-2"></div>
         </div>
+
+        <!-- Quick Link Search Bar (Ctrl+K Internal Fast Search Trigger) -->
+        <button type="button" id="topbarSpotlightSearchBtn" class="btn btn-sm d-none d-md-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mx-2" style="background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.12); color: #94a3b8; font-size: 0.78rem;" onclick="if(window.BCSSpotlightSearch) window.BCSSpotlightSearch.toggle();" title="Search pages, products, suppliers (Ctrl+K)">
+            <i class="bi bi-search text-info" style="font-size: 0.8rem;"></i>
+            <span>Search or jump to...</span>
+            <span class="badge bg-secondary bg-opacity-25 text-light px-1 py-0" style="font-size: 0.65rem; font-family: monospace;">Ctrl+K</span>
+        </button>
 
         <div class="d-flex align-items-center gap-2 flex-nowrap" style="min-width: 0;">
             <!-- Live Date & 12-Hour Time with Seconds Clock (DD/MM/YYYY hh:mm:ss AM/PM) -->

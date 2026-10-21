@@ -47,11 +47,17 @@ function loadGlobalLoader() {
     }
 }
 
-// Auto-inject global styling, icons, animation engine, holographic auto-updater, Groq AI Copilot, and neon laser loader
+function loadGlobalSpotlightSearch() {
+    loadCss('spotlight-search');
+    loadScript('spotlight-search').catch(() => {});
+}
+
+// Auto-inject global styling, icons, animation engine, holographic auto-updater, Groq AI Copilot, spotlight search, and neon laser loader
 loadGlobalIcons();
 loadGlobalAnimations();
 loadGlobalUpdater();
 loadGlobalAICopilot();
+loadGlobalSpotlightSearch();
 loadGlobalLoader();
 
 function loadScript(name) {
