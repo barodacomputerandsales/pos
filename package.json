@@ -1,6 +1,6 @@
 {
     "name": "bcs-enterprise-pos",
-    "version": "2.3.7",
+    "version": "2.3.8",
     "description": "BCS Enterprise POS PRO Max",
     "author": "BCS Developer",
     "main": "main.js",
@@ -13,6 +13,7 @@
     },
     "dependencies": {
         "acorn": "^8.19.0",
+        "chart.js": "^4.5.1",
         "electron-updater": "^6.8.9"
     },
     "devDependencies": {

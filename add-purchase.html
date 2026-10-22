@@ -255,23 +255,29 @@
                         <!-- 2. Purchase Items Table Card -->
                         <div class="glass-panel p-4 mb-4">
                             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-                                <h5 class="fw-bold mb-0 d-flex align-items-center gap-2 text-info">
-                                    <i class="bi bi-cart4"></i> Purchased Items &amp; Inventory Products
-                                </h5>
+                                <div>
+                                    <h5 class="fw-bold mb-0 d-flex align-items-center gap-2 text-info">
+                                        <i class="bi bi-cart4"></i> Purchased Items &amp; Inventory Cart
+                                    </h5>
+                                    <span class="small text-muted">Search products below or scan barcode to automatically add to purchase cart.</span>
+                                </div>
                                 <div class="small text-muted">
-                                    <span id="itemsCountBadge" class="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-25">0 Items</span>
+                                    <span id="itemsCountBadge" class="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-25 fs-6 px-3 py-1">0 Items in Cart</span>
                                 </div>
                             </div>
 
-                            <!-- Quick Barcode / Product Search Bar -->
-                            <div class="mb-3">
-                                <div class="input-group">
-                                    <span class="input-group-text bg-dark border-secondary border-opacity-25 text-info">
-                                        <i class="bi bi-upc-scan"></i>
+                            <!-- Fast Product Search & Scan Bar -->
+                            <div class="mb-3 position-relative">
+                                <div class="input-group input-group-lg shadow-sm">
+                                    <span class="input-group-text bg-dark border-secondary border-opacity-25 text-info px-3">
+                                        <i class="bi bi-search"></i>
                                     </span>
-                                    <input type="text" class="form-control" id="quickProductSearch" placeholder="Type product name, SKU or scan barcode to quickly add item..." autocomplete="off">
+                                    <input type="text" class="form-control" id="quickProductSearch" placeholder="🔍 Search product by Name, SKU, Barcode, or Model to add to cart..." autocomplete="off">
+                                    <button class="btn btn-primary px-4 fw-semibold d-flex align-items-center gap-2" type="button" id="addItemRowBtn">
+                                        <i class="bi bi-plus-lg"></i> Add Custom Item
+                                    </button>
                                 </div>
-                                <div id="quickSearchResults" class="list-group position-absolute mt-1 shadow-lg border border-secondary border-opacity-25" style="z-index: 1050; display: none; max-height: 240px; overflow-y: auto; width: 60%;"></div>
+                                <div id="quickSearchResults" class="list-group position-absolute mt-1 shadow-lg border border-secondary border-opacity-50 w-100" style="z-index: 1050; display: none; max-height: 280px; overflow-y: auto;"></div>
                             </div>
 
                             <div class="table-responsive">
@@ -284,12 +290,13 @@
                                             <th class="text-center" style="width: 100px;">Unit</th>
                                             <th class="text-center" style="width: 130px;">Buy Cost (৳) *</th>
                                             <th class="text-center" style="width: 130px;">Sell Price (৳)</th>
+                                            <th class="text-center" style="width: 150px;">Lot Status</th>
                                             <th class="text-end" style="width: 130px;">Subtotal (৳)</th>
                                             <th class="text-end" style="width: 48px;"></th>
                                         </tr>
                                     </thead>
                                     <tbody id="purchaseItemsTableBody">
-                                        <!-- Dynamically generated rows -->
+                                        <!-- Dynamically generated cart rows -->
                                     </tbody>
                                 </table>
                             </div>
@@ -528,29 +535,55 @@
             }
         }
 
-        // Add a line item to the purchase table
+        // Add a line item to the purchase cart table
         function addItemRow(prefillProduct = null) {
             const tbody = document.getElementById('purchaseItemsTableBody');
-            const rowId = 'pur_row_' + Date.now() + '_' + Math.floor(Math.random() * 100);
 
+            // If prefillProduct is passed and already exists in the cart, simply increment its quantity!
+            if (prefillProduct && prefillProduct.id) {
+                const existingRow = Array.from(tbody.querySelectorAll('.purchase-item-row')).find(r => {
+                    const sel = r.querySelector('.item-select');
+                    return sel && sel.value === prefillProduct.id;
+                });
+
+                if (existingRow) {
+                    const qtyInput = existingRow.querySelector('.item-qty-input');
+                    qtyInput.value = (parseFloat(qtyInput.value) || 0) + 1;
+                    recalcRowAndTotals(existingRow);
+                    existingRow.classList.add('table-active');
+                    setTimeout(() => existingRow.classList.remove('table-active'), 500);
+                    return;
+                }
+            }
+
+            const rowId = 'pur_row_' + Date.now() + '_' + Math.floor(Math.random() * 100);
             const row = document.createElement('tr');
             row.id = rowId;
             row.className = 'purchase-item-row';
+
+            const curStock = prefillProduct ? Number(prefillProduct.quantity || prefillProduct.stock || 0) : 0;
+            const originalBuyPrice = prefillProduct ? Number(prefillProduct.buyPrice || prefillProduct.buy_price || 0) : 0;
+            const originalSellPrice = prefillProduct ? Number(prefillProduct.sellPrice || prefillProduct.sell_price || 0) : 0;
+
             row.innerHTML = `
                 <td>
                     <select class="form-select form-select-sm item-select" required>
                         <option value="">-- Choose or Type Product --</option>
                         ${allProducts.map(p => {
                             const isSelected = prefillProduct && prefillProduct.id === p.id ? 'selected' : '';
-                            return `<option value="${p.id}" ${isSelected} data-stock="${p.quantity || p.stock || 0}" data-buyprice="${p.buyPrice || p.buy_price || 0}" data-sellprice="${p.sellPrice || p.sell_price || 0}" data-unit="${p.unit || 'Pcs'}">${p.name} (${p.barcode || 'No SKU'})</option>`;
+                            return `<option value="${p.id}" ${isSelected} 
+                                data-stock="${p.quantity || p.stock || 0}" 
+                                data-buyprice="${p.buyPrice || p.buy_price || 0}" 
+                                data-sellprice="${p.sellPrice || p.sell_price || 0}" 
+                                data-unit="${p.unit || 'Pcs'}">${p.name} (${p.barcode || 'No SKU'})</option>`;
                         }).join('')}
                     </select>
                 </td>
                 <td class="text-center font-monospace small text-muted item-current-stock">
-                    ${prefillProduct ? (prefillProduct.quantity || prefillProduct.stock || 0) + ' ' + (prefillProduct.unit || 'Pcs') : '0 Pcs'}
+                    ${prefillProduct ? curStock + ' ' + (prefillProduct.unit || 'Pcs') : '0 Pcs'}
                 </td>
                 <td class="text-center">
-                    <input type="number" class="form-control form-control-sm text-center font-monospace item-qty-input" min="0.01" step="any" value="1" required>
+                    <input type="number" class="form-control form-control-sm text-center font-monospace item-qty-input fw-bold" min="0.01" step="any" value="1" required style="width: 85px; margin: 0 auto;">
                 </td>
                 <td class="text-center">
                     <select class="form-select form-select-sm item-unit-select">
@@ -563,13 +596,16 @@
                     </select>
                 </td>
                 <td class="text-center">
-                    <input type="number" class="form-control form-control-sm text-end font-monospace item-buyprice-input" min="0" step="any" value="${prefillProduct ? (prefillProduct.buyPrice || prefillProduct.buy_price || 0) : 0}" required>
+                    <input type="number" class="form-control form-control-sm text-end font-monospace item-buyprice-input" min="0" step="any" value="${originalBuyPrice}" required>
                 </td>
                 <td class="text-center">
-                    <input type="number" class="form-control form-control-sm text-end font-monospace item-sellprice-input" min="0" step="any" value="${prefillProduct ? (prefillProduct.sellPrice || prefillProduct.sell_price || 0) : 0}">
+                    <input type="number" class="form-control form-control-sm text-end font-monospace item-sellprice-input" min="0" step="any" value="${originalSellPrice}">
+                </td>
+                <td class="text-center item-lot-status-cell">
+                    <span class="badge bg-secondary bg-opacity-25 text-secondary border border-secondary border-opacity-25" style="font-size: 0.72rem;">No Product</span>
                 </td>
                 <td class="text-end font-monospace text-info fw-semibold item-subtotal-display">
-                    ${prefillProduct ? formatCurrency(prefillProduct.buyPrice || 0) : '৳0.00'}
+                    ${formatCurrency(originalBuyPrice)}
                 </td>
                 <td class="text-end">
                     <button type="button" class="btn btn-outline-danger btn-sm p-1 remove-row-btn" title="Remove Item">
@@ -577,6 +613,11 @@
                     </button>
                 </td>
             `;
+
+            // Store original baseline metrics for dynamic Lot determination
+            row.dataset.originalStock = curStock;
+            row.dataset.originalBuyPrice = originalBuyPrice;
+            row.dataset.originalSellPrice = originalSellPrice;
 
             tbody.appendChild(row);
 
@@ -589,13 +630,78 @@
             select.addEventListener('change', () => onProductSelectChange(row));
             qtyInput.addEventListener('input', () => recalcRowAndTotals(row));
             buyPriceInput.addEventListener('input', () => recalcRowAndTotals(row));
-            sellPriceInput.addEventListener('input', () => recalcTotals());
+            sellPriceInput.addEventListener('input', () => recalcRowAndTotals(row));
             removeBtn.addEventListener('click', () => {
                 row.remove();
                 recalcTotals();
             });
 
+            updateRowLotStatus(row);
             recalcTotals();
+        }
+
+        /**
+         * Evaluates and updates Lot status based on user business rules:
+         * 1. If product is in stock (stock > 0): Lot is ACTIVATED (new batch with distinct pricing/inventory tracking).
+         * 2. If product is OUT OF STOCK (stock <= 0) AND prices have changed (buyPrice or sellPrice altered): Lot is NOT ACTIVATED (it simply restocks the main item at new baseline price).
+         * 3. If in stock: Lot activates automatically.
+         */
+        function updateRowLotStatus(row) {
+            const select = row.querySelector('.item-select');
+            const lotCell = row.querySelector('.item-lot-status-cell');
+            if (!select || !lotCell) return;
+
+            if (!select.value) {
+                lotCell.innerHTML = `<span class="badge bg-secondary bg-opacity-25 text-secondary border border-secondary border-opacity-25" style="font-size: 0.72rem;">No Product</span>`;
+                row.dataset.lotActive = 'false';
+                return;
+            }
+
+            const currentStock = parseFloat(row.dataset.originalStock) || 0;
+            const originalBuy = parseFloat(row.dataset.originalBuyPrice) || 0;
+            const originalSell = parseFloat(row.dataset.originalSellPrice) || 0;
+
+            const enteredBuy = parseFloat(row.querySelector('.item-buyprice-input').value) || 0;
+            const enteredSell = parseFloat(row.querySelector('.item-sellprice-input').value) || 0;
+
+            const isPriceChanged = (Math.abs(enteredBuy - originalBuy) > 0.001) || (Math.abs(enteredSell - originalSell) > 0.001);
+
+            let isLotActive = false;
+            let badgeHtml = '';
+
+            if (currentStock > 0) {
+                // Product is currently IN STOCK -> Lot is ACTIVATED!
+                isLotActive = true;
+                const lotNum = 'LOT-' + Math.floor(1000 + Math.random() * 9000);
+                row.dataset.assignedLot = row.dataset.assignedLot || lotNum;
+                badgeHtml = `
+                    <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25 d-inline-flex align-items-center gap-1" title="Product is in stock: Active Lot tracking enabled">
+                        <i class="bi bi-layers-fill"></i> Lot Active (${row.dataset.assignedLot})
+                    </span>
+                `;
+            } else {
+                // Product is OUT OF STOCK
+                if (isPriceChanged) {
+                    // Out of stock AND prices changed -> Lot is NOT ACTIVATED (replaces baseline catalog price)
+                    isLotActive = false;
+                    badgeHtml = `
+                        <span class="badge bg-warning bg-opacity-25 text-warning border border-warning border-opacity-25" title="Out of stock with price update: Base Catalog Price will update (No Lot)">
+                            <i class="bi bi-arrow-repeat"></i> Price Updated
+                        </span>
+                    `;
+                } else {
+                    // Out of stock with same prices -> Standard restock
+                    isLotActive = false;
+                    badgeHtml = `
+                        <span class="badge bg-secondary bg-opacity-25 text-light border border-secondary border-opacity-25" title="Out of stock: Standard inventory refill">
+                            <i class="bi bi-box-seam"></i> Restock
+                        </span>
+                    `;
+                }
+            }
+
+            row.dataset.lotActive = isLotActive ? 'true' : 'false';
+            lotCell.innerHTML = badgeHtml;
         }
 
         function onProductSelectChange(row) {
@@ -610,6 +716,10 @@
                 stockDisplay.textContent = '0 Pcs';
                 buyPriceInput.value = 0;
                 sellPriceInput.value = 0;
+                row.dataset.originalStock = 0;
+                row.dataset.originalBuyPrice = 0;
+                row.dataset.originalSellPrice = 0;
+                updateRowLotStatus(row);
                 recalcRowAndTotals(row);
                 return;
             }
@@ -619,11 +729,16 @@
             const sellPrice = parseFloat(opt.dataset.sellprice) || 0;
             const unit = opt.dataset.unit || 'Pcs';
 
+            row.dataset.originalStock = stock;
+            row.dataset.originalBuyPrice = buyPrice;
+            row.dataset.originalSellPrice = sellPrice;
+
             stockDisplay.textContent = `${stock} ${unit}`;
             buyPriceInput.value = buyPrice;
             sellPriceInput.value = sellPrice;
             if (unitSelect) unitSelect.value = unit;
 
+            updateRowLotStatus(row);
             recalcRowAndTotals(row);
         }
 
@@ -635,6 +750,11 @@
             const qty = parseFloat(qtyInput.value) || 0;
             const buyPrice = parseFloat(buyPriceInput.value) || 0;
             const lineSubtotal = qty * buyPrice;
+
+            subtotalDisplay.textContent = formatCurrency(lineSubtotal);
+            updateRowLotStatus(row);
+            recalcTotals();
+        }
 
             subtotalDisplay.textContent = formatCurrency(lineSubtotal);
             recalcTotals();
@@ -682,13 +802,46 @@
             }
         }
 
-        // Quick Search Autocomplete Filter
+        // Quick Search Autocomplete Filter & Instant Barcode Scan Handler
         const quickSearchInput = document.getElementById('quickProductSearch');
         const quickResults = document.getElementById('quickSearchResults');
 
+        quickSearchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const query = this.value.trim().toLowerCase();
+                if (!query) return;
+
+                // Check exact barcode or SKU match first (for fast laser barcode scanners)
+                const exactMatch = allProducts.find(p => 
+                    (p.barcode && p.barcode.toLowerCase() === query) ||
+                    (p.name && p.name.toLowerCase() === query)
+                );
+
+                if (exactMatch) {
+                    addItemRow(exactMatch);
+                    this.value = '';
+                    quickResults.style.display = 'none';
+                    return;
+                }
+
+                // If not exact, pick first matching suggestion
+                const firstMatch = allProducts.find(p => 
+                    (p.name && p.name.toLowerCase().includes(query)) ||
+                    (p.barcode && p.barcode.toLowerCase().includes(query))
+                );
+
+                if (firstMatch) {
+                    addItemRow(firstMatch);
+                    this.value = '';
+                    quickResults.style.display = 'none';
+                }
+            }
+        });
+
         quickSearchInput.addEventListener('input', function() {
             const query = this.value.trim().toLowerCase();
-            if (query.length < 2) {
+            if (query.length < 1) {
                 quickResults.style.display = 'none';
                 return;
             }
@@ -700,20 +853,28 @@
             ).slice(0, 8);
 
             if (matches.length === 0) {
-                quickResults.innerHTML = `<div class="list-group-item bg-dark text-muted small p-2">No matching products found.</div>`;
+                quickResults.innerHTML = `<div class="list-group-item bg-dark text-muted small p-3 text-center">No matching products found in catalog.</div>`;
                 quickResults.style.display = 'block';
                 return;
             }
 
-            quickResults.innerHTML = matches.map(p => `
-                <a href="#" class="list-group-item list-group-item-action bg-dark text-white border-secondary border-opacity-25 d-flex justify-content-between align-items-center quick-prod-item" data-id="${p.id}">
-                    <div>
-                        <div class="fw-semibold small">${p.name}</div>
-                        <div class="text-muted" style="font-size: 0.72rem;">SKU: ${p.barcode || 'N/A'} • Stock: ${p.quantity || 0} ${p.unit || 'Pcs'}</div>
+            quickResults.innerHTML = matches.map(p => {
+                const isOutOfStock = Number(p.quantity || 0) <= 0;
+                return `
+                <a href="#" class="list-group-item list-group-item-action bg-dark text-white border-secondary border-opacity-25 d-flex justify-content-between align-items-center py-2 px-3 quick-prod-item" data-id="${p.id}">
+                    <div class="d-flex align-items-center gap-2">
+                        ${p.imageUrl ? `<img src="${p.imageUrl}" style="width: 32px; height: 32px; border-radius: 6px; object-fit: cover;">` : `<i class="bi bi-box-seam text-info fs-5"></i>`}
+                        <div>
+                            <div class="fw-semibold small">${p.name}</div>
+                            <div class="text-muted" style="font-size: 0.72rem;">SKU: ${p.barcode || 'N/A'} • Stock: <span class="${isOutOfStock ? 'text-danger fw-bold' : 'text-success'}">${p.quantity || 0} ${p.unit || 'Pcs'}</span></div>
+                        </div>
                     </div>
-                    <span class="badge bg-primary bg-opacity-25 text-primary">৳${p.buyPrice || 0}</span>
+                    <div class="text-end">
+                        <span class="badge bg-primary bg-opacity-25 text-primary font-monospace">Cost: ৳${p.buyPrice || 0}</span>
+                        <div class="small text-muted" style="font-size: 0.7rem;">Sell: ৳${p.sellPrice || 0}</div>
+                    </div>
                 </a>
-            `).join('');
+            `}).join('');
             quickResults.style.display = 'block';
 
             quickResults.querySelectorAll('.quick-prod-item').forEach(item => {
@@ -725,6 +886,7 @@
                         addItemRow(prod);
                         quickSearchInput.value = '';
                         quickResults.style.display = 'none';
+                        quickSearchInput.focus();
                     }
                 });
             });
@@ -824,6 +986,9 @@
                     return;
                 }
 
+                const isLotActive = row.dataset.lotActive === 'true';
+                const assignedLot = row.dataset.assignedLot || null;
+
                 items.push({
                     productId,
                     name: productName,
@@ -831,6 +996,8 @@
                     unit,
                     buyPrice,
                     sellPrice,
+                    lotActive: isLotActive,
+                    lotNumber: isLotActive ? assignedLot : null,
                     subtotal: qty * buyPrice
                 });
             }
@@ -885,7 +1052,7 @@
                 // 2. Save purchase document to Cloudflare D1
                 await addDocument('purchases', purchaseRecord);
 
-                // 3. Update stock & prices in products table (if Received or Ordered)
+                // 3. Update stock, lots & prices in products table (if Received or Ordered)
                 if (purchaseStatus === 'Received') {
                     for (const item of items) {
                         const existingProd = allProducts.find(p => p.id === item.productId);
@@ -901,6 +1068,41 @@
 
                             if (item.sellPrice > 0) {
                                 updatePayload.sellPrice = item.sellPrice;
+                            }
+
+                            // Manage Lot Array in Product Document
+                            let lots = [];
+                            try {
+                                if (typeof existingProd.lots === 'string') {
+                                    lots = JSON.parse(existingProd.lots);
+                                } else if (Array.isArray(existingProd.lots)) {
+                                    lots = existingProd.lots;
+                                }
+                            } catch (e) {
+                                lots = [];
+                            }
+
+                            if (item.lotActive && item.lotNumber) {
+                                // Add newly activated lot
+                                lots.push({
+                                    lotNumber: item.lotNumber,
+                                    quantity: item.quantity,
+                                    buyPrice: item.buyPrice,
+                                    sellPrice: item.sellPrice || existingProd.sellPrice,
+                                    invoiceNo: invoiceNo,
+                                    createdAt: new Date().toISOString()
+                                });
+                                updatePayload.lots = JSON.stringify(lots);
+                            } else if (curQty <= 0) {
+                                // Out of stock replenishment resets active lots to fresh base
+                                updatePayload.lots = JSON.stringify([{
+                                    lotNumber: 'LOT-BASE',
+                                    quantity: updatedQty,
+                                    buyPrice: item.buyPrice,
+                                    sellPrice: item.sellPrice || existingProd.sellPrice,
+                                    invoiceNo: invoiceNo,
+                                    createdAt: new Date().toISOString()
+                                }]);
                             }
 
                             await updateDocument('products', item.productId, updatePayload);

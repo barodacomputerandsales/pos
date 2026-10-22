@@ -195,10 +195,10 @@
                     <p class="text-secondary mb-0 small" style="font-size: 0.88rem;">Manage registered suppliers, contact lines, wholesale storefronts, and purchasing records.</p>
                 </div>
                 <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2 px-3 py-2 fw-semibold" id="exportCsvBtn">
+                    <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2 px-3 py-2 fw-semibold" id="exportCsvBtn" data-permission="export_suppliers">
                         <i class="bi bi-download"></i> Export CSV
                     </button>
-                    <a href="add-supplier.html" class="btn btn-primary d-flex align-items-center gap-2 px-3 py-2 fw-bold">
+                    <a href="add-supplier.html" class="btn btn-primary d-flex align-items-center gap-2 px-3 py-2 fw-bold" data-permission="add_supplier">
                         <i class="bi bi-person-plus-fill"></i> Add New Supplier
                     </a>
                 </div>
@@ -514,13 +514,13 @@
                         <td class="text-center">${statusBadge}</td>
                         <td class="text-end">
                             <div class="d-inline-flex gap-1">
-                                <a href="add-purchase.html?supplier=${encodeURIComponent(s.supplierName || '')}" class="btn btn-sm btn-outline-info fw-semibold" title="Add Purchase Invoice">
+                                <a href="add-purchase.html?supplier=${encodeURIComponent(s.supplierName || '')}" class="btn btn-sm btn-outline-info fw-semibold" title="Add Purchase Invoice" data-permission="add_purchase">
                                     <i class="bi bi-bag-plus"></i>
                                 </a>
-                                <button type="button" class="btn btn-sm btn-outline-secondary btn-edit-supplier" data-id="${s.id}" title="Edit Supplier Profile">
+                                <button type="button" class="btn btn-sm btn-outline-secondary btn-edit-supplier" data-id="${s.id}" title="Edit Supplier Profile" data-permission="edit_supplier">
                                     <i class="bi bi-pencil"></i>
                                 </button>
-                                <button type="button" class="btn btn-sm btn-outline-danger btn-delete-supplier" data-id="${s.id}" data-name="${escapeHtml(s.supplierName || '')}" title="Delete Supplier">
+                                <button type="button" class="btn btn-sm btn-outline-danger btn-delete-supplier" data-id="${s.id}" data-name="${escapeHtml(s.supplierName || '')}" title="Delete Supplier" data-permission="delete_supplier">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </div>
@@ -557,6 +557,10 @@
                     }
                 });
             });
+            // Auto-filter dynamic row action buttons according to RBAC permissions
+            if (window.applyUIPermissions) {
+                window.applyUIPermissions(tbody);
+            }
         }
 
         function openEditModal(sup) {

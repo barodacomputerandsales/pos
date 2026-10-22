@@ -240,7 +240,7 @@
                     <button class="btn btn-outline-secondary d-flex align-items-center gap-2" id="refreshBtn">
                         <i class="bi bi-arrow-clockwise"></i> Refresh
                     </button>
-                    <button class="btn btn-outline-info d-flex align-items-center gap-2" id="printReportBtn">
+                    <button class="btn btn-outline-info d-flex align-items-center gap-2" id="printReportBtn" data-permission="export_production">
                         <i class="bi bi-printer"></i> Print Report
                     </button>
                     <a href="add-production.html" class="btn btn-primary d-flex align-items-center gap-2" data-permission="add_production">
@@ -635,10 +635,10 @@
                         </td>
                         <td class="text-end">
                             <div class="btn-group btn-group-sm">
-                                <button class="btn btn-outline-info view-details-btn" data-id="${item.id}" title="View Breakdown">
+                                <button class="btn btn-outline-info view-details-btn" data-id="${item.id}" title="View Breakdown" data-permission="view_production">
                                     <i class="bi bi-eye"></i>
                                 </button>
-                                <button class="btn btn-outline-danger delete-batch-btn" data-id="${item.id}" data-batch="${item.batchNumber || item.id}" title="Delete Record">
+                                <button class="btn btn-outline-danger delete-batch-btn" data-id="${item.id}" data-batch="${item.batchNumber || item.id}" title="Delete Record" data-permission="delete_production">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </div>
@@ -659,6 +659,11 @@
                     modal.show();
                 });
             });
+
+            // Auto-filter dynamic table actions via RBAC permissions
+            if (window.applyUIPermissions) {
+                window.applyUIPermissions(document.getElementById('historyTableBody'));
+            }
         }
 
         function showDetailsModal(id) {
