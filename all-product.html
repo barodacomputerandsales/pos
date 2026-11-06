@@ -720,6 +720,9 @@
 
             function processChunk() {
                 let cardsHtml = '';
+                const canView = window.hasPermission('view_products');
+                const canEdit = window.hasPermission('all_product_edit');
+                const canDelete = window.hasPermission('delete_product');
                 const end = Math.min(index + chunkSize, filteredProducts.length);
 
                 for (; index < end; index++) {
@@ -766,11 +769,11 @@
                             <div class="card-body d-flex flex-column mt-2">
                                 <div class="card-actions">
         ${viewTrashMode ? 
-            `<button class="btn btn-success me-2" onclick="restoreProd('${p.firestoreId}')" title="Restore Product"><i class="bi bi-arrow-counterclockwise"></i> Restore</button>
-             <button class="btn btn-danger" onclick="hardDeleteProd('${p.firestoreId}')" title="Delete Permanently"><i class="bi bi-trash-fill"></i></button>` :
-            `<button class="btn btn-success" onclick="openDetails('${p.firestoreId}')"><i class="bi bi-eye-fill"></i></button>
-             <button class="btn btn-warning" onclick="editProduct('${p.firestoreId}')"><i class="bi bi-pencil-square"></i></button>
-             <button class="btn btn-danger" onclick="deleteProd('${p.firestoreId}')"><i class="bi bi-trash3-fill"></i></button>`
+            `${canDelete ? `<button class="btn btn-success me-2" onclick="restoreProd('${p.firestoreId}')" title="Restore Product"><i class="bi bi-arrow-counterclockwise"></i> Restore</button>
+             <button class="btn btn-danger" onclick="hardDeleteProd('${p.firestoreId}')" title="Delete Permanently"><i class="bi bi-trash-fill"></i></button>` : '<span class="text-muted small px-2 py-1">Trash (Read-only)</span>'}` :
+            `${canView ? `<button class="btn btn-success" onclick="openDetails('${p.firestoreId}')" title="View Details"><i class="bi bi-eye-fill"></i></button>` : ''}
+             ${canEdit ? `<button class="btn btn-warning" onclick="editProduct('${p.firestoreId}')" title="Edit Product"><i class="bi bi-pencil-square"></i></button>` : ''}
+             ${canDelete ? `<button class="btn btn-danger" onclick="deleteProd('${p.firestoreId}')" title="Move to Trash"><i class="bi bi-trash3-fill"></i></button>` : ''}`
         }
     </div>
                                 <h5 class="card-title fw-bold mb-1">${p.name} ${viewTrashMode ? '<span class="badge bg-danger ms-2" style="font-size: 0.6rem;">Pending Deletion</span>' : ''}</h5>
@@ -796,6 +799,14 @@
         }
 
         window.editProduct = function(id) {
+            if (!window.hasPermission('all_product_edit')) {
+                if (typeof showCustomAlert === 'function') {
+                    showCustomAlert('Access Denied', 'You do not have permission to edit products.', 'failed');
+                } else {
+                    alert('Access Denied: You do not have permission to edit products.');
+                }
+                return;
+            }
             const p = allProducts.find(item => item.firestoreId === id || item.id === id);
             localStorage.setItem('editProductId', id);
             if (p && p.isProduction) {
@@ -805,6 +816,14 @@
             }
         };
         window.hardDeleteProd = async function(id) {
+            if (!window.hasPermission('delete_product')) {
+                if (typeof showCustomAlert === 'function') {
+                    showCustomAlert('Access Denied', 'You do not have permission to delete products.', 'failed');
+                } else {
+                    alert('Access Denied: You do not have permission to delete products.');
+                }
+                return;
+            }
             if(confirm("Are you sure you want to permanently delete this product? This action CANNOT be undone.")) {
                 try {
                     await deleteDocument('products', id);
@@ -883,6 +902,14 @@
         }
 
         window.bulkDelete = async function() {
+            if (!window.hasPermission('delete_product')) {
+                if (typeof showCustomAlert === 'function') {
+                    showCustomAlert('Access Denied', 'You do not have permission to delete products.', 'failed');
+                } else {
+                    alert('Access Denied: You do not have permission to delete products.');
+                }
+                return;
+            }
             if (selectedProductIds.size === 0) return;
             
             const msg = viewTrashMode 
@@ -927,6 +954,14 @@
         };
 
         window.bulkRestore = async function() {
+            if (!window.hasPermission('delete_product')) {
+                if (typeof showCustomAlert === 'function') {
+                    showCustomAlert('Access Denied', 'You do not have permission to restore products.', 'failed');
+                } else {
+                    alert('Access Denied: You do not have permission to restore products.');
+                }
+                return;
+            }
             if (selectedProductIds.size === 0 || !viewTrashMode) return;
             if (!confirm(`Restore ${selectedProductIds.size} products to active inventory?`)) return;
             
@@ -958,6 +993,14 @@
         };
 
         window.deleteProd = async function(id) {
+            if (!window.hasPermission('delete_product')) {
+                if (typeof showCustomAlert === 'function') {
+                    showCustomAlert('Access Denied', 'You do not have permission to delete products.', 'failed');
+                } else {
+                    alert('Access Denied: You do not have permission to delete products.');
+                }
+                return;
+            }
             if(confirm("Are you sure you want to move this product to the trash? It will be permanently deleted after 2 days.")) {
                 const p = allProducts.find(x => x.firestoreId === id);
                 if (p) p.isDeleted = true;
@@ -981,6 +1024,14 @@
         };
 
         window.restoreProd = async function(id) {
+            if (!window.hasPermission('delete_product')) {
+                if (typeof showCustomAlert === 'function') {
+                    showCustomAlert('Access Denied', 'You do not have permission to restore products.', 'failed');
+                } else {
+                    alert('Access Denied: You do not have permission to restore products.');
+                }
+                return;
+            }
             if(confirm("Restore this product from the trash?")) {
                 const p = allProducts.find(x => x.firestoreId === id);
                 if (p) p.isDeleted = false;
@@ -1023,6 +1074,14 @@
         };
 
         window.openDetails = function(id) {
+            if (!window.hasPermission('view_products')) {
+                if (typeof showCustomAlert === 'function') {
+                    showCustomAlert('Access Denied', 'You do not have permission to view product details.', 'failed');
+                } else {
+                    alert('Access Denied: You do not have permission to view product details.');
+                }
+                return;
+            }
             console.log("Opening details", id);
             try {
                 const p = allProducts.find(x => x.firestoreId === id);
@@ -1139,9 +1198,9 @@
                         <button type="button" class="btn btn-outline-info btn-sm mt-2 w-100 d-flex align-items-center justify-content-center gap-1 shadow-sm" onclick="handleDownloadProductJpeg('${p.imageUrl}', '${p.barcode || p.name}')">
                             <i class="bi bi-download"></i> Download as JPEG
                         </button>` : ''}
-                        <button type="button" class="btn btn-outline-warning btn-sm mt-2 w-100 d-flex align-items-center justify-content-center gap-1 shadow-sm" onclick="if(detailsModal) detailsModal.hide(); editProduct('${p.firestoreId}')">
+                        ${window.hasPermission('all_product_edit') ? `<button type="button" class="btn btn-outline-warning btn-sm mt-2 w-100 d-flex align-items-center justify-content-center gap-1 shadow-sm" onclick="if(detailsModal) detailsModal.hide(); editProduct('${p.firestoreId}')">
                             <i class="bi bi-pencil-square"></i> Edit / Update Image & Details
-                        </button>
+                        </button>` : ''}
                     </div>
                     <div class="col-md-8 mt-3 mt-md-0">
                         <h3 class="fw-bold mb-1">${p.name}</h3>

@@ -1,6 +1,6 @@
 window._renderSidebarImpl = function(activeMenu, activeSubMenu = null) {
-    const isProductionActive = activeMenu === 'production' || (activeMenu === 'products' && (activeSubMenu === 'add-production' || activeSubMenu === 'production-history' || activeSubMenu === 'add-production-product'));
-    const isProductsActive = (activeMenu === 'products' && !isProductionActive);
+    const isProductsActive = activeMenu === 'products' || activeMenu === 'production' || ['all-product', 'add-product', 'add-production', 'production-history', 'add-production-product'].includes(activeSubMenu);
+    const isSettingsActive = activeMenu === 'settings' || ['system-settings', 'account', 'accounts', 'employee'].includes(activeSubMenu);
 
     const SIDEBAR_HTML = `
     <aside class="sidebar">
@@ -9,7 +9,7 @@ window._renderSidebarImpl = function(activeMenu, activeSubMenu = null) {
                 <img src="assets/icon.png" onerror="this.src='template/bcs-logo.svg'" alt="BCS" style="width: 42px; height: 42px; border-radius: 10px; object-fit: contain; filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.45));"> BCS POS
             </h5>
         </div>
-        <div class="sidebar-user">
+        <div class="sidebar-user" onclick="window.location.href='account.html'" style="cursor: pointer;" title="Open Account Center">
             <div class="user-avatar">
                 <i class="bi bi-person-fill"></i>
             </div>
@@ -31,7 +31,7 @@ window._renderSidebarImpl = function(activeMenu, activeSubMenu = null) {
                 <span>AI Studio</span>
             </a>
 
-            <!-- Products Menu Group -->
+            <!-- Products Menu Group (Including Production) -->
             <div class="menu-group ${isProductsActive ? 'open' : ''}">
                 <button class="menu-item has-submenu ${isProductsActive ? 'active' : ''}">
                     <i class="bi bi-box-seam-fill"></i>
@@ -45,6 +45,15 @@ window._renderSidebarImpl = function(activeMenu, activeSubMenu = null) {
                         </a>
                         <a href="add-product.html" class="submenu-item ${activeSubMenu === 'add-product' ? 'active' : ''}" data-permission="add_product">
                             <div class="submenu-dot"></div> Add Product
+                        </a>
+                        <a href="add-production.html" class="submenu-item ${activeSubMenu === 'add-production' ? 'active' : ''}" data-permission="add_production">
+                            <div class="submenu-dot"></div> Add Production
+                        </a>
+                        <a href="production-history.html" class="submenu-item ${activeSubMenu === 'production-history' ? 'active' : ''}" data-permission="view_production">
+                            <div class="submenu-dot"></div> Production History
+                        </a>
+                        <a href="add-production-product.html" class="submenu-item ${activeSubMenu === 'add-production-product' ? 'active' : ''}" data-permission="add_production_item">
+                            <div class="submenu-dot"></div> Add Production Item
                         </a>
                     </div>
                 </div>
@@ -64,28 +73,6 @@ window._renderSidebarImpl = function(activeMenu, activeSubMenu = null) {
                         </a>
                         <a href="purchase-history.html" class="submenu-item ${activeSubMenu === 'purchase-history' ? 'active' : ''}" data-permission="view_purchases">
                             <div class="submenu-dot"></div> Purchase History
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Production Menu Group -->
-            <div class="menu-group ${isProductionActive ? 'open' : ''}">
-                <button class="menu-item has-submenu ${isProductionActive ? 'active' : ''}">
-                    <i class="bi bi-gear-wide-connected"></i>
-                    <span>Production</span>
-                    <i class="bi bi-chevron-down chevron"></i>
-                </button>
-                <div class="submenu">
-                    <div class="submenu-inner">
-                        <a href="add-production.html" class="submenu-item ${activeSubMenu === 'add-production' ? 'active' : ''}" data-permission="add_production">
-                            <div class="submenu-dot"></div> Add Production
-                        </a>
-                        <a href="production-history.html" class="submenu-item ${activeSubMenu === 'production-history' ? 'active' : ''}" data-permission="view_production">
-                            <div class="submenu-dot"></div> Production History
-                        </a>
-                        <a href="add-production-product.html" class="submenu-item ${activeSubMenu === 'add-production-product' ? 'active' : ''}" data-permission="add_production_item">
-                            <div class="submenu-dot"></div> Add Production Item
                         </a>
                     </div>
                 </div>
@@ -111,10 +98,27 @@ window._renderSidebarImpl = function(activeMenu, activeSubMenu = null) {
             </div>
             
             <div class="menu-label mt-4">MANAGEMENT</div>
-            <a href="settings.html" class="menu-item ${activeMenu === 'settings' ? 'active' : ''}" data-permission="manage_settings">
-                <i class="bi bi-gear-fill"></i>
-                <span>Settings</span>
-            </a>
+            <!-- Settings Menu Group -->
+            <div class="menu-group ${isSettingsActive ? 'open' : ''}">
+                <button class="menu-item has-submenu ${isSettingsActive ? 'active' : ''}">
+                    <i class="bi bi-gear-fill"></i>
+                    <span>Settings</span>
+                    <i class="bi bi-chevron-down chevron"></i>
+                </button>
+                <div class="submenu">
+                    <div class="submenu-inner">
+                        <a href="settings.html" class="submenu-item ${(!activeSubMenu || activeSubMenu === 'system-settings' || (activeMenu === 'settings' && !['account', 'accounts', 'employee'].includes(activeSubMenu))) ? 'active' : ''}" data-permission="manage_settings">
+                            <div class="submenu-dot"></div> System Settings
+                        </a>
+                        <a href="account.html" class="submenu-item ${(activeSubMenu === 'account' || activeSubMenu === 'accounts') ? 'active' : ''}">
+                            <div class="submenu-dot"></div> Account Center
+                        </a>
+                        <a href="employee.html" class="submenu-item ${activeSubMenu === 'employee' ? 'active' : ''}" data-permission="manage_users">
+                            <div class="submenu-dot"></div> Employees
+                        </a>
+                    </div>
+                </div>
+            </div>
         </nav>
         
         <div class="sidebar-footer">
@@ -156,15 +160,21 @@ window._renderSidebarImpl = function(activeMenu, activeSubMenu = null) {
                 });
             });
             
-            // Define global logout function if not exists
-            if (!window.logout) {
-                window.logout = function() {
+            // Define global logout function
+            window.logout = function() {
+                if (typeof window.logoutUser === 'function') {
+                    window.logoutUser();
+                } else {
                     localStorage.removeItem('isAuthenticated');
+                    localStorage.removeItem('loggedInUserId');
+                    localStorage.removeItem('loggedInUserName');
+                    localStorage.removeItem('userRole');
+                    localStorage.removeItem('userPermissions');
                     localStorage.removeItem('sessionId');
                     localStorage.removeItem('sessionPort');
                     window.location.replace('index.html');
-                };
-            }
+                }
+            };
         } catch (err) {
             console.error('Sidebar initialization error:', err);
         }

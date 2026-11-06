@@ -937,11 +937,11 @@
 
             init();
 
-            // --- Groq AI Smart Fill Handler ---
+            // --- BCS AI Smart Fill Handler ---
             document.getElementById('aiSmartFillProductBtn')?.addEventListener('click', async function () {
                 const productName = document.getElementById('productName')?.value.trim();
                 if (!productName) {
-                    showCustomAlert('Missing Product Name', 'Please enter a Product Name first so Groq AI can suggest category, pricing & description.', 'error');
+                    showCustomAlert('Missing Product Name', 'Please enter a Product Name first so AI can suggest category, pricing & description.', 'error');
                     document.getElementById('productName')?.focus();
                     return;
                 }
@@ -953,7 +953,7 @@
                 const btn = this;
                 const origHtml = btn.innerHTML;
                 btn.disabled = true;
-                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Groq AI Thinking...';
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> AI Thinking...';
 
                 try {
                     const unit = document.getElementById('unit')?.value || 'Pcs';
@@ -1006,8 +1006,7 @@
                     else if (unit === 'Packet') applyMarginSet('buyPricePacket', 'wholesalePricePacketNormal', 'wholesalePricePacketShop', 'sellPricePacketNormal', 'sellPricePacketShop');
                     else applyMarginSet('buyPrice', 'wholesalePriceNormal', 'wholesalePriceShop', 'sellPriceNormal', 'sellPriceShop');
 
-                    const keyLabel = res.keySlotUsed === 'backup' ? 'Backup Groq Key Failover' : 'Primary Groq Key';
-                    showCustomAlert('Groq AI Smart Fill Complete', `Filled product metadata via ${keyLabel} (${window.BCSAICopilot.getRateStatus().remainingThisHour} reqs left this hour).`, 'success');
+                    showCustomAlert('AI Smart Fill Complete', `Filled product metadata (${window.BCSAICopilot.getRateStatus().remainingThisHour} reqs left this hour).`, 'success');
                 } catch (err) {
                     showCustomAlert('AI Smart Fill Notice', err.message, 'error');
                 } finally {

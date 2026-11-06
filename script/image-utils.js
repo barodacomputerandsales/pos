@@ -6,7 +6,7 @@
  * 4. Zero permanent JPEG storage footprint on database or GitHub.
  */
 
-const API_BASE_URL = 'https://backend.bcs.bcsdeveloper.com/api';
+const API_BASE_URL = 'https://backend-bcs.bcsdeveloper.com/api';
 const MASTER_API_KEY = 'backend-bcs-pos';
 
 /**

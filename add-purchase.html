@@ -465,7 +465,7 @@
             document.getElementById('invoiceNo').value = generateInvoiceNumber();
 
             try {
-                // Fetch products from Cloudflare D1
+                // Fetch products from backend database
                 const res = await getCollection('products');
                 allProducts = (res.docs || []).map(d => ({ id: d.id, ...d.data() })).filter(p => !p.deleteScheduledAt);
 
@@ -753,10 +753,6 @@
 
             subtotalDisplay.textContent = formatCurrency(lineSubtotal);
             updateRowLotStatus(row);
-            recalcTotals();
-        }
-
-            subtotalDisplay.textContent = formatCurrency(lineSubtotal);
             recalcTotals();
         }
 
@@ -1049,7 +1045,7 @@
                     createdAt: new Date().toISOString()
                 };
 
-                // 2. Save purchase document to Cloudflare D1
+                // 2. Save purchase document to backend database
                 await addDocument('purchases', purchaseRecord);
 
                 // 3. Update stock, lots & prices in products table (if Received or Ordered)

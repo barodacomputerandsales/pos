@@ -157,8 +157,8 @@
                 <div class="stat-card">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <p class="text-muted mb-1 small fw-semibold text-uppercase">Total Products</p>
-                            <h2 class="fw-bold mb-0 text-white" id="totalProducts">
+                            <p class="card-header-label">Total Products</p>
+                            <h2 class="fw-bold mb-0 stat-val-white" id="totalProducts">
                                 <div class="skeleton skeleton-text"></div>
                             </h2>
                         </div>
@@ -174,8 +174,8 @@
                 <div class="stat-card">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <p class="text-muted mb-1 small fw-semibold text-uppercase">Production Items</p>
-                            <h2 class="fw-bold mb-0 text-info" id="totalProductionProducts">
+                            <p class="card-header-label">Production Items</p>
+                            <h2 class="fw-bold mb-0 stat-val-cyan" id="totalProductionProducts">
                                 <div class="skeleton skeleton-text"></div>
                             </h2>
                         </div>
@@ -191,8 +191,8 @@
                 <div class="stat-card">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <p class="text-muted mb-1 small fw-semibold text-uppercase">With Image</p>
-                            <h2 class="fw-bold mb-0 text-success" id="totalWithImages">
+                            <p class="card-header-label">With Image</p>
+                            <h2 class="fw-bold mb-0 stat-val-emerald" id="totalWithImages">
                                 <div class="skeleton skeleton-text"></div>
                             </h2>
                         </div>
@@ -208,8 +208,8 @@
                 <div class="stat-card">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <p class="text-muted mb-1 small fw-semibold text-uppercase">No Image Added</p>
-                            <h2 class="fw-bold mb-0 text-secondary" id="totalNoImages">
+                            <p class="card-header-label">No Image Added</p>
+                            <h2 class="fw-bold mb-0 stat-val-slate" id="totalNoImages">
                                 <div class="skeleton skeleton-text"></div>
                             </h2>
                         </div>
@@ -225,8 +225,8 @@
                 <div class="stat-card">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <p class="text-muted mb-1 small fw-semibold text-uppercase">Alert Stock</p>
-                            <h2 class="fw-bold mb-0 text-warning" id="totalAlertStock">
+                            <p class="card-header-label">Alert Stock</p>
+                            <h2 class="fw-bold mb-0 stat-val-amber" id="totalAlertStock">
                                 <div class="skeleton skeleton-text"></div>
                             </h2>
                         </div>
@@ -242,8 +242,8 @@
                 <div class="stat-card">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <p class="text-muted mb-1 small fw-semibold text-uppercase">Out of Stock</p>
-                            <h2 class="fw-bold mb-0 text-danger" id="totalOutOfStock">
+                            <p class="card-header-label">Out of Stock</p>
+                            <h2 class="fw-bold mb-0 stat-val-rose" id="totalOutOfStock">
                                 <div class="skeleton skeleton-text"></div>
                             </h2>
                         </div>
@@ -259,8 +259,8 @@
                 <div class="stat-card">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <p class="text-muted mb-1 small fw-semibold text-uppercase">Total Purchases</p>
-                            <h2 class="fw-bold mb-0" id="totalPurchases">
+                            <p class="card-header-label">Total Purchases</p>
+                            <h2 class="fw-bold mb-0 stat-val-indigo" id="totalPurchases">
                                 <div class="skeleton skeleton-text"></div>
                             </h2>
                         </div>
@@ -276,8 +276,8 @@
                 <div class="stat-card">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <p class="text-muted mb-1 small fw-semibold text-uppercase">Total Sales</p>
-                            <h2 class="fw-bold mb-0" id="totalSales">
+                            <p class="card-header-label">Total Sales</p>
+                            <h2 class="fw-bold mb-0 stat-val-pink" id="totalSales">
                                 <div class="skeleton skeleton-text"></div>
                             </h2>
                         </div>
@@ -293,8 +293,8 @@
                 <div class="stat-card">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <p class="text-muted mb-1 small fw-semibold text-uppercase">System Users</p>
-                            <h2 class="fw-bold mb-0" id="totalUsers">
+                            <p class="card-header-label">System Users</p>
+                            <h2 class="fw-bold mb-0 stat-val-purple" id="totalUsers">
                                 <div class="skeleton skeleton-text"></div>
                             </h2>
                         </div>
@@ -307,17 +307,17 @@
         </div>
 
         <!-- Inventory Valuation & Financial Calculations Row (RBAC Protected) -->
-        <div class="stat-cards-grid mb-4" data-permission="view_products">
+        <div class="stat-cards-grid mb-4">
             <!-- Total Stock Units -->
-            <div class="stat-card-col">
+            <div class="stat-card-col" data-permission="view_products">
                 <div class="stat-card border-info border-opacity-25" style="background: linear-gradient(135deg, #1e293b, rgba(14, 165, 233, 0.08));">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <p class="text-muted mb-1 small fw-semibold text-uppercase">Total Stock Units</p>
-                            <h2 class="fw-bold mb-0 text-info" id="calcTotalStockUnits">
+                            <p class="card-header-label">Total Stock Units</p>
+                            <h2 class="fw-bold mb-0 stat-val-cyan" id="calcTotalStockUnits">
                                 <div class="skeleton skeleton-text"></div>
                             </h2>
-                            <span class="text-muted" style="font-size: 0.72rem;">Available across all products</span>
+                            <span class="card-subtext">Available across all products</span>
                         </div>
                         <div class="stat-icon" style="background: linear-gradient(135deg, #0284c7, #0369a1);">
                             <i class="bi bi-stack"></i>
@@ -327,15 +327,15 @@
             </div>
 
             <!-- Total Inventory Cost Value (Purchase Valuation) -->
-            <div class="stat-card-col">
+            <div class="stat-card-col" data-permission="view_purchases">
                 <div class="stat-card border-primary border-opacity-25" style="background: linear-gradient(135deg, #1e293b, rgba(99, 102, 241, 0.08));">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <p class="text-muted mb-1 small fw-semibold text-uppercase">Total Cost Valuation</p>
-                            <h2 class="fw-bold mb-0 text-primary-emphasis" id="calcTotalCostValue">
+                            <p class="card-header-label">Total Cost Valuation</p>
+                            <h2 class="fw-bold mb-0 stat-val-indigo" id="calcTotalCostValue">
                                 <div class="skeleton skeleton-text"></div>
                             </h2>
-                            <span class="text-muted" style="font-size: 0.72rem;">∑ (Stock × Buy Price)</span>
+                            <span class="card-subtext">∑ (Stock × Buy Price)</span>
                         </div>
                         <div class="stat-icon" style="background: linear-gradient(135deg, #4f46e5, #4338ca);">
                             <i class="bi bi-wallet2"></i>
@@ -345,15 +345,15 @@
             </div>
 
             <!-- Total Inventory Retail Value (Selling Valuation) -->
-            <div class="stat-card-col">
+            <div class="stat-card-col" data-permission="view_sales">
                 <div class="stat-card border-success border-opacity-25" style="background: linear-gradient(135deg, #1e293b, rgba(16, 185, 129, 0.08));">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <p class="text-muted mb-1 small fw-semibold text-uppercase">Total Retail Valuation</p>
-                            <h2 class="fw-bold mb-0 text-success" id="calcTotalRetailValue">
+                            <p class="card-header-label">Total Retail Valuation</p>
+                            <h2 class="fw-bold mb-0 stat-val-emerald" id="calcTotalRetailValue">
                                 <div class="skeleton skeleton-text"></div>
                             </h2>
-                            <span class="text-muted" style="font-size: 0.72rem;">∑ (Stock × Sell Price)</span>
+                            <span class="card-subtext">∑ (Stock × Sell Price)</span>
                         </div>
                         <div class="stat-icon" style="background: linear-gradient(135deg, #059669, #047857);">
                             <i class="bi bi-cash-stack"></i>
@@ -363,15 +363,15 @@
             </div>
 
             <!-- Potential Gross Profit -->
-            <div class="stat-card-col">
+            <div class="stat-card-col" data-permission="view_sales">
                 <div class="stat-card border-warning border-opacity-25" style="background: linear-gradient(135deg, #1e293b, rgba(245, 158, 11, 0.08));">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <p class="text-muted mb-1 small fw-semibold text-uppercase">Est. Stock Margin</p>
-                            <h2 class="fw-bold mb-0 text-warning" id="calcPotentialProfit">
+                            <p class="card-header-label">Est. Stock Margin</p>
+                            <h2 class="fw-bold mb-0 stat-val-amber" id="calcPotentialProfit">
                                 <div class="skeleton skeleton-text"></div>
                             </h2>
-                            <span class="text-muted" id="calcMarginPercentage" style="font-size: 0.72rem;">Est. Margin: 0.0%</span>
+                            <span class="card-subtext" id="calcMarginPercentage">Est. Margin: 0.0%</span>
                         </div>
                         <div class="stat-icon" style="background: linear-gradient(135deg, #d97706, #b45309);">
                             <i class="bi bi-graph-up-arrow"></i>
@@ -385,14 +385,19 @@
         <div class="charts-grid mb-4" data-permission="view_products">
             <!-- Product Category Distribution Chart -->
             <div class="chart-col-half">
-                <div class="stat-card d-flex flex-column">
+                <div class="stat-card d-flex flex-column h-100">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="fw-bold mb-0 d-flex align-items-center gap-2">
-                            <i class="bi bi-pie-chart-fill text-info"></i> Inventory Category Breakdown
-                        </h5>
-                        <span class="badge bg-secondary bg-opacity-25 text-light" id="categoryCountBadge">0 Categories</span>
+                        <div>
+                            <h5 class="fw-bold mb-0 d-flex align-items-center gap-2">
+                                <i class="bi bi-pie-chart-fill text-info"></i> Inventory Category Breakdown
+                            </h5>
+                            <span class="text-muted small" style="font-size: 0.75rem;">Interactive share of store inventory</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-secondary bg-opacity-25 text-light" id="categoryCountBadge">0 Categories</span>
+                        </div>
                     </div>
-                    <div style="position: relative; height: 260px; width: 100%;">
+                    <div style="position: relative; height: 290px; width: 100%;" class="d-flex align-items-center justify-content-center">
                         <canvas id="categoryChart"></canvas>
                     </div>
                 </div>
@@ -446,10 +451,10 @@
 
                     <div class="p-3 rounded-4 border" data-permission="use_ai_studio" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.14), rgba(0, 229, 255, 0.08)); border-color: rgba(0, 229, 255, 0.3) !important;">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="fw-bold d-flex align-items-center gap-2"><i class="bi bi-stars text-info"></i> Groq AI Business Insights</span>
-                            <span class="badge bg-info bg-opacity-25 text-info border border-info border-opacity-25" style="font-size: 0.68rem;">Dual-Key Failover</span>
+                            <span class="fw-bold d-flex align-items-center gap-2"><i class="bi bi-stars text-info"></i> BCS AI Business Insights</span>
+                            <span class="badge bg-info bg-opacity-25 text-info border border-info border-opacity-25" style="font-size: 0.68rem;">Ruleare Engine</span>
                         </div>
-                        <p class="small text-muted mb-3" id="aiDashboardInsightOutput">Analyze live store inventory, low-stock items, and pricing opportunities with Groq LPU AI.</p>
+                        <p class="small text-muted mb-3" id="aiDashboardInsightOutput">Analyze live store inventory, low-stock items, and pricing opportunities with Ruleare Native AI.</p>
                         <div class="d-flex gap-2">
                             <button type="button" id="generateAiInsightsBtn" class="btn btn-sm btn-info text-white fw-semibold flex-grow-1">
                                 <i class="bi bi-lightning-charge-fill me-1"></i> Generate Live Insights
@@ -581,7 +586,7 @@
                     });
                 }
 
-                // Expose live context for BCS Groq AI Copilot & Business Insights
+                // Expose live context for BCS AI Copilot & Business Insights
                 const lowStockItems = [...outOfStock, ...alertStock].slice(0, 15).map(p => ({
                     name: p.name,
                     category: p.category,
@@ -651,15 +656,20 @@
             const canvas = document.getElementById('categoryChart');
             if (!canvas) return;
 
-            // Group products by category
+            // Group products by category and calculate total items
             const categoryMap = {};
+            let totalProductCount = 0;
             products.forEach(p => {
-                const cat = (p.category || 'Uncategorized').trim();
+                const cat = (p.category || 'General').trim();
                 categoryMap[cat] = (categoryMap[cat] || 0) + 1;
+                totalProductCount++;
             });
 
-            const labels = Object.keys(categoryMap);
-            const dataCounts = Object.values(categoryMap);
+            // Sort categories descending by volume for visually appealing flow
+            const sortedEntries = Object.entries(categoryMap).sort((a, b) => b[1] - a[1]);
+            const labels = sortedEntries.map(e => e[0]);
+            const dataCounts = sortedEntries.map(e => e[1]);
+
             const badge = document.getElementById('categoryCountBadge');
             if (badge) badge.textContent = `${labels.length} Categories`;
 
@@ -668,10 +678,50 @@
             }
 
             const ctx = canvas.getContext('2d');
-            const palette = [
-                '#6366f1', '#0ea5e9', '#10b981', '#f59e0b', '#ec4899', 
-                '#8b5cf6', '#14b8a6', '#f97316', '#3b82f6', '#84cc16'
+            
+            // Vibrant modern neon gradient palette
+            const modernPalette = [
+                '#6366f1', // Indigo
+                '#00e5ff', // Cyan Neon
+                '#10b981', // Emerald
+                '#f59e0b', // Amber
+                '#ec4899', // Pink
+                '#8b5cf6', // Violet
+                '#14b8a6', // Teal
+                '#f97316', // Orange
+                '#3b82f6', // Blue
+                '#a855f7', // Purple
+                '#06b6d4', // Sky
+                '#84cc16'  // Lime
             ];
+
+            // Custom center text plugin for total products in doughnut
+            const centerTextPlugin = {
+                id: 'centerTextPlugin',
+                beforeDraw: function(chart) {
+                    if (chart.config.type !== 'doughnut') return;
+                    const { ctx: c, chartArea } = chart;
+                    if (!chartArea) return;
+                    c.save();
+                    const centerX = (chartArea.left + chartArea.right) / 2;
+                    const centerY = (chartArea.top + chartArea.bottom) / 2;
+
+                    c.textAlign = 'center';
+                    c.textBaseline = 'middle';
+
+                    // Number of items
+                    c.font = '800 24px "Plus Jakarta Sans", sans-serif';
+                    c.fillStyle = '#ffffff';
+                    c.fillText(totalProductCount.toLocaleString('en-IN'), centerX, centerY - 8);
+
+                    // Subtitle
+                    c.font = '600 11px "Plus Jakarta Sans", sans-serif';
+                    c.fillStyle = '#94a3b8';
+                    c.fillText('PRODUCTS', centerX, centerY + 14);
+
+                    c.restore();
+                }
+            };
 
             categoryChartInstance = new window.Chart(ctx, {
                 type: 'doughnut',
@@ -679,36 +729,89 @@
                     labels: labels.length > 0 ? labels : ['No Products'],
                     datasets: [{
                         data: dataCounts.length > 0 ? dataCounts : [1],
-                        backgroundColor: palette.slice(0, Math.max(labels.length, 1)),
-                        borderColor: '#1e293b',
-                        borderWidth: 2,
-                        hoverOffset: 6
+                        backgroundColor: labels.length > 0 ? modernPalette.slice(0, labels.length) : ['#334155'],
+                        borderWidth: 0,
+                        hoverBorderWidth: 0,
+                        hoverOffset: 8,
+                        borderRadius: 6,
+                        spacing: 2
                     }]
                 },
+                plugins: [centerTextPlugin],
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true,
+                        duration: 900,
+                        easing: 'easeOutQuart'
+                    },
+                    layout: {
+                        padding: 10
+                    },
                     plugins: {
                         legend: {
                             position: 'right',
+                            align: 'center',
                             labels: {
-                                color: '#94a3b8',
-                                boxWidth: 12,
-                                font: { family: 'Inter', size: 11 }
+                                color: '#cbd5e1',
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                boxWidth: 8,
+                                boxHeight: 8,
+                                padding: 12,
+                                font: {
+                                    family: "'Plus Jakarta Sans', system-ui, sans-serif",
+                                    size: 11,
+                                    weight: '600'
+                                },
+                                generateLabels: function(chart) {
+                                    const data = chart.data;
+                                    if (data.labels.length && data.datasets.length) {
+                                        const dataset = data.datasets[0];
+                                        const total = dataset.data.reduce((a, b) => a + b, 0);
+                                        return data.labels.map((label, i) => {
+                                            const val = dataset.data[i];
+                                            const pct = total > 0 ? ((val / total) * 100).toFixed(0) : 0;
+                                            return {
+                                                text: `${label} (${pct}%)`,
+                                                fillStyle: dataset.backgroundColor[i] || '#6366f1',
+                                                strokeStyle: dataset.backgroundColor[i] || '#6366f1',
+                                                lineWidth: 0,
+                                                hidden: isNaN(dataset.data[i]) || chart.getDatasetMeta(0).data[i]?.hidden,
+                                                index: i
+                                            };
+                                        });
+                                    }
+                                    return [];
+                                }
                             }
                         },
                         tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#e2e8f0',
+                            borderColor: 'rgba(255, 255, 255, 0.15)',
+                            borderWidth: 1,
+                            padding: 12,
+                            cornerRadius: 10,
+                            boxPadding: 6,
+                            usePointStyle: true,
                             callbacks: {
+                                labelPointStyle: function() {
+                                    return { pointStyle: 'circle', rotation: 0 };
+                                },
                                 label: function(context) {
                                     const total = context.dataset.data.reduce((a, b) => a + b, 0);
                                     const value = context.parsed;
                                     const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                                    return ` ${context.label}: ${value} items (${percentage}%)`;
+                                    return `  ${context.label}: ${value.toLocaleString()} items (${percentage}%)`;
                                 }
                             }
                         }
                     },
-                    cutout: '68%'
+                    cutout: '72%'
                 }
             });
         }
@@ -796,7 +899,7 @@
             btn.disabled = true;
             const origHtml = btn.innerHTML;
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Analyzing...';
-            outEl.innerHTML = '<span class="text-info"><i class="bi bi-cpu me-1"></i>Running Groq LPU analysis on live inventory & sales...</span>';
+            outEl.innerHTML = '<span class="text-info"><i class="bi bi-cpu me-1"></i>Running Ruleare AI analysis on live inventory & sales...</span>';
 
             try {
                 const res = await window.BCSAICopilot.ask({
@@ -810,10 +913,7 @@
                     .replace(/>/g, '&gt;')
                     .replace(/\*\*(.*?)\*\*/g, '<strong class="text-light">$1</strong>')
                     .replace(/\n/g, '<br>');
-                const keyBadge = res.keySlotUsed === 'backup'
-                    ? '<span class="badge bg-warning text-dark ms-1">Backup Key</span>'
-                    : '<span class="badge bg-success bg-opacity-25 text-success ms-1">Primary Key</span>';
-                outEl.innerHTML = `<div class="text-light" style="max-height: 220px; overflow-y: auto; font-size: 0.82rem; line-height: 1.5;">${formatted}</div><div class="mt-2 small text-muted">Completed via Groq ${keyBadge}</div>`;
+                outEl.innerHTML = `<div class="text-light" style="max-height: 220px; overflow-y: auto; font-size: 0.82rem; line-height: 1.5;">${formatted}</div><div class="mt-2 small text-muted">Completed via Ruleare AI Engine</div>`;
             } catch (err) {
                 outEl.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>${err.message}</span>`;
             } finally {

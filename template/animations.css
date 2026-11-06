@@ -32,6 +32,36 @@
     --bcs-glow-info: 0 4px 20px rgba(6, 182, 212, 0.35);
     --bcs-glow-danger: 0 4px 20px rgba(239, 68, 68, 0.35);
     --bcs-glow-warning: 0 4px 20px rgba(245, 158, 11, 0.35);
+
+    /* --- Windows Deep OS Integration Defaults --- */
+    --win-accent: #6366f1;
+    --win-accent-rgb: 99, 102, 241;
+    --win-selection-bg: rgba(var(--win-accent-rgb, 99, 102, 241), 0.55);
+    --win-selection-color: #ffffff;
+}
+
+/* ==========================================================================
+   0. Windows Accent Text Selection Synchronization
+   Deeply synchronizes text highlight selection across the entire workspace
+   with the native Windows 11/10 system accent theme.
+   ========================================================================== */
+::selection {
+    background-color: var(--win-selection-bg, rgba(var(--win-accent-rgb, 99, 102, 241), 0.55)) !important;
+    color: var(--win-selection-color, #ffffff) !important;
+    text-shadow: none !important;
+}
+
+::-moz-selection {
+    background-color: var(--win-selection-bg, rgba(var(--win-accent-rgb, 99, 102, 241), 0.55)) !important;
+    color: var(--win-selection-color, #ffffff) !important;
+    text-shadow: none !important;
+}
+
+input::selection,
+textarea::selection {
+    background-color: rgba(var(--win-accent-rgb, 99, 102, 241), 0.65) !important;
+    color: #ffffff !important;
+    text-shadow: none !important;
 }
 
 /* ==========================================================================
@@ -1067,7 +1097,8 @@ html[data-bs-theme="light"] .sidebar .submenu-item:hover .submenu-dot {
 }
 
 html[data-bs-theme="light"] .topbar {
-    background: rgba(255, 255, 255, 0.85) !important;
+    background: transparent !important;
+    --topbar-glass-bg: rgba(255, 255, 255, 0.7);
     border-bottom: 1px solid rgba(15, 23, 42, 0.09) !important;
     color: #0f172a !important;
     box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04) !important;
@@ -1224,4 +1255,5 @@ html[data-bs-theme="light"] .auth-form-pane .input-wrapper input {
     border-color: #cbd5e1 !important;
     color: #0f172a !important;
 }
+
 

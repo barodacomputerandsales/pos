@@ -417,7 +417,7 @@
                         <!-- Form Actions Bar -->
                         <div class="solid-panel p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
                             <div class="text-secondary small fw-medium">
-                                <i class="bi bi-shield-check text-success me-1 fs-6"></i> Cloudflare D1 central database and local cache synchronization enabled.
+                                <i class="bi bi-shield-check text-success me-1 fs-6"></i> High-performance central database and local cache synchronization enabled.
                             </div>
                             <div class="d-flex gap-2">
                                 <button type="button" class="btn btn-outline-secondary px-3 py-2 fw-semibold" id="resetBtn">
@@ -784,9 +784,9 @@
             const submitBtn = document.getElementById('saveSupplierBtn');
             const origHtml = submitBtn.innerHTML;
             submitBtn.disabled = true;
-            submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Saving to Cloudflare D1...`;
+            submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Saving to Database...`;
 
-            if (window.showBcsLoader) window.showBcsLoader("Registering Supplier in Cloudflare D1...");
+            if (window.showBcsLoader) window.showBcsLoader("Registering Supplier in Database...");
 
             try {
                 await addDocument('suppliers', supplierData);

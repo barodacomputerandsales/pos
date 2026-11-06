@@ -4,7 +4,7 @@ window._renderTopbarImpl = function() {
         <div class="d-flex align-items-center gap-2 flex-shrink-0">
             <img src="assets/icon.png" onerror="this.src='template/bcs-logo.svg'" alt="BCS" style="width: 36px; height: 36px; border-radius: 9px; object-fit: contain; filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.45));">
             <h4 class="mb-0 fw-bold fs-5 text-nowrap" style="background: linear-gradient(135deg, #00e5ff, var(--win-accent, #6366f1)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">BCS Enterprise</h4>
-            <span id="topbarVersionBadge" class="badge bg-secondary bg-opacity-25 text-muted border border-secondary border-opacity-25 small" style="font-size: 0.72rem;">v2.3.7</span>
+            <span id="topbarVersionBadge" class="badge bg-secondary bg-opacity-25 text-muted border border-secondary border-opacity-25 small" style="font-size: 0.72rem;">v2.3.8</span>
             <div id="topbarUpdateContainer" class="d-inline-flex align-items-center ms-2"></div>
         </div>
 
@@ -44,7 +44,7 @@ window._renderTopbarImpl = function() {
                 <span id="topbarThemeLabel">Win11</span>
             </button>
 
-            <div class="user-profile px-2 py-1">
+            <div class="user-profile px-2 py-1" onclick="window.location.href='account.html'" style="cursor: pointer;" title="Open Account Center">
                 <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--win-accent, #6366f1), #a855f7); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.85rem;" id="topbarUserInitial">
                     A
                 </div>
@@ -53,8 +53,9 @@ window._renderTopbarImpl = function() {
                     <small class="text-muted text-truncate d-block" style="font-size: 0.7rem; max-width: 90px;" id="topbarUserRole">Admin</small>
                 </div>
             </div>
-            <button class="btn logout-btn py-1 px-3" style="font-size: 0.78rem; white-space: nowrap; flex-shrink: 0;" onclick="if(window.handleSmartLogout) window.handleSmartLogout(); else if(window.logoutUser) window.logoutUser(); else window.location.href='index.html';">
-                <i class="bi bi-box-arrow-right" style="font-size: 0.85rem;"></i> Logout
+            <button type="button" id="topbarLogoutBtn" class="btn btn-sm d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill topbar-logout-btn" style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: #ef4444; font-size: 0.78rem; font-weight: 600; white-space: nowrap; flex-shrink: 0;" onclick="if(window.handleSmartLogout) window.handleSmartLogout(); else if(window.logoutUser) window.logoutUser(); else window.location.href='index.html';">
+                <i class="bi bi-box-arrow-right" style="font-size: 0.85rem;"></i>
+                <span>Logout</span>
             </button>
         </div>
     </header>
@@ -127,3 +128,22 @@ window.promptInstallUpdate = function(version) {
         window.applyBcsUpdateAndRestart();
     }
 };
+
+// Global Clean Session Terminator & Logout Function
+window.handleSmartLogout = function() {
+    try {
+        localStorage.removeItem('isAuthenticated');
+        localStorage.removeItem('loggedInUserId');
+        localStorage.removeItem('loggedInUserName');
+        localStorage.removeItem('userRole');
+        localStorage.removeItem('userPermissions');
+        localStorage.removeItem('sessionId');
+        localStorage.removeItem('sessionPort');
+        sessionStorage.clear();
+    } catch(e) {}
+    window.location.replace('index.html?logout=true');
+};
+window.logout = window.handleSmartLogout;
+window.logoutUser = window.handleSmartLogout;
+
+

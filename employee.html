@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <script>
+        if (localStorage.getItem('isAuthenticated') !== 'true' || !localStorage.getItem('sessionId') || !localStorage.getItem('sessionPort')) {
+            window.location.replace('index.html');
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management | BCS Enterprise POS</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+    <link rel="apple-touch-icon" href="assets/icon.png">
+
+    <!-- Portable Enterprise Neon Laser Loader (Auto-pushes immediately on load) -->
+    <script src="template/loader/loader-1.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bs-body-font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            --page-bg: #0b132b;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --input-bg: #0f172a;
+            --input-border: #334155;
+            --accent-cyan: #00e5ff;
+            --brand-purple: #7c3aed;
+            --text-primary: #ffffff;
+            --text-secondary: #f1f5f9;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            -webkit-font-smoothing: subpixel-antialiased !important;
+            text-rendering: geometricPrecision !important;
+        }
+
+        body {
+            font-family: var(--bs-body-font-family);
+            background: var(--page-bg) !important;
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 85px 30px 40px 30px;
+            flex-grow: 1;
+            min-height: 100vh;
+        }
+
+        @media (max-width: 992px) {
+            .main-content {
+                margin-left: 0;
+                padding: 80px 16px 30px 16px;
+            }
+        }
+
+        .solid-panel {
+            background: var(--card-bg) !important;
+            border: 1px solid var(--card-border) !important;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 18px;
+            transition: border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .stat-card:hover {
+            border-color: var(--accent-cyan);
+            transform: translateY(-2px);
+        }
+
+        /* Form Controls */
+        .form-control, .form-select {
+            background-color: var(--input-bg) !important;
+            border: 1.5px solid var(--input-border) !important;
+            color: #ffffff !important;
+            font-weight: 500;
+            font-size: 0.95rem;
+            border-radius: 9px;
+            padding: 10px 14px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background-color: #0b1329 !important;
+            border-color: var(--accent-cyan) !important;
+            box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.25) !important;
+            color: #ffffff !important;
+        }
+
+        .form-control::placeholder {
+            color: #64748b !important;
+            font-weight: 400;
+        }
+
+        /* High-Contrast Table Styling */
+        .table-custom {
+            margin-bottom: 0;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .table-custom thead th {
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #ffffff !important;
+            font-weight: 800;
+            background: #0f172a !important;
+            border-bottom: 2px solid #334155 !important;
+            padding: 16px 18px;
+            white-space: nowrap;
+        }
+
+        .table-custom tbody td {
+            vertical-align: middle;
+            background: #1e293b !important;
+            border-bottom: 1px solid #334155 !important;
+            padding: 14px 18px;
+            color: #f8fafc !important;
+            font-size: 0.92rem;
+        }
+
+        .table-custom tbody tr:hover td {
+            background: #253349 !important;
+        }
+
+        .role-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 999px;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+
+        .role-admin {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+
+        .role-manager {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+
+        .role-employee {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+
+        .role-cashier {
+            background: rgba(6, 182, 212, 0.2);
+            color: #22d3ee;
+            border: 1px solid rgba(6, 182, 212, 0.4);
+        }
+
+        .perm-tag {
+            font-size: 0.72rem;
+            padding: 3px 8px;
+            background: rgba(99, 102, 241, 0.16);
+            color: #c7d2fe;
+            border: 1px solid rgba(99, 102, 241, 0.35);
+            border-radius: 6px;
+            display: inline-block;
+            margin: 2px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .perm-card-selector {
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 12px 14px;
+            height: 100%;
+            transition: all 0.2s ease;
+        }
+
+        .perm-card-selector:hover {
+            border-color: rgba(99, 102, 241, 0.5);
+            background: rgba(15, 23, 42, 0.95);
+        }
+
+        .form-check-input:checked {
+            background-color: #6366f1;
+            border-color: #6366f1;
+        }
+
+        .search-input-wrap {
+            position: relative;
+            max-width: 380px;
+        }
+
+        .search-input-wrap i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+        }
+
+        .search-input-wrap input {
+            padding-left: 40px;
+        }
+
+        /* Custom Floating Alerts */
+        #custom-alert-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 420px;
+        }
+
+        .custom-alert {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 14px 18px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #ffffff;
+            animation: alertSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .custom-alert.success { border-left: 5px solid #10b981; }
+        .custom-alert.error { border-left: 5px solid #ef4444; }
+        .custom-alert.info { border-left: 5px solid #00e5ff; }
+
+        .custom-alert .title { font-weight: 700; font-size: 0.94rem; margin-bottom: 2px; }
+        .custom-alert .message { font-size: 0.84rem; color: #cbd5e1; line-height: 1.35; }
+        .custom-alert .close-btn { background: none; border: none; color: #94a3b8; cursor: pointer; padding: 0; font-size: 1.25rem; }
+        .custom-alert .close-btn:hover { color: #ffffff; }
+
+        @keyframes alertSlideIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes alertSlideOut { to { transform: translateX(110%); opacity: 0; } }
+    </style>
+</head>
+<body>
+    <!-- Topbar & Sidebar Container (Layout Engine) -->
+    <script src="template/layout.js"></script>
+    <script>
+        protectRoute('manage_users');
+        renderTopbar();
+        renderSidebar('settings', 'employee');
+    </script>
+
+    <div id="custom-alert-container"></div>
+
+    <main class="main-content" id="mainContent">
+        <!-- Breadcrumb & Page Header -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1 small text-muted">
+                        <li class="breadcrumb-item"><a href="dashboard.html" class="text-decoration-none text-muted">Home</a></li>
+                        <li class="breadcrumb-item"><a href="settings.html" class="text-decoration-none text-muted">Settings</a></li>
+                        <li class="breadcrumb-item active text-info" aria-current="page">Employees</li>
+                    </ol>
+                </nav>
+                <h3 class="fw-bold text-white mb-0 d-flex align-items-center gap-2">
+                    <i class="bi bi-people-fill text-info"></i> Employee Management
+                </h3>
+                <p class="text-muted small mb-0 mt-1">Manage staff user profiles, cashiers, fast login PINs, and granular operational permissions.</p>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <a href="account.html" class="btn btn-outline-info d-flex align-items-center gap-2 px-3 py-2 fw-semibold">
+                    <i class="bi bi-person-badge"></i> Account Center
+                </a>
+                <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2 px-3 py-2 fw-semibold" id="refreshEmployeesBtn">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                </button>
+                <button type="button" class="btn btn-primary d-flex align-items-center gap-2 px-3 py-2 fw-bold" id="openAddUserModalBtn" data-permission="manage_users">
+                    <i class="bi bi-person-plus-fill"></i> Add New Employee
+                </button>
+            </div>
+        </div>
+
+        <!-- Quick Switcher to Personal Account Center Banner -->
+        <div class="alert alert-dark border-secondary border-opacity-25 py-2 px-3 mb-4 d-flex align-items-center justify-content-between flex-wrap gap-2" style="background: rgba(15, 23, 42, 0.7); border-radius: 12px;">
+            <div class="small text-muted d-flex align-items-center gap-2">
+                <i class="bi bi-info-circle text-info fs-6"></i>
+                <span>Looking to update your own administrator password, security PIN, or workstation port?</span>
+            </div>
+            <a href="account.html" class="btn btn-sm btn-outline-info py-1 px-3 fw-semibold">
+                <i class="bi bi-person-badge me-1"></i> Open Account Center
+            </a>
+        </div>
+
+        <!-- Metric Stat Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="stat-card">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <span class="text-muted small text-uppercase fw-semibold">Total Employees</span>
+                            <h3 class="fw-bold text-white mb-0 mt-1" id="statTotalUsers">0</h3>
+                        </div>
+                        <div class="rounded-3 p-3 bg-primary bg-opacity-10 text-primary fs-4">
+                            <i class="bi bi-people"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="stat-card">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <span class="text-muted small text-uppercase fw-semibold">Managers</span>
+                            <h3 class="fw-bold text-warning mb-0 mt-1" id="statManagerUsers">0</h3>
+                        </div>
+                        <div class="rounded-3 p-3 bg-warning bg-opacity-10 text-warning fs-4">
+                            <i class="bi bi-briefcase"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="stat-card">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <span class="text-muted small text-uppercase fw-semibold">Cashiers &amp; Staff</span>
+                            <h3 class="fw-bold text-success mb-0 mt-1" id="statStaffUsers">0</h3>
+                        </div>
+                        <div class="rounded-3 p-3 bg-success bg-opacity-10 text-success fs-4">
+                            <i class="bi bi-person-badge"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="stat-card">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <span class="text-muted small text-uppercase fw-semibold">Security Model</span>
+                            <h6 class="fw-bold text-info mb-0 mt-1">Granular RBAC</h6>
+                        </div>
+                        <div class="rounded-3 p-3 bg-info bg-opacity-10 text-info fs-4">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="solid-panel p-3 mb-4">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <div class="search-input-wrap flex-grow-1">
+                    <i class="bi bi-search"></i>
+                    <input type="text" class="form-control" id="searchUserInput" placeholder="Search employees by name, username, or role...">
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <select class="form-select bg-dark text-white border-secondary" id="roleFilterSelect" style="width: auto;">
+                        <option value="all">All Employee Roles</option>
+                        <option value="manager">Managers</option>
+                        <option value="cashier">Cashiers</option>
+                        <option value="employee">Staff / Associates</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Employee Accounts Table -->
+        <div class="solid-panel p-0 overflow-hidden mb-5">
+            <div class="table-responsive">
+                <table class="table table-custom align-middle">
+                    <thead>
+                        <tr>
+                            <th>User Profile</th>
+                            <th>Role</th>
+                            <th>Permissions &amp; Scope</th>
+                            <th>Security Code</th>
+                            <th>Session Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employeesTableBody">
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <div class="spinner-border spinner-border-sm text-info me-2" role="status"></div>
+                                Loading employee profiles from database...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal: Add / Edit Employee Account -->
+    <div class="modal fade" id="employeeModal" tabindex="-1" aria-labelledby="employeeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content solid-panel" style="background: #1e293b !important; border: 1.5px solid #334155 !important;">
+                <div class="modal-header border-bottom border-secondary border-opacity-25 pb-3">
+                    <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2" id="employeeModalLabel">
+                        <i class="bi bi-person-fill text-info"></i> <span id="modalActionTitle">Add New Employee</span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="employeeForm">
+                        <input type="hidden" id="editUserId" value="">
+
+                        <!-- Account Identity -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label text-white small fw-bold" for="empUsername">Username <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="empUsername" required placeholder="e.g. john_doe" autocomplete="off">
+                                <div class="form-text text-muted small">Unique login username.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-white small fw-bold" for="empFullName">Full Name / Display Name</label>
+                                <input type="text" class="form-control" id="empFullName" placeholder="e.g. John Doe">
+                            </div>
+                        </div>
+
+                        <!-- Password & Security Code -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label text-white small fw-bold" for="empPassword">Password <span id="passwordRequiredStar" class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="empPassword" placeholder="••••••••" autocomplete="new-password">
+                                    <button class="btn btn-outline-secondary" type="button" id="toggleEmpPassBtn"><i class="bi bi-eye"></i></button>
+                                </div>
+                                <div class="form-text text-muted small" id="passwordHelpText">Enter password. Leave blank when editing to keep current.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-white small fw-bold" for="empSecurityCode">Security Code</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control mono" id="empSecurityCode" placeholder="••••••" autocomplete="off">
+                                    <button class="btn btn-outline-secondary" type="button" id="toggleEmpCodeBtn"><i class="bi bi-eye"></i></button>
+                                </div>
+                                <div class="form-text text-muted small">Used for Fast Login &amp; Workstation unlock (no length limit).</div>
+                            </div>
+                        </div>
+
+                        <!-- Role & Status -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label text-white small fw-bold" for="empRole">Employee Role <span class="text-danger">*</span></label>
+                                <select class="form-select" id="empRole" required>
+                                    <option value="employee">Staff / Associate (Custom RBAC)</option>
+                                    <option value="cashier">Cashier (POS Checkout &amp; Billing)</option>
+                                    <option value="manager">Store Manager (Operations &amp; Sales)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-white small fw-bold" for="empPhone">Phone / Contact</label>
+                                <input type="text" class="form-control" id="empPhone" placeholder="+880 1XXX XXXXXX">
+                            </div>
+                        </div>
+
+                        <!-- Granular Permissions Grid -->
+                        <div class="mb-3" id="permissionsSection">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="form-label text-white small fw-bold mb-0">
+                                    <i class="bi bi-shield-check text-info me-1"></i> Module Access &amp; Permissions
+                                </label>
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" id="btnSelectAllPerms" style="font-size: 0.72rem;">Select All</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" id="btnClearAllPerms" style="font-size: 0.72rem;">Clear All</button>
+                                </div>
+                            </div>
+
+                            <div class="row g-2">
+                                <!-- Products -->
+                                <div class="col-12 col-md-6">
+                                    <div class="perm-card-selector">
+                                        <div class="fw-bold small text-white mb-2"><i class="bi bi-box-seam-fill text-info me-1"></i> Products &amp; Inventory</div>
+                                        <div class="form-check form-check-inline small">
+                                            <input class="form-check-input perm-checkbox" type="checkbox" value="view_products" id="perm_view_products">
+                                            <label class="form-check-label text-muted" for="perm_view_products">View Products</label>
+                                        </div>
+                                        <div class="form-check form-check-inline small">
+                                            <input class="form-check-input perm-checkbox" type="checkbox" value="add_product" id="perm_add_product">
+                                            <label class="form-check-label text-muted" for="perm_add_product">Add Product</label>
+                                        </div>
+                                        <div class="form-check form-check-inline small">
+                                            <input class="form-check-input perm-checkbox" type="checkbox" value="all_product_edit" id="perm_all_product_edit">
+                                            <label class="form-check-label text-muted" for="perm_all_product_edit">Edit Product</label>
+                                        </div>
+                                        <div class="form-check form-check-inline small">
+                                            <input class="form-check-input perm-checkbox" type="checkbox" value="delete_product" id="perm_delete_product">
+                                            <label class="form-check-label text-muted" for="perm_delete_product">Delete Product</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Sales & POS -->
+                                <div class="col-12 col-md-6">
+                                    <div class="perm-card-selector">
+                                        <div class="fw-bold small text-white mb-2"><i class="bi bi-cart-check-fill text-success me-1"></i> Point of Sale (POS)</div>
+                                        <div class="form-check form-check-inline small">
+                                            <input class="form-check-input perm-checkbox" type="checkbox" value="pos_access" id="perm_pos_access">
+                                            <label class="form-check-label text-muted" for="perm_pos_access">Access POS Register</label>
+                                        </div>
+                                        <div class="form-check form-check-inline small">
+                                            <input class="form-check-input perm-checkbox" type="checkbox" value="make_sales" id="perm_make_sales">
+                                            <label class="form-check-label text-muted" for="perm_make_sales">Checkout &amp; Bill</label>
+                                        </div>
+                                        <div class="form-check form-check-inline small">
+                                            <input class="form-check-input perm-checkbox" type="checkbox" value="view_sales" id="perm_view_sales">
+                                            <label class="form-check-label text-muted" for="perm_view_sales">Sales History</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Purchase & Suppliers -->
+                                <div class="col-12 col-md-6">
+                                    <div class="perm-card-selector">
+                                        <div class="fw-bold small text-white mb-2"><i class="bi bi-bag-check-fill text-warning me-1"></i> Purchases &amp; Suppliers</div>
+                                        <div class="form-check form-check-inline small">
+                                            <input class="form-check-input perm-checkbox" type="checkbox" value="view_purchases" id="perm_view_purchases">
+                                            <label class="form-check-label text-muted" for="perm_view_purchases">View Purchases</label>
+                                        </div>
+                                        <div class="form-check form-check-inline small">
+                                            <input class="form-check-input perm-checkbox" type="checkbox" value="add_purchase" id="perm_add_purchase">
+                                            <label class="form-check-label text-muted" for="perm_add_purchase">Add Purchase</label>
+                                        </div>
+                                        <div class="form-check form-check-inline small">
+                                            <input class="form-check-input perm-checkbox" type="checkbox" value="delete_purchase" id="perm_delete_purchase">
+                                            <label class="form-check-label text-muted" for="perm_delete_purchase">Delete Invoice</label>
+                                        </div>
+                                        <div class="form-check form-check-inline small">
+                                            <input class="form-check-input perm-checkbox" type="checkbox" value="view_suppliers" id="perm_view_suppliers">
+                                            <label class="form-check-label text-muted" for="perm_view_suppliers">Suppliers</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Production -->
+                                <div class="col-12 col-md-6">
+                                    <div class="perm-card-selector">
+                                        <div class="fw-bold small text-white mb-2"><i class="bi bi-gear-wide-connected text-primary me-1"></i> Manufacturing &amp; Production</div>
+                                        <div class="form-check form-check-inline small">
+                                            <input class="form-check-input perm-checkbox" type="checkbox" value="view_production" id="perm_view_production">
+                                            <label class="form-check-label text-muted" for="perm_view_production">View Production</label>
+                                        </div>
+                                        <div class="form-check form-check-inline small">
+                                            <input class="form-check-input perm-checkbox" type="checkbox" value="add_production" id="perm_add_production">
+                                            <label class="form-check-label text-muted" for="perm_add_production">Record Batch</label>
+                                        </div>
+                                        <div class="form-check form-check-inline small">
+                                            <input class="form-check-input perm-checkbox" type="checkbox" value="add_production_item" id="perm_add_production_item">
+                                            <label class="form-check-label text-muted" for="perm_add_production_item">Define BOM Items</label>
+                                        </div>
+                                        <div class="form-check form-check-inline small">
+                                            <input class="form-check-input perm-checkbox" type="checkbox" value="delete_production" id="perm_delete_production">
+                                            <label class="form-check-label text-muted" for="perm_delete_production">Delete Batch</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- AI & Settings -->
+                                <div class="col-12">
+                                    <div class="perm-card-selector">
+                                        <div class="fw-bold small text-white mb-2"><i class="bi bi-stars text-info me-1"></i> Management &amp; Tools</div>
+                                        <div class="form-check form-check-inline small">
+                                            <input class="form-check-input perm-checkbox" type="checkbox" value="use_ai_studio" id="perm_use_ai_studio">
+                                            <label class="form-check-label text-muted" for="perm_use_ai_studio">AI Studio &amp; Copilot</label>
+                                        </div>
+                                        <div class="form-check form-check-inline small">
+                                            <input class="form-check-input perm-checkbox" type="checkbox" value="manage_settings" id="perm_manage_settings">
+                                            <label class="form-check-label text-muted" for="perm_manage_settings">System Settings</label>
+                                        </div>
+                                        <div class="form-check form-check-inline small">
+                                            <input class="form-check-input perm-checkbox" type="checkbox" value="manage_users" id="perm_manage_users">
+                                            <label class="form-check-label text-muted" for="perm_manage_users">Manage User Accounts</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer border-top border-secondary border-opacity-25 px-0 pb-0 mt-4">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary px-4 fw-semibold" id="saveEmployeeBtn">
+                                <i class="bi bi-check-circle-fill me-1"></i> Save Employee Account
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Page Logic Script -->
+    <script type="module">
+        import { getCollection, addDocument, updateDocument, deleteDocument, fetchAPI } from './script/api.js';
+
+        let allUsers = [];
+        let modalInstance = null;
+
+        // Custom in-page Alert Notification
+        window.showCustomAlert = function(title, message, type = 'success') {
+            const container = document.getElementById('custom-alert-container');
+            if (!container) return;
+            const alert = document.createElement('div');
+            alert.className = `custom-alert ${type}`;
+            const iconSvg = type === 'success' 
+                ? '<i class="bi bi-check-circle-fill text-success fs-5"></i>' 
+                : type === 'info'
+                    ? '<i class="bi bi-info-circle-fill text-info fs-5"></i>'
+                    : '<i class="bi bi-exclamation-octagon-fill text-danger fs-5"></i>';
+
+            alert.innerHTML = `
+                <div>${iconSvg}</div>
+                <div class="flex-grow-1">
+                    <div class="title">${title}</div>
+                    <div class="message">${message}</div>
+                </div>
+                <button class="close-btn" onclick="this.closest('.custom-alert').remove()">&times;</button>
+            `;
+
+            container.appendChild(alert);
+            setTimeout(() => {
+                alert.style.animation = 'alertSlideOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+                setTimeout(() => alert.remove(), 300);
+            }, 4500);
+        };
+
+        // SHA-256 helper for security codes and passwords
+        async function sha256Hex(msg) {
+            if (!msg) return '';
+            const data = new TextEncoder().encode(msg);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // Toggle password & code visibility
+        document.getElementById('toggleEmpPassBtn')?.addEventListener('click', () => {
+            const el = document.getElementById('empPassword');
+            if (el) el.type = el.type === 'password' ? 'text' : 'password';
+        });
+
+        document.getElementById('toggleEmpCodeBtn')?.addEventListener('click', () => {
+            const el = document.getElementById('empSecurityCode');
+            if (el) el.type = el.type === 'password' ? 'text' : 'password';
+        });
+
+        // Role change: Admin gets all permissions automatically
+        document.getElementById('empRole')?.addEventListener('change', function() {
+            const isAdm = this.value === 'admin';
+            document.querySelectorAll('.perm-checkbox').forEach(cb => {
+                if (isAdm) {
+                    cb.checked = true;
+                    cb.disabled = true;
+                } else {
+                    cb.disabled = false;
+                }
+            });
+        });
+
+        // Bulk perm toggles
+        document.getElementById('btnSelectAllPerms')?.addEventListener('click', () => {
+            document.querySelectorAll('.perm-checkbox:not(:disabled)').forEach(cb => cb.checked = true);
+        });
+        document.getElementById('btnClearAllPerms')?.addEventListener('click', () => {
+            document.querySelectorAll('.perm-checkbox:not(:disabled)').forEach(cb => cb.checked = false);
+        });
+
+        // Load & Render Employees
+        async function loadEmployees() {
+            const tbody = document.getElementById('employeesTableBody');
+            try {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-muted"><div class="spinner-border spinner-border-sm text-info me-2" role="status"></div> Fetching employee accounts...</td></tr>`;
+                
+                // Fetch users table
+                const users = await getCollection('users', true);
+                const rawUsers = Array.isArray(users) ? users : (users.docs || []);
+                
+                // Strict employee filter: Exclude all admin accounts (Admins manage their own account in Account Center)
+                const isEmployee = (u) => {
+                    const role = String(u.role || '').toLowerCase().trim();
+                    const uname = String(u.username || '').toLowerCase().trim();
+                    if (uname === 'admin' || role === 'admin' || role === 'administrator' || role === 'superadmin') {
+                        return false;
+                    }
+                    let perms = [];
+                    try {
+                        perms = typeof u.permissions === 'string' ? JSON.parse(u.permissions) : (u.permissions || []);
+                        if (!Array.isArray(perms)) perms = [perms];
+                    } catch(e) {
+                        perms = String(u.permissions || '').split(',').filter(Boolean);
+                    }
+                    return !perms.includes('*');
+                };
+
+                allUsers = rawUsers
+                    .map(u => typeof u.data === 'function' ? { ...u.data(), id: u.id || u.data().id } : u)
+                    .filter(isEmployee);
+
+                updateStats();
+                renderTable();
+            } catch (err) {
+                console.error('Error loading employees:', err);
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i> Failed to load employee accounts: ${escapeHtml(err.message || err)}</td></tr>`;
+            }
+        }
+
+        function updateStats() {
+            const total = allUsers.length;
+            const managers = allUsers.filter(u => String(u.role || '').toLowerCase() === 'manager').length;
+            const staff = total - managers;
+
+            const totalEl = document.getElementById('statTotalUsers');
+            const managerEl = document.getElementById('statManagerUsers');
+            const staffEl = document.getElementById('statStaffUsers');
+
+            if (totalEl) totalEl.textContent = total;
+            if (managerEl) managerEl.textContent = managers;
+            if (staffEl) staffEl.textContent = staff;
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('employeesTableBody');
+            const query = (document.getElementById('searchUserInput')?.value || '').toLowerCase().trim();
+            const roleFilter = document.getElementById('roleFilterSelect')?.value || 'all';
+
+            const filtered = allUsers.filter(u => {
+                const matchQuery = !query || 
+                    String(u.username || '').toLowerCase().includes(query) ||
+                    String(u.fullName || '').toLowerCase().includes(query) ||
+                    String(u.role || '').toLowerCase().includes(query);
+
+                const roleLower = String(u.role || 'employee').toLowerCase();
+                const matchRole = roleFilter === 'all' || 
+                    (roleFilter === 'manager' && roleLower === 'manager') ||
+                    (roleFilter === 'cashier' && roleLower === 'cashier') ||
+                    (roleFilter === 'employee' && (roleLower === 'employee' || roleLower === 'staff' || roleLower === 'technician'));
+
+                return matchQuery && matchRole;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-muted"><i class="bi bi-person-x fs-3 d-block mb-2 opacity-50"></i>No employee accounts found. Click 'Add New Employee' to register staff.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(u => {
+                const roleLower = String(u.role || 'employee').toLowerCase();
+                let roleClass = 'role-employee';
+                if (roleLower === 'manager') roleClass = 'role-manager';
+                else if (roleLower === 'cashier') roleClass = 'role-cashier';
+
+                let perms = [];
+                try {
+                    perms = typeof u.permissions === 'string' ? JSON.parse(u.permissions) : (u.permissions || []);
+                    if (!Array.isArray(perms)) perms = [perms];
+                } catch(e) {
+                    perms = String(u.permissions || '').split(',').filter(Boolean);
+                }
+
+                let permTagsHtml = '';
+                if (perms.length === 0) {
+                    permTagsHtml = '<span class="text-muted small fst-italic">No permissions granted</span>';
+                } else {
+                    permTagsHtml = perms.slice(0, 4).map(p => `<span class="perm-tag">${escapeHtml(p)}</span>`).join('');
+                    if (perms.length > 4) {
+                        permTagsHtml += `<span class="perm-tag text-muted">+${perms.length - 4} more</span>`;
+                    }
+                }
+
+                const hasCode = !!u.security_code;
+                const codeBadge = hasCode 
+                    ? '<span class="badge bg-success bg-opacity-15 text-success border border-success border-opacity-25 small"><i class="bi bi-check-circle me-1"></i>Active (6+ Digits)</span>'
+                    : '<span class="badge bg-secondary bg-opacity-25 text-muted small">Not Set</span>';
+
+                const sessionBadge = u.session_id 
+                    ? '<span class="badge bg-info bg-opacity-15 text-info border border-info border-opacity-25 small"><i class="bi bi-hdd-network me-1"></i>Bonded</span>'
+                    : '<span class="badge bg-secondary bg-opacity-25 text-muted small">Offline</span>';
+
+                return `
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" style="width: 38px; height: 38px; background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+                                    ${(u.username || 'U').charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-white">${escapeHtml(u.username || 'Unknown')}</div>
+                                    <div class="small text-muted">${escapeHtml(u.fullName || (u.phone ? u.phone : 'No details'))}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="role-badge ${roleClass}">${escapeHtml(u.role || 'employee')}</span>
+                        </td>
+                        <td>
+                            <div class="d-flex flex-wrap align-items-center">
+                                ${permTagsHtml}
+                            </div>
+                        </td>
+                        <td>${codeBadge}</td>
+                        <td>${sessionBadge}</td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-outline-info btn-edit-user" data-id="${u.id}" title="Edit Profile & Permissions">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-danger btn-delete-user" data-id="${u.id}" data-username="${escapeHtml(u.username)}" title="Delete Account">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Bind action buttons
+            tbody.querySelectorAll('.btn-edit-user').forEach(btn => {
+                btn.addEventListener('click', () => openEditModal(btn.dataset.id));
+            });
+
+            tbody.querySelectorAll('.btn-delete-user').forEach(btn => {
+                btn.addEventListener('click', () => handleDeleteUser(btn.dataset.id, btn.dataset.username));
+            });
+        }
+
+        // Open Add Modal
+        document.getElementById('openAddUserModalBtn')?.addEventListener('click', () => {
+            const form = document.getElementById('employeeForm');
+            form.reset();
+            document.getElementById('editUserId').value = '';
+            document.getElementById('modalActionTitle').textContent = 'Add New Employee';
+            document.getElementById('empUsername').disabled = false;
+            document.getElementById('passwordRequiredStar').classList.remove('d-none');
+            document.getElementById('empPassword').required = true;
+            document.getElementById('passwordHelpText').textContent = 'Required for new accounts.';
+            
+            document.querySelectorAll('.perm-checkbox').forEach(cb => {
+                cb.checked = false;
+                cb.disabled = false;
+            });
+
+            modalInstance = new bootstrap.Modal(document.getElementById('employeeModal'));
+            modalInstance.show();
+        });
+
+        // Open Edit Modal
+        function openEditModal(userId) {
+            const user = allUsers.find(u => String(u.id) === String(userId));
+            if (!user) return;
+
+            document.getElementById('editUserId').value = user.id;
+            document.getElementById('modalActionTitle').textContent = `Edit Employee: ${user.username}`;
+            document.getElementById('empUsername').value = user.username || '';
+            document.getElementById('empUsername').disabled = user.username === 'admin';
+            document.getElementById('empFullName').value = user.fullName || '';
+            document.getElementById('empPhone').value = user.phone || '';
+            document.getElementById('empRole').value = user.role || 'employee';
+            
+            document.getElementById('empPassword').value = '';
+            document.getElementById('empPassword').required = false;
+            document.getElementById('passwordRequiredStar').classList.add('d-none');
+            document.getElementById('passwordHelpText').textContent = 'Leave blank to preserve existing password.';
+
+            document.getElementById('empSecurityCode').value = '';
+
+            let perms = [];
+            try {
+                perms = typeof user.permissions === 'string' ? JSON.parse(user.permissions) : (user.permissions || []);
+                if (!Array.isArray(perms)) perms = [perms];
+            } catch(e) {
+                perms = String(user.permissions || '').split(',').filter(Boolean);
+            }
+
+            const isAdm = user.role === 'admin' || user.role === 'administrator';
+            document.querySelectorAll('.perm-checkbox').forEach(cb => {
+                cb.checked = isAdm || perms.includes('*') || perms.includes(cb.value);
+                cb.disabled = isAdm;
+            });
+
+            modalInstance = new bootstrap.Modal(document.getElementById('employeeModal'));
+            modalInstance.show();
+        }
+
+        // Form Submit
+        document.getElementById('employeeForm')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const saveBtn = document.getElementById('saveEmployeeBtn');
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Saving...';
+
+            try {
+                const editId = document.getElementById('editUserId').value;
+                const username = document.getElementById('empUsername').value.trim();
+                const fullName = document.getElementById('empFullName').value.trim();
+                const phone = document.getElementById('empPhone').value.trim();
+                const role = document.getElementById('empRole').value;
+                const rawPassword = document.getElementById('empPassword').value.trim();
+                const rawCode = document.getElementById('empSecurityCode').value.trim();
+
+                if (!username) throw new Error('Username is required.');
+                if (username.toLowerCase() === 'admin') {
+                    throw new Error('The username "admin" is reserved for Administrator accounts. Please configure admin accounts in the Account Center.');
+                }
+                if (!editId && !rawPassword) throw new Error('Password is required for new accounts.');
+
+                // Collect permissions
+                let perms = [];
+                document.querySelectorAll('.perm-checkbox:checked').forEach(cb => perms.push(cb.value));
+
+                const payload = {
+                    username,
+                    fullName,
+                    phone,
+                    role,
+                    permissions: JSON.stringify(perms),
+                    updatedAt: new Date().toISOString()
+                };
+
+                if (rawPassword) {
+                    payload.password_hash = await sha256Hex(rawPassword);
+                }
+
+                if (rawCode) {
+                    payload.security_code = await sha256Hex(rawCode);
+                }
+
+                if (window.showBcsLoader) window.showBcsLoader("Saving Employee Account...");
+
+                if (editId) {
+                    // Update user
+                    await updateDocument('users', editId, payload);
+                } else {
+                    // Create user
+                    payload.id = 'usr_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+                    payload.createdAt = new Date().toISOString();
+                    await addDocument('users', payload);
+                }
+
+                if (window.hideBcsLoader) window.hideBcsLoader();
+                if (modalInstance) modalInstance.hide();
+                await loadEmployees();
+
+                showCustomAlert('Success', `Employee account '${username}' saved successfully.`, 'success');
+            } catch (err) {
+                if (window.hideBcsLoader) window.hideBcsLoader();
+                console.error('Error saving employee:', err);
+                showCustomAlert('Error Saving Account', err.message || err, 'error');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> Save Employee Account';
+            }
+        });
+
+        // Delete User
+        async function handleDeleteUser(userId, username) {
+            if (!confirm(`Are you sure you want to permanently delete employee account '${username}'?`)) return;
+            try {
+                if (window.showBcsLoader) window.showBcsLoader("Deleting Employee Account...");
+                await deleteDocument('users', userId);
+                if (window.hideBcsLoader) window.hideBcsLoader();
+                await loadEmployees();
+                showCustomAlert('Deleted', `Employee account '${username}' has been removed.`, 'info');
+            } catch (err) {
+                if (window.hideBcsLoader) window.hideBcsLoader();
+                console.error('Error deleting user:', err);
+                showCustomAlert('Failed to Delete', err.message || err, 'error');
+            }
+        }
+
+        // Live filters
+        document.getElementById('searchUserInput')?.addEventListener('input', renderTable);
+        document.getElementById('roleFilterSelect')?.addEventListener('change', renderTable);
+        document.getElementById('refreshEmployeesBtn')?.addEventListener('click', loadEmployees);
+
+        function escapeHtml(str) {
+            return String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // Initial Load
+        loadEmployees();
+    </script>
+</body>
+</html>

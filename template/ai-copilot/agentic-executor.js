@@ -2,7 +2,7 @@
 (function() {
     if (window.BCSAgenticExecutor) return;
 
-    const API_BASE_URL = 'https://backend.bcs.bcsdeveloper.com/api';
+    const API_BASE_URL = 'https://backend-bcs.bcsdeveloper.com/api';
 
     async function apiRequest(endpoint, method = 'GET', body = null) {
         const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}/${endpoint.replace(/^\//, '')}`;

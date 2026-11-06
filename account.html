@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <script>
+        if (localStorage.getItem('isAuthenticated') !== 'true' || !localStorage.getItem('sessionId') || !localStorage.getItem('sessionPort')) {
+            window.location.replace('index.html');
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Center | BCS Enterprise POS</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+    <link rel="apple-touch-icon" href="assets/icon.png">
+
+    <!-- Portable Enterprise Neon Laser Loader -->
+    <script src="template/loader/loader-1.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bs-body-font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            --page-bg: #0b132b;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --input-bg: #0f172a;
+            --input-border: #334155;
+            --accent-cyan: #00e5ff;
+            --brand-purple: #7c3aed;
+            --text-primary: #ffffff;
+            --text-secondary: #f1f5f9;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            -webkit-font-smoothing: subpixel-antialiased !important;
+            text-rendering: geometricPrecision !important;
+        }
+
+        body {
+            font-family: var(--bs-body-font-family);
+            background: var(--page-bg) !important;
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 85px 30px 40px 30px;
+            flex-grow: 1;
+            min-height: 100vh;
+        }
+
+        @media (max-width: 992px) {
+            .main-content {
+                margin-left: 0;
+                padding: 80px 16px 30px 16px;
+            }
+        }
+
+        .solid-panel {
+            background: var(--card-bg) !important;
+            border: 1px solid var(--card-border) !important;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+            position: relative;
+        }
+
+        .profile-hero {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-hero::after {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -10%;
+            width: 320px;
+            height: 320px;
+            background: radial-gradient(circle, rgba(0, 229, 255, 0.12) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .avatar-circle {
+            width: 82px;
+            height: 82px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #00e5ff, #6366f1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #ffffff;
+            box-shadow: 0 0 25px rgba(0, 229, 255, 0.45);
+        }
+
+        /* Form Controls */
+        .form-control, .form-select {
+            background-color: var(--input-bg) !important;
+            border: 1.5px solid var(--input-border) !important;
+            color: #ffffff !important;
+            font-weight: 500;
+            font-size: 0.95rem;
+            border-radius: 10px;
+            padding: 11px 14px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background-color: #0b1329 !important;
+            border-color: var(--accent-cyan) !important;
+            box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.25) !important;
+            color: #ffffff !important;
+        }
+
+        .form-control:disabled, .form-control[readonly] {
+            background-color: rgba(15, 23, 42, 0.6) !important;
+            border-color: rgba(51, 65, 85, 0.6) !important;
+            color: #94a3b8 !important;
+            cursor: not-allowed;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .nav-account {
+            display: inline-flex;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 5px;
+            gap: 6px;
+        }
+
+        .nav-account .nav-link {
+            color: #94a3b8;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 9px 20px;
+            border-radius: 10px;
+            border: none;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-account .nav-link:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-account .nav-link.active {
+            color: #ffffff !important;
+            background: linear-gradient(135deg, #4f46e5, #00e5ff);
+            box-shadow: 0 4px 18px rgba(79, 70, 229, 0.4);
+        }
+
+        .perm-pill {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            background: rgba(99, 102, 241, 0.16);
+            color: #c7d2fe;
+            border: 1px solid rgba(99, 102, 241, 0.35);
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Section Subheading Divider */
+        .section-subheading {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            color: var(--accent-cyan);
+            margin: 20px 0 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-subheading::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(51, 65, 85, 0.6);
+        }
+
+        /* Re-authentication & Session Guard Protection Overlay */
+        .security-locked-wrap {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .security-lock-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(11, 19, 43, 0.88);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 32px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .security-lock-overlay.unlocked {
+            opacity: 0;
+            pointer-events: none;
+            display: none !important;
+        }
+
+        .lock-shield-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(245, 158, 11, 0.25), transparent 70%);
+            border: 2px solid rgba(245, 158, 11, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: #fbbf24;
+            margin-bottom: 14px;
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.3);
+        }
+
+        /* Custom Floating Alerts */
+        #custom-alert-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 420px;
+        }
+
+        .custom-alert {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 14px 18px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #ffffff;
+            animation: alertSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .custom-alert.success { border-left: 5px solid #10b981; }
+        .custom-alert.error { border-left: 5px solid #ef4444; }
+        .custom-alert.info { border-left: 5px solid #00e5ff; }
+
+        .custom-alert .title { font-weight: 700; font-size: 0.94rem; margin-bottom: 2px; }
+        .custom-alert .message { font-size: 0.84rem; color: #cbd5e1; line-height: 1.35; }
+        .custom-alert .close-btn { background: none; border: none; color: #94a3b8; cursor: pointer; padding: 0; font-size: 1.25rem; }
+
+        @keyframes alertSlideIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes alertSlideOut { to { transform: translateX(110%); opacity: 0; } }
+    </style>
+</head>
+<body>
+    <!-- Topbar & Sidebar Container (Layout Engine) -->
+    <script src="template/layout.js"></script>
+    <script>
+        renderTopbar();
+        renderSidebar('settings', 'account');
+    </script>
+
+    <div id="custom-alert-container"></div>
+
+    <main class="main-content" id="mainContent">
+        <!-- Breadcrumb & Page Header -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1 small text-muted">
+                        <li class="breadcrumb-item"><a href="dashboard.html" class="text-decoration-none text-muted">Home</a></li>
+                        <li class="breadcrumb-item"><a href="settings.html" class="text-decoration-none text-muted">Settings</a></li>
+                        <li class="breadcrumb-item active text-info" aria-current="page">Account Center</li>
+                    </ol>
+                </nav>
+                <h3 class="fw-bold text-white mb-0 d-flex align-items-center gap-2">
+                    <i class="bi bi-person-badge-fill text-info"></i> Account Center
+                </h3>
+                <p class="text-muted small mb-0 mt-1">Enterprise administrator profile, family records, mail verification, and re-authentication guarded security.</p>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <a href="employee.html" class="btn btn-outline-info d-flex align-items-center gap-2 px-3 py-2 fw-semibold">
+                    <i class="bi bi-people-fill"></i> Manage Employees
+                </a>
+                <button type="button" class="btn btn-danger d-flex align-items-center gap-2 px-3 py-2 fw-bold" onclick="logout()">
+                    <i class="bi bi-box-arrow-right"></i> Sign Out
+                </button>
+            </div>
+        </div>
+
+        <!-- Profile Hero Overview -->
+        <div class="profile-hero mb-4">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-4">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-circle" id="heroUserInitial">A</div>
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <h4 class="fw-bold text-white mb-0" id="heroUserName">Admin</h4>
+                            <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-25 text-uppercase fw-bold" id="heroUserRole">Administrator</span>
+                            <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-25" id="heroStatusBadge">
+                                <i class="bi bi-shield-check me-1"></i> Active Session
+                            </span>
+                        </div>
+                        <p class="text-muted small mb-2" id="heroUserSubtext">Baroda Computers &amp; Sales Enterprise Root Administrator</p>
+                        <div class="d-flex flex-wrap align-items-center gap-3 small text-muted">
+                            <div><i class="bi bi-key text-info me-1"></i> User ID: <span class="mono text-white" id="heroUserId">admin-1</span></div>
+                            <div><i class="bi bi-laptop text-warning me-1"></i> Bonded Port: <span class="mono text-white" id="heroBondedPort">Not Bonded</span></div>
+                            <div><i class="bi bi-envelope text-info me-1"></i> Email: <span class="text-white" id="heroUserEmail">Not Set</span></div>
+                            <div><i class="bi bi-clock-history text-success me-1"></i> Last Synced: <span class="text-white" id="heroLastSync">Just now</span></div>
+                            <div><i class="bi bi-shield-lock-fill text-info me-1"></i> Security Code: <a href="javascript:void(0)" onclick="document.getElementById('password-tab-btn').click();" class="text-info fw-bold text-decoration-none"><i class="bi bi-pencil-square"></i> Change Code</a></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-info d-flex align-items-center justify-content-center gap-2 py-2 px-3 fw-semibold" id="refreshAccountBtn">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh Account
+                    </button>
+                    <button type="button" class="btn btn-sm btn-warning text-dark d-flex align-items-center justify-content-center gap-2 py-2 px-3 fw-bold" id="btnHeaderReauthTrigger">
+                        <i class="bi bi-shield-lock-fill"></i> <span id="headerReauthText">Authenticate Controls</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="mb-4">
+            <ul class="nav nav-account" id="accountTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="profile-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-profile" type="button" role="tab">
+                        <i class="bi bi-person-circle"></i> Profile &amp; Family Details
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="password-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-password" type="button" role="tab">
+                        <i class="bi bi-shield-lock-fill text-warning"></i> Password &amp; Security Code <span class="badge bg-warning bg-opacity-25 text-warning ms-1" style="font-size: 0.68rem;"><i class="bi bi-lock-fill"></i> Protected</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="session-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-session" type="button" role="tab">
+                        <i class="bi bi-shield-lock-fill text-info"></i> Workstation &amp; Session Guard <span class="badge bg-warning bg-opacity-25 text-warning ms-1" style="font-size: 0.68rem;"><i class="bi bi-lock-fill"></i> Protected</span>
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="accountTabsContent">
+
+            <!-- ==================== TAB 1: PROFILE, FAMILY & CONTACT DETAILS ==================== -->
+            <div class="tab-pane fade show active" id="tab-profile" role="tabpanel">
+                <div class="row g-4">
+                    <!-- Left: Comprehensive Profile Form -->
+                    <div class="col-12 col-xl-8">
+                        <div class="solid-panel p-4 mb-4">
+                            <h5 class="fw-bold text-white mb-1 d-flex align-items-center gap-2">
+                                <i class="bi bi-person-vcard text-info"></i> Administrator Profile &amp; Family Information
+                            </h5>
+                            <p class="text-muted small mb-3">Enterprise identity records, family lineage (optional), and verified communication channels.</p>
+
+                            <form id="profileUpdateForm">
+                                <!-- 1. Core Account Identity -->
+                                <div class="section-subheading">
+                                    <i class="bi bi-shield-shaded"></i> Account Identity &amp; System Bonding
+                                </div>
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label text-muted small fw-semibold">ACCOUNT USERNAME</label>
+                                        <input type="text" class="form-control mono" id="inputUsername" readonly disabled>
+                                        <small class="text-muted" style="font-size: 0.72rem;">Permanently bonded admin ID.</small>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label text-muted small fw-semibold">SYSTEM ROLE</label>
+                                        <input type="text" class="form-control text-uppercase" id="inputRole" readonly disabled>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label text-muted small fw-semibold">DISPLAY / BRAND NAME</label>
+                                        <input type="text" class="form-control" id="inputFullName" placeholder="e.g. Indranil Saha">
+                                    </div>
+                                </div>
+
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label text-muted small fw-semibold">ACCOUNT PASSWORD</label>
+                                        <div class="input-group">
+                                            <input type="password" class="form-control" value="••••••••" readonly disabled>
+                                            <button type="button" class="btn btn-outline-warning" onclick="document.getElementById('password-tab-btn').click(); setTimeout(() => document.getElementById('currPassword')?.focus(), 150);">
+                                                <i class="bi bi-key-fill me-1"></i> Change Password
+                                            </button>
+                                        </div>
+                                        <small class="text-muted" style="font-size: 0.72rem;">Primary account authentication credential.</small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label text-muted small fw-semibold">SECURITY ACCESS CODE</label>
+                                        <div class="input-group">
+                                            <input type="password" class="form-control mono" value="••••••••" readonly disabled>
+                                            <button type="button" class="btn btn-outline-info" onclick="document.getElementById('password-tab-btn').click(); setTimeout(() => document.getElementById('newPinCode')?.focus(), 150);">
+                                                <i class="bi bi-shield-lock-fill me-1"></i> Change Code
+                                            </button>
+                                        </div>
+                                        <small class="text-muted" style="font-size: 0.72rem;">Required 3rd factor on sign-in &amp; fast counter unlock.</small>
+                                    </div>
+                                </div>
+
+                                <!-- 2. Personal & Contact Details -->
+                                <div class="section-subheading">
+                                    <i class="bi bi-person-badge"></i> Personal &amp; Communication Details
+                                </div>
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label text-muted small fw-semibold">FIRST NAME</label>
+                                        <input type="text" class="form-control" id="inputFirstName" placeholder="e.g. Indranil">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label text-muted small fw-semibold">LAST NAME</label>
+                                        <input type="text" class="form-control" id="inputLastName" placeholder="e.g. Saha">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label text-muted small fw-semibold">MOBILE / PHONE NUMBER</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-telephone-fill"></i></span>
+                                            <input type="text" class="form-control" id="inputPhone" placeholder="+880 1XXX XXXXXX">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <label class="form-label text-muted small fw-semibold mb-0">EMAIL ADDRESS</label>
+                                            <span id="emailVerifyStatusBadge">
+                                                <span class="badge bg-secondary bg-opacity-25 text-muted small">Unset</span>
+                                            </span>
+                                        </div>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-envelope-at-fill"></i></span>
+                                            <input type="email" class="form-control" id="inputEmail" placeholder="admin@barodacomputers.com">
+                                            <button type="button" class="btn btn-outline-info" id="btnVerifyEmailAction" title="Verify via BCS Mail Subsystem">
+                                                <i class="bi bi-send-check me-1"></i> Verify Mail
+                                            </button>
+                                        </div>
+                                        <small class="text-muted" style="font-size: 0.72rem;">Integrated with server-native Google OAuth2 Mail Subsystem.</small>
+                                    </div>
+                                </div>
+
+                                <!-- 3. Family & Heritage Details (Optional) -->
+                                <div class="section-subheading">
+                                    <i class="bi bi-people-fill"></i> Family &amp; Lineage Records <span class="badge bg-secondary bg-opacity-25 text-muted ms-1" style="font-size: 0.68rem;">Optional</span>
+                                </div>
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label text-muted small fw-semibold">FATHER'S FIRST NAME</label>
+                                        <input type="text" class="form-control" id="inputFatherFirstName" placeholder="Father's given name">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label text-muted small fw-semibold">FATHER'S LAST NAME</label>
+                                        <input type="text" class="form-control" id="inputFatherLastName" placeholder="Father's surname">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label text-muted small fw-semibold">MOTHER'S FULL NAME</label>
+                                        <input type="text" class="form-control" id="inputMotherName" placeholder="Mother's complete name">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label text-muted small fw-semibold">EMERGENCY CONTACT NUMBER</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-heart-pulse-fill text-danger"></i></span>
+                                            <input type="text" class="form-control" id="inputEmergencyPhone" placeholder="Emergency relative or phone">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 4. Residence & Identity Details (Optional) -->
+                                <div class="section-subheading">
+                                    <i class="bi bi-geo-alt-fill"></i> Residential &amp; National Identity <span class="badge bg-secondary bg-opacity-25 text-muted ms-1" style="font-size: 0.68rem;">Optional</span>
+                                </div>
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-12">
+                                        <label class="form-label text-muted small fw-semibold">RESIDENTIAL ADDRESS</label>
+                                        <input type="text" class="form-control" id="inputAddress" placeholder="House, Street, Area">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label text-muted small fw-semibold">CITY / DISTRICT</label>
+                                        <input type="text" class="form-control" id="inputCity" placeholder="City">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label text-muted small fw-semibold">POSTAL / ZIP CODE</label>
+                                        <input type="text" class="form-control" id="inputPostalCode" placeholder="Postal Code">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label text-muted small fw-semibold">NATIONAL ID (NID) / PASSPORT</label>
+                                        <input type="text" class="form-control mono" id="inputNid" placeholder="NID Number">
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-end mt-4 pt-3 border-top border-secondary border-opacity-25">
+                                    <button type="submit" class="btn btn-primary px-4 py-2 fw-bold d-flex align-items-center gap-2 shadow-sm" id="btnSaveProfile">
+                                        <i class="bi bi-check2-circle fs-5"></i> Save Profile &amp; Family Records
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Right: Permissions Matrix & System Health Overview -->
+                    <div class="col-12 col-xl-4">
+                        <div class="solid-panel p-4 mb-4">
+                            <h5 class="fw-bold text-white mb-2 d-flex align-items-center gap-2">
+                                <i class="bi bi-shield-check text-success"></i> Granted Privileges
+                            </h5>
+                            <p class="text-muted small mb-3">Capabilities authorized for this account across the POS ecosystem.</p>
+
+                            <div id="permissionsContainer" class="d-flex flex-wrap gap-2 mb-3">
+                                <div class="spinner-border spinner-border-sm text-info" role="status"></div>
+                            </div>
+
+                            <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25 mt-3">
+                                <div class="small fw-semibold text-info mb-1"><i class="bi bi-info-circle me-1"></i> Root Administrator Bypass</div>
+                                <div class="small text-muted" style="font-size: 0.78rem;">
+                                    This account possesses full master bypass (<code class="text-white mono">*</code>). All inventory, sales, purchases, manufacturing, settings, and server operations are unlocked.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mail Subsystem Diagnostics Card -->
+                        <div class="solid-panel p-4 mb-4">
+                            <h6 class="fw-bold text-white mb-2 d-flex align-items-center gap-2">
+                                <i class="bi bi-envelope-paper-fill text-info"></i> BCS Mail Subsystem Status
+                            </h6>
+                            <p class="text-muted small mb-3">Connected directly to verified Google OAuth2 RFC 2822 mail gateway.</p>
+                            
+                            <div class="d-flex flex-column gap-2 small">
+                                <div class="d-flex justify-content-between p-2 rounded-2 bg-dark bg-opacity-40">
+                                    <span class="text-muted">Sender Account:</span>
+                                    <span class="mono text-white">barodacomputerandsales@gmail.com</span>
+                                </div>
+                                <div class="d-flex justify-content-between p-2 rounded-2 bg-dark bg-opacity-40">
+                                    <span class="text-muted">Mail Gateway:</span>
+                                    <span class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Operational</span>
+                                </div>
+                                <div class="d-flex justify-content-between p-2 rounded-2 bg-dark bg-opacity-40">
+                                    <span class="text-muted">Verification Engine:</span>
+                                    <span class="text-info">6-Digit Cryptographic OTP</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== TAB 2: PASSWORD & LOGIN PIN (RE-AUTH GUARDED) ==================== -->
+            <div class="tab-pane fade" id="tab-password" role="tabpanel">
+                <!-- Re-Authentication Status Banner -->
+                <div id="reauthBannerPasswordTab"></div>
+
+                <div class="row g-4">
+                    <!-- Change Password Card -->
+                    <div class="col-12 col-lg-6">
+                        <div class="solid-panel p-4 h-100 security-locked-wrap" id="panelChangePassword">
+                            <!-- Security Lock Overlay (visible when not reauthenticated) -->
+                            <div class="security-lock-overlay" id="overlayPassword">
+                                <div class="lock-shield-icon"><i class="bi bi-shield-lock-fill"></i></div>
+                                <h5 class="fw-bold text-white mb-1">Credential Guard Locked</h5>
+                                <p class="text-muted small mb-3" style="max-width: 320px;">
+                                    Changing administrator login credentials strictly requires active identity re-authentication.
+                                </p>
+                                <button type="button" class="btn btn-warning text-dark fw-bold px-4 py-2 btn-trigger-reauth">
+                                    <i class="bi bi-key-fill me-1"></i> Authenticate to Unlock
+                                </button>
+                            </div>
+
+                            <h5 class="fw-bold text-white mb-2 d-flex align-items-center gap-2">
+                                <i class="bi bi-key-fill text-warning"></i> Change Account Password
+                            </h5>
+                            <p class="text-muted small mb-4">Update your primary login password. Minimum 6 characters required.</p>
+
+                            <form id="changePasswordForm">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small fw-semibold">CURRENT PASSWORD</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="currPassword" required placeholder="Enter current password">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('currPassword')">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small fw-semibold">NEW PASSWORD</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="newPassword" required placeholder="Enter new password">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('newPassword')">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label text-muted small fw-semibold">CONFIRM NEW PASSWORD</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="confirmNewPassword" required placeholder="Re-enter new password">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('confirmNewPassword')">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-warning text-dark w-100 py-2 fw-bold d-flex align-items-center justify-content-center gap-2" id="btnSubmitPassword">
+                                    <i class="bi bi-shield-lock"></i> Update Password
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Change Security Access Code Card -->
+                    <div class="col-12 col-lg-6">
+                        <div class="solid-panel p-4 h-100 security-locked-wrap" id="panelFastPin">
+                            <!-- Security Lock Overlay -->
+                            <div class="security-lock-overlay" id="overlayFastPin">
+                                <div class="lock-shield-icon"><i class="bi bi-shield-lock-fill"></i></div>
+                                <h5 class="fw-bold text-white mb-1">Security Code Guard Locked</h5>
+                                <p class="text-muted small mb-3" style="max-width: 320px;">
+                                    Setting or updating your security access code strictly requires active identity re-authentication.
+                                </p>
+                                <button type="button" class="btn btn-warning text-dark fw-bold px-4 py-2 btn-trigger-reauth">
+                                    <i class="bi bi-key-fill me-1"></i> Authenticate to Unlock
+                                </button>
+                            </div>
+
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <h5 class="fw-bold text-white mb-0 d-flex align-items-center gap-2">
+                                    <i class="bi bi-shield-check text-info"></i> Change Security Access Code
+                                </h5>
+                                <span class="badge bg-info bg-opacity-15 text-info border border-info border-opacity-25 small">
+                                    <i class="bi bi-asterisk"></i> 3rd Factor &amp; Fast PIN
+                                </span>
+                            </div>
+                            <p class="text-muted small mb-4">Set or update the security access code required for login Factor 3 and instant Fast PIN unlock (no character limits).</p>
+
+                            <form id="updatePinForm">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small fw-semibold">NEW SECURITY ACCESS CODE</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control mono text-center fs-4 fw-bold letter-spacing-2" id="newPinCode" required placeholder="Enter new access code">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('newPinCode')">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                    <small class="text-muted" style="font-size: 0.75rem;">Can be numbers, letters, or symbols (no character limits).</small>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label text-muted small fw-semibold">CONFIRM SECURITY ACCESS CODE</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control mono text-center fs-4 fw-bold letter-spacing-2" id="confirmPinCode" required placeholder="Re-enter new access code">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('confirmPinCode')">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-info text-white w-100 py-2 fw-bold d-flex align-items-center justify-content-center gap-2" id="btnSubmitPin">
+                                    <i class="bi bi-check2-circle"></i> Update Security Access Code
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== TAB 3: WORKSTATION & SESSION GUARD (RE-AUTH GUARDED) ==================== -->
+            <div class="tab-pane fade" id="tab-session" role="tabpanel">
+                <!-- Re-Authentication Status Banner -->
+                <div id="reauthBannerSessionTab"></div>
+
+                <div class="solid-panel p-4 mb-4 security-locked-wrap" id="panelWorkstationGuard">
+                    <!-- Security Lock Overlay -->
+                    <div class="security-lock-overlay" id="overlayWorkstation">
+                        <div class="lock-shield-icon"><i class="bi bi-hdd-network-fill"></i></div>
+                        <h5 class="fw-bold text-white mb-1">Workstation Guard Locked</h5>
+                        <p class="text-muted small mb-3" style="max-width: 360px;">
+                            Modifying workstation port bonding or session locks strictly requires active identity re-authentication.
+                        </p>
+                        <button type="button" class="btn btn-warning text-dark fw-bold px-4 py-2 btn-trigger-reauth">
+                            <i class="bi bi-key-fill me-1"></i> Authenticate to Unlock
+                        </button>
+                    </div>
+
+                    <h5 class="fw-bold text-white mb-2 d-flex align-items-center gap-2">
+                        <i class="bi bi-shield-shaded text-primary"></i> Anti-Hijacking Workstation &amp; Session Guard
+                    </h5>
+                    <p class="text-muted small mb-4">Manage workstation port bonding to protect your account against unauthorized external logins.</p>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-12 col-md-4">
+                            <div class="p-3 rounded-3 bg-dark bg-opacity-60 border border-secondary border-opacity-25">
+                                <span class="text-muted small text-uppercase fw-semibold">Active Session Token</span>
+                                <div class="mono text-info text-truncate mt-1" id="sessionTokenVal" style="font-size: 0.85rem;">--</div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <div class="p-3 rounded-3 bg-dark bg-opacity-60 border border-secondary border-opacity-25">
+                                <span class="text-muted small text-uppercase fw-semibold">Current Client Port</span>
+                                <div class="mono text-warning mt-1 fw-bold fs-5" id="currentPortVal">--</div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <div class="p-3 rounded-3 bg-dark bg-opacity-60 border border-secondary border-opacity-25">
+                                <span class="text-muted small text-uppercase fw-semibold">Bonded Trusted Port</span>
+                                <div class="mono text-success mt-1 fw-bold fs-5" id="bondedPortVal">--</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap align-items-center gap-3 pt-3 border-top border-secondary border-opacity-25">
+                        <button type="button" class="btn btn-primary px-3 py-2 fw-semibold d-flex align-items-center gap-2" id="actionBondPortBtn">
+                            <i class="bi bi-link-45deg"></i> Bond Current Workstation Port
+                        </button>
+                        <button type="button" class="btn btn-outline-warning px-3 py-2 fw-semibold d-flex align-items-center gap-2" id="actionClearBondBtn">
+                            <i class="bi bi-slash-circle"></i> Clear Workstation Bonding (Allow Roaming)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ==================== MODAL: RE-AUTHENTICATION CHALLENGE ==================== -->
+    <div class="modal fade" id="reauthModal" tabindex="-1" aria-labelledby="reauthModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content solid-panel" style="background: #1e293b !important; border: 1.5px solid #475569 !important;">
+                <div class="modal-header border-bottom border-secondary border-opacity-25 pb-3">
+                    <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2" id="reauthModalLabel">
+                        <i class="bi bi-shield-lock-fill text-warning"></i> Security Re-Authentication
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="alert alert-dark border-secondary border-opacity-40 small mb-3" style="background: rgba(15, 23, 42, 0.8);">
+                        <i class="bi bi-info-circle text-info me-1"></i> Please re-authenticate by entering your administrator account password to unlock credential management and workstation controls.
+                    </div>
+
+                    <form id="reauthForm">
+                        <div class="mb-3">
+                            <label class="form-label text-white small fw-bold" for="reauthPassword">Account Password <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="reauthPassword" required placeholder="Enter current password" autocomplete="current-password">
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('reauthPassword')">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="reauthErrorAlert" class="alert alert-danger py-2 px-3 small d-none mb-3"></div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="button" class="btn btn-outline-secondary px-3 py-2" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-warning text-dark fw-bold px-4 py-2 d-flex align-items-center gap-2" id="btnSubmitReauth">
+                                <i class="bi bi-unlock-fill"></i> Verify &amp; Unlock Controls
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: EMAIL VERIFICATION VIA BCS MAIL ==================== -->
+    <div class="modal fade" id="emailVerifyModal" tabindex="-1" aria-labelledby="emailVerifyModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content solid-panel" style="background: #1e293b !important; border: 1.5px solid #00e5ff !important;">
+                <div class="modal-header border-bottom border-secondary border-opacity-25 pb-3">
+                    <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2" id="emailVerifyModalLabel">
+                        <i class="bi bi-envelope-check-fill text-info"></i> Verify Email Address
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="text-center mb-3">
+                        <div class="rounded-circle d-inline-flex p-3 bg-info bg-opacity-10 text-info mb-2 fs-2">
+                            <i class="bi bi-send-check"></i>
+                        </div>
+                        <h6 class="fw-bold text-white mb-1">Verification Code Dispatched</h6>
+                        <p class="text-muted small mb-0">We sent a 6-digit cryptographic verification code to:</p>
+                        <div class="fw-bold text-info mono my-1" id="verifyTargetEmailDisplay">admin@example.com</div>
+                    </div>
+
+                    <form id="emailVerifyForm">
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold text-center d-block">ENTER VERIFICATION CODE</label>
+                            <input type="text" class="form-control mono text-center fs-3 fw-bold letter-spacing-3" id="emailOtpInput" required placeholder="••••••" autocomplete="one-time-code">
+                        </div>
+
+                        <div id="emailVerifyErrorAlert" class="alert alert-danger py-2 px-3 small d-none mb-3"></div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-3 small">
+                            <span class="text-muted">Didn't receive code?</span>
+                            <button type="button" class="btn btn-link text-info p-0 text-decoration-none small" id="btnResendOtp">Resend Code</button>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-outline-secondary px-3 py-2" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-info text-white fw-bold px-4 py-2 d-flex align-items-center gap-2" id="btnConfirmEmailVerify">
+                                <i class="bi bi-patch-check-fill"></i> Confirm Verification
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { getCollection, updateDocument, fetchAPI } from './script/api.js';
+
+        let currentAccount = null;
+        let isSecurityReauthenticated = false;
+        let activeEmailVerification = null;
+        let reauthModalInstance = null;
+        let emailVerifyModalInstance = null;
+
+        window.showCustomAlert = function(title, message, type = 'success') {
+            const container = document.getElementById('custom-alert-container');
+            if (!container) return;
+            const alert = document.createElement('div');
+            alert.className = `custom-alert ${type}`;
+            const iconSvg = type === 'success' 
+                ? '<i class="bi bi-check-circle-fill text-success fs-5"></i>' 
+                : type === 'info'
+                    ? '<i class="bi bi-info-circle-fill text-info fs-5"></i>'
+                    : '<i class="bi bi-exclamation-octagon-fill text-danger fs-5"></i>';
+
+            alert.innerHTML = `
+                <div>${iconSvg}</div>
+                <div class="flex-grow-1">
+                    <div class="title">${title}</div>
+                    <div class="message">${message}</div>
+                </div>
+                <button class="close-btn" onclick="this.closest('.custom-alert').remove()">&times;</button>
+            `;
+
+            container.appendChild(alert);
+            setTimeout(() => {
+                alert.style.animation = 'alertSlideOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+                setTimeout(() => alert.remove(), 300);
+            }, 4500);
+        };
+
+        window.togglePasswordVisibility = function(id) {
+            const el = document.getElementById(id);
+            if (el) el.type = el.type === 'password' ? 'text' : 'password';
+        };
+
+        async function sha256Hex(msg) {
+            if (!msg) return '';
+            const data = new TextEncoder().encode(msg);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // ==================== RE-AUTHENTICATION SYSTEM ====================
+        function updateSecurityGateUI() {
+            const overlays = [
+                document.getElementById('overlayPassword'),
+                document.getElementById('overlayFastPin'),
+                document.getElementById('overlayWorkstation')
+            ];
+
+            const headerBtnText = document.getElementById('headerReauthText');
+            if (headerBtnText) {
+                headerBtnText.textContent = isSecurityReauthenticated ? 'Security Controls Unlocked' : 'Authenticate Controls';
+            }
+
+            const headerBtn = document.getElementById('btnHeaderReauthTrigger');
+            if (headerBtn) {
+                if (isSecurityReauthenticated) {
+                    headerBtn.className = 'btn btn-sm btn-outline-success d-flex align-items-center justify-content-center gap-2 py-2 px-3 fw-bold';
+                    headerBtn.innerHTML = '<i class="bi bi-shield-fill-check text-success"></i> Re-Lock Controls';
+                } else {
+                    headerBtn.className = 'btn btn-sm btn-warning text-dark d-flex align-items-center justify-content-center gap-2 py-2 px-3 fw-bold';
+                    headerBtn.innerHTML = '<i class="bi bi-shield-lock-fill"></i> Authenticate Controls';
+                }
+            }
+
+            // Render Banner in Tab 2 and Tab 3
+            const bannerHtml = isSecurityReauthenticated
+                ? `
+                    <div class="alert alert-dark border-success border-opacity-40 d-flex align-items-center justify-content-between flex-wrap gap-3 p-3 mb-4 rounded-4" style="background: rgba(16, 185, 129, 0.08);">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-circle p-2 bg-success bg-opacity-20 text-success fs-4">
+                                <i class="bi bi-shield-fill-check"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-white mb-1">Security Controls Unlocked (Active Session Verified)</h6>
+                                <p class="text-muted small mb-0">Identity verified. You are authorized to modify passwords, fast PINs, and workstation port bonding.</p>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-outline-danger btn-sm px-3 py-2 fw-semibold btn-relock-security">
+                            <i class="bi bi-lock-fill me-1"></i> Re-Lock Controls
+                        </button>
+                    </div>
+                `
+                : `
+                    <div class="alert alert-dark border-warning border-opacity-40 d-flex align-items-center justify-content-between flex-wrap gap-3 p-3 mb-4 rounded-4" style="background: rgba(30, 41, 59, 0.9);">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-circle p-2 bg-warning bg-opacity-15 text-warning fs-4">
+                                <i class="bi bi-shield-lock-fill"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-white mb-1">Re-Authentication Required</h6>
+                                <p class="text-muted small mb-0">Sensitive credential, fast PIN, and workstation session guards are locked for your security.</p>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-warning text-dark fw-bold px-3 py-2 btn-trigger-reauth">
+                            <i class="bi bi-key-fill me-1"></i> Authenticate to Unlock
+                        </button>
+                    </div>
+                `;
+
+            const b1 = document.getElementById('reauthBannerPasswordTab');
+            const b2 = document.getElementById('reauthBannerSessionTab');
+            if (b1) b1.innerHTML = bannerHtml;
+            if (b2) b2.innerHTML = bannerHtml;
+
+            // Toggle locked overlays
+            overlays.forEach(ov => {
+                if (!ov) return;
+                if (isSecurityReauthenticated) {
+                    ov.classList.add('unlocked');
+                } else {
+                    ov.classList.remove('unlocked');
+                }
+            });
+
+            // Bind click handlers on banners
+            document.querySelectorAll('.btn-trigger-reauth').forEach(btn => {
+                btn.onclick = openReauthModal;
+            });
+            document.querySelectorAll('.btn-relock-security').forEach(btn => {
+                btn.onclick = lockSecurityControls;
+            });
+        }
+
+        function openReauthModal() {
+            const errEl = document.getElementById('reauthErrorAlert');
+            if (errEl) errEl.classList.add('d-none');
+            const passInput = document.getElementById('reauthPassword');
+            if (passInput) passInput.value = '';
+
+            const modalEl = document.getElementById('reauthModal');
+            if (!reauthModalInstance) {
+                reauthModalInstance = new bootstrap.Modal(modalEl);
+            }
+            reauthModalInstance.show();
+        }
+
+        function lockSecurityControls() {
+            isSecurityReauthenticated = false;
+            updateSecurityGateUI();
+            showCustomAlert('Controls Locked', 'Sensitive security controls have been locked.', 'info');
+        }
+
+        // Header button action
+        document.getElementById('btnHeaderReauthTrigger')?.addEventListener('click', () => {
+            if (isSecurityReauthenticated) {
+                lockSecurityControls();
+            } else {
+                openReauthModal();
+            }
+        });
+
+        // Re-Auth Form Submit
+        document.getElementById('reauthForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmitReauth');
+            const errEl = document.getElementById('reauthErrorAlert');
+            const enteredPass = document.getElementById('reauthPassword').value;
+
+            if (!enteredPass) return;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Verifying...';
+            if (errEl) errEl.classList.add('d-none');
+
+            try {
+                const username = currentAccount?.username || localStorage.getItem('loggedInUserName') || 'admin';
+                // Dedicated in-session re-authentication endpoint (does not touch session_id or trusted_port)
+                const verifyRes = await fetchAPI('auth/reauth', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        username,
+                        password: enteredPass
+                    })
+                });
+
+                if (!verifyRes || !verifyRes.verified) {
+                    throw new Error(verifyRes?.error || 'Incorrect administrator password. Identity verification failed.');
+                }
+
+                isSecurityReauthenticated = true;
+                updateSecurityGateUI();
+                if (reauthModalInstance) reauthModalInstance.hide();
+                showCustomAlert('Re-Authentication Successful', 'Security controls unlocked without altering session state.', 'success');
+            } catch (err) {
+                if (errEl) {
+                    errEl.textContent = err.message || 'Authentication failed.';
+                    errEl.classList.remove('d-none');
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-unlock-fill"></i> Verify &amp; Unlock Controls';
+            }
+        });
+
+        // ==================== LOAD ACCOUNT DETAILS ====================
+        async function loadAccountDetails() {
+            try {
+                const currentUsername = localStorage.getItem('loggedInUserName') || 'admin';
+                const sessionId = localStorage.getItem('sessionId') || '';
+                const sessionPort = localStorage.getItem('sessionPort') || '';
+
+                if (document.getElementById('sessionTokenVal')) {
+                    document.getElementById('sessionTokenVal').textContent = sessionId || 'N/A';
+                }
+                if (document.getElementById('currentPortVal')) {
+                    document.getElementById('currentPortVal').textContent = sessionPort ? `Port ${sessionPort}` : 'None';
+                }
+
+                // Fetch latest user details from database via getCollection
+                const usersColl = await getCollection('users', true);
+                const rawUsers = Array.isArray(usersColl) ? usersColl : (usersColl.docs || []);
+                const userList = rawUsers.map(u => typeof u.data === 'function' ? { ...u.data(), id: u.id || u.data().id } : u);
+
+                currentAccount = userList.find(u => String(u.username || '').toLowerCase() === currentUsername.toLowerCase()) || null;
+
+                if (!currentAccount) {
+                    currentAccount = userList.find(u => {
+                        const r = String(u.role || '').toLowerCase();
+                        return r === 'admin' || r === 'administrator';
+                    }) || {
+                        id: 'admin-1',
+                        username: currentUsername,
+                        role: 'admin',
+                        permissions: ['*'],
+                        trusted_port: sessionPort
+                    };
+                }
+
+                // Populate Hero
+                document.getElementById('heroUserName').textContent = currentAccount.fullName || currentAccount.name || currentAccount.username || 'Admin';
+                document.getElementById('heroUserId').textContent = currentAccount.id || 'N/A';
+                document.getElementById('heroUserRole').textContent = currentAccount.role || 'Administrator';
+                document.getElementById('heroUserInitial').textContent = (currentAccount.username || 'A').charAt(0).toUpperCase();
+                document.getElementById('heroUserEmail').textContent = currentAccount.email || 'Not Set';
+                
+                const bondedPort = currentAccount.trusted_port || null;
+                document.getElementById('heroBondedPort').textContent = bondedPort ? `Port ${bondedPort} (Bonded)` : 'Roaming (Unrestricted)';
+                document.getElementById('bondedPortVal').textContent = bondedPort ? `Port ${bondedPort}` : 'None (Roaming)';
+
+                // Form Fields: Core Identity
+                document.getElementById('inputUsername').value = currentAccount.username || '';
+                document.getElementById('inputRole').value = currentAccount.role || 'admin';
+                document.getElementById('inputFullName').value = currentAccount.fullName || currentAccount.name || '';
+
+                // Form Fields: Personal & Contact Details
+                document.getElementById('inputFirstName').value = currentAccount.firstName || '';
+                document.getElementById('inputLastName').value = currentAccount.lastName || '';
+                document.getElementById('inputPhone').value = currentAccount.phone || currentAccount.mobile || '';
+                document.getElementById('inputEmail').value = currentAccount.email || '';
+
+                // Form Fields: Family & Heritage Details
+                document.getElementById('inputFatherFirstName').value = currentAccount.fatherFirstName || '';
+                document.getElementById('inputFatherLastName').value = currentAccount.fatherLastName || '';
+                document.getElementById('inputMotherName').value = currentAccount.motherName || '';
+                document.getElementById('inputEmergencyPhone').value = currentAccount.emergencyPhone || '';
+
+                // Form Fields: Residential & Identity
+                document.getElementById('inputAddress').value = currentAccount.address || '';
+                document.getElementById('inputCity').value = currentAccount.city || '';
+                document.getElementById('inputPostalCode').value = currentAccount.postalCode || '';
+                document.getElementById('inputNid').value = currentAccount.nid || '';
+
+                // Update Email Verification Status Pill
+                renderEmailVerificationBadge();
+
+                // Populate Permissions Matrix
+                const permContainer = document.getElementById('permissionsContainer');
+                let perms = currentAccount.permissions || ['*'];
+                if (typeof perms === 'string') {
+                    try { perms = JSON.parse(perms); } catch(e) { perms = [perms]; }
+                }
+
+                if (perms.includes('*')) {
+                    permContainer.innerHTML = '<span class="perm-pill text-danger border-danger border-opacity-40" style="background: rgba(239, 68, 68, 0.2);"><i class="bi bi-shield-fill-check"></i> Master System Access (*)</span>';
+                } else {
+                    permContainer.innerHTML = perms.map(p => `<span class="perm-pill">${p}</span>`).join('');
+                }
+
+                document.getElementById('heroLastSync').textContent = new Date().toLocaleTimeString();
+                updateSecurityGateUI();
+            } catch (err) {
+                console.error('Failed to load account details:', err);
+                showCustomAlert('Error', 'Failed to load user account details: ' + err.message, 'error');
+            }
+        }
+
+        // ==================== EMAIL VERIFICATION BADGE & LOGIC ====================
+        function renderEmailVerificationBadge() {
+            const container = document.getElementById('emailVerifyStatusBadge');
+            if (!container) return;
+
+            const email = (document.getElementById('inputEmail')?.value || '').trim();
+            if (!email) {
+                container.innerHTML = '<span class="badge bg-secondary bg-opacity-25 text-muted small">Email Unset</span>';
+                return;
+            }
+
+            if (currentAccount && currentAccount.email_verified && currentAccount.email === email) {
+                container.innerHTML = '<span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-30 small"><i class="bi bi-patch-check-fill me-1"></i>Verified</span>';
+            } else {
+                container.innerHTML = '<span class="badge bg-warning bg-opacity-20 text-warning border border-warning border-opacity-30 small"><i class="bi bi-exclamation-circle-fill me-1"></i>Unverified</span>';
+            }
+        }
+
+        document.getElementById('inputEmail')?.addEventListener('input', renderEmailVerificationBadge);
+
+        // Verify Email Action Button Click
+        document.getElementById('btnVerifyEmailAction')?.addEventListener('click', async () => {
+            const email = (document.getElementById('inputEmail')?.value || '').trim();
+            if (!email || !email.includes('@')) {
+                showCustomAlert('Invalid Email', 'Please provide a valid email address first.', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('btnVerifyEmailAction');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Sending...';
+
+            try {
+                // Generate secure 6-digit OTP
+                const otp = Math.floor(100000 + Math.random() * 900000).toString();
+                activeEmailVerification = {
+                    email,
+                    code: otp,
+                    expiresAt: Date.now() + (10 * 60 * 1000) // 10 minutes
+                };
+
+                // Dispatch Email via verified BCS Mail Subsystem
+                await fetchAPI('mail/send', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        to: email,
+                        subject: `🔐 Baroda Computers POS - Email Verification OTP: ${otp}`,
+                        htmlBody: `
+                            <div style="font-family: Arial, sans-serif; background: #0f172a; color: #f8fafc; padding: 32px; border-radius: 12px; max-width: 580px; margin: auto; border: 1px solid #334155;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                                    <h2 style="color: #00e5ff; margin: 0;">Baroda Computers &amp; Sales</h2>
+                                </div>
+                                <h3 style="color: #ffffff; margin-top: 0;">Account Center Email Verification</h3>
+                                <p style="font-size: 15px; color: #cbd5e1; line-height: 1.5;">
+                                    Hello <strong>${currentAccount.username}</strong>,<br>
+                                    You requested to verify this email address for your administrator account in the POS Account Center.
+                                </p>
+                                <div style="background: #1e293b; border: 1.5px dashed #00e5ff; border-radius: 10px; padding: 22px; text-align: center; margin: 26px 0;">
+                                    <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: #94a3b8; margin-bottom: 8px;">Your 6-Digit Verification Code</div>
+                                    <span style="font-size: 34px; font-weight: 800; letter-spacing: 8px; color: #38bdf8; font-family: monospace;">${otp}</span>
+                                </div>
+                                <p style="font-size: 13px; color: #94a3b8; line-height: 1.4;">
+                                    This verification code is strictly confidential and expires in 10 minutes. If you did not initiate this request, you can safely ignore this email.
+                                </p>
+                                <hr style="border: 0; border-top: 1px solid #334155; margin: 24px 0;">
+                                <div style="font-size: 11px; color: #64748b; text-align: center;">
+                                    Baroda Computers &amp; Sales Enterprise Ecosystem • Verified Mail Subsystem (RFC 2822)
+                                </div>
+                            </div>
+                        `
+                    })
+                });
+
+                document.getElementById('verifyTargetEmailDisplay').textContent = email;
+                document.getElementById('emailOtpInput').value = '';
+                document.getElementById('emailVerifyErrorAlert').classList.add('d-none');
+
+                const modalEl = document.getElementById('emailVerifyModal');
+                emailVerifyModalInstance = new bootstrap.Modal(modalEl);
+                emailVerifyModalInstance.show();
+
+                showCustomAlert('Verification Dispatched', `A 6-digit OTP was sent to ${email} via BCS Mail.`, 'info');
+            } catch (err) {
+                console.error('Mail dispatch error:', err);
+                showCustomAlert('Mail Error', 'Failed to dispatch verification email: ' + err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-send-check me-1"></i> Verify Mail';
+            }
+        });
+
+        // Resend OTP
+        document.getElementById('btnResendOtp')?.addEventListener('click', () => {
+            document.getElementById('btnVerifyEmailAction')?.click();
+        });
+
+        // Confirm Email Verification Code
+        document.getElementById('emailVerifyForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const entered = (document.getElementById('emailOtpInput')?.value || '').trim();
+            const errEl = document.getElementById('emailVerifyErrorAlert');
+
+            if (!activeEmailVerification) {
+                errEl.textContent = 'No active verification request. Please request a new code.';
+                errEl.classList.remove('d-none');
+                return;
+            }
+
+            if (Date.now() > activeEmailVerification.expiresAt) {
+                errEl.textContent = 'Verification code has expired. Please request a new code.';
+                errEl.classList.remove('d-none');
+                return;
+            }
+
+            if (entered !== activeEmailVerification.code) {
+                errEl.textContent = 'Incorrect 6-digit code. Please check your inbox and try again.';
+                errEl.classList.remove('d-none');
+                return;
+            }
+
+            try {
+                if (window.showBcsLoader) window.showBcsLoader("Verifying Email...");
+
+                // Mark email as verified and update user record
+                currentAccount.email = activeEmailVerification.email;
+                currentAccount.email_verified = true;
+                currentAccount.email_verified_at = new Date().toISOString();
+
+                await updateDocument('users', currentAccount.id, {
+                    email: activeEmailVerification.email,
+                    email_verified: true,
+                    email_verified_at: currentAccount.email_verified_at
+                });
+
+                if (window.hideBcsLoader) window.hideBcsLoader();
+                if (emailVerifyModalInstance) emailVerifyModalInstance.hide();
+
+                renderEmailVerificationBadge();
+                showCustomAlert('Email Verified', `Your email address '${activeEmailVerification.email}' has been verified successfully!`, 'success');
+                activeEmailVerification = null;
+                await loadAccountDetails();
+            } catch (err) {
+                if (window.hideBcsLoader) window.hideBcsLoader();
+                errEl.textContent = 'Failed to record verification: ' + err.message;
+                errEl.classList.remove('d-none');
+            }
+        });
+
+        // ==================== PROFILE FORM SUBMIT ====================
+        document.getElementById('profileUpdateForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentAccount || !currentAccount.id) return;
+
+            const btn = document.getElementById('btnSaveProfile');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Saving...';
+
+            const firstName = document.getElementById('inputFirstName').value.trim();
+            const lastName = document.getElementById('inputLastName').value.trim();
+            let fullName = document.getElementById('inputFullName').value.trim();
+            if (!fullName && (firstName || lastName)) {
+                fullName = [firstName, lastName].filter(Boolean).join(' ');
+                document.getElementById('inputFullName').value = fullName;
+            }
+
+            const phone = document.getElementById('inputPhone').value.trim();
+            const email = document.getElementById('inputEmail').value.trim();
+
+            const fatherFirstName = document.getElementById('inputFatherFirstName').value.trim();
+            const fatherLastName = document.getElementById('inputFatherLastName').value.trim();
+            const motherName = document.getElementById('inputMotherName').value.trim();
+            const emergencyPhone = document.getElementById('inputEmergencyPhone').value.trim();
+
+            const address = document.getElementById('inputAddress').value.trim();
+            const city = document.getElementById('inputCity').value.trim();
+            const postalCode = document.getElementById('inputPostalCode').value.trim();
+            const nid = document.getElementById('inputNid').value.trim();
+
+            const updatePayload = {
+                fullName,
+                name: fullName,
+                firstName,
+                lastName,
+                phone,
+                mobile: phone,
+                email,
+                fatherFirstName,
+                fatherLastName,
+                motherName,
+                emergencyPhone,
+                address,
+                city,
+                postalCode,
+                nid,
+                updatedAt: new Date().toISOString()
+            };
+
+            // If email changed, invalidate previous email_verified state
+            if (email !== (currentAccount.email || '')) {
+                updatePayload.email_verified = false;
+                updatePayload.email_verified_at = null;
+            }
+
+            try {
+                if (window.showBcsLoader) window.showBcsLoader("Saving Profile Records...");
+                await updateDocument('users', currentAccount.id, updatePayload);
+                if (window.hideBcsLoader) window.hideBcsLoader();
+
+                showCustomAlert('Profile Saved', 'Personal and family records have been updated in SQLite.', 'success');
+                await loadAccountDetails();
+            } catch (err) {
+                if (window.hideBcsLoader) window.hideBcsLoader();
+                console.error('Error updating profile:', err);
+                showCustomAlert('Update Failed', err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-check2-circle fs-5"></i> Save Profile &amp; Family Records';
+            }
+        });
+
+        // ==================== CHANGE PASSWORD FORM SUBMIT (RE-AUTH PROTECTED) ====================
+        document.getElementById('changePasswordForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!isSecurityReauthenticated) {
+                openReauthModal();
+                return;
+            }
+
+            if (!currentAccount || !currentAccount.id) return;
+
+            const curr = document.getElementById('currPassword').value;
+            const newP = document.getElementById('newPassword').value;
+            const conf = document.getElementById('confirmNewPassword').value;
+
+            if (newP !== conf) {
+                showCustomAlert('Password Mismatch', 'New password and confirmation do not match.', 'error');
+                return;
+            }
+
+            if (!newP) {
+                showCustomAlert('Password Required', 'Please enter a valid new password.', 'error');
+                return;
+            }
+
+            try {
+                if (window.showBcsLoader) window.showBcsLoader("Updating Password Hash...");
+
+                // 1. Verify current password via dedicated reauth endpoint (preserves session and port)
+                const verifyRes = await fetchAPI('auth/reauth', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        username: currentAccount.username,
+                        password: curr
+                    })
+                });
+
+                if (!verifyRes || !verifyRes.verified) {
+                    if (window.hideBcsLoader) window.hideBcsLoader();
+                    showCustomAlert('Authentication Error', verifyRes?.error || 'Current password is incorrect.', 'error');
+                    return;
+                }
+
+                // 2. Hash and update password in database
+                const newHash = await sha256Hex(newP);
+                currentAccount.password_hash = newHash;
+
+                await updateDocument('users', currentAccount.id, {
+                    password_hash: newHash
+                });
+
+                if (window.hideBcsLoader) window.hideBcsLoader();
+                showCustomAlert('Password Changed', 'Your password has been successfully updated.', 'success');
+                document.getElementById('changePasswordForm').reset();
+                await loadAccountDetails();
+            } catch (err) {
+                if (window.hideBcsLoader) window.hideBcsLoader();
+                showCustomAlert('Error', 'Failed to update password: ' + err.message, 'error');
+            }
+        });
+
+        // ==================== UPDATE SECURITY ACCESS CODE (RE-AUTH PROTECTED) ====================
+        document.getElementById('updatePinForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!isSecurityReauthenticated) {
+                openReauthModal();
+                return;
+            }
+
+            if (!currentAccount) return;
+
+            const p1 = document.getElementById('newPinCode').value.trim();
+            const p2 = document.getElementById('confirmPinCode').value.trim();
+
+            if (p1 !== p2) {
+                showCustomAlert('Code Mismatch', 'New security code and confirmation do not match.', 'error');
+                return;
+            }
+
+            if (!p1) {
+                showCustomAlert('Invalid Code', 'Please enter a valid security access code.', 'error');
+                return;
+            }
+
+            try {
+                if (window.showBcsLoader) window.showBcsLoader("Updating Security Access Code...");
+
+                const res = await fetchAPI('auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'set_security_code',
+                        code: p1,
+                        username: currentAccount.username,
+                        session_id: localStorage.getItem('sessionId')
+                    })
+                });
+
+                if (window.hideBcsLoader) window.hideBcsLoader();
+
+                if (res.success) {
+                    showCustomAlert('Security Code Updated', 'Your security access code (Factor 3 & Fast PIN) has been updated successfully.', 'success');
+                    document.getElementById('updatePinForm').reset();
+                    await loadAccountDetails();
+                } else {
+                    showCustomAlert('Update Failed', res.error || 'Failed to update security code.', 'error');
+                }
+            } catch (err) {
+                if (window.hideBcsLoader) window.hideBcsLoader();
+                showCustomAlert('Error', err.message, 'error');
+            }
+        });
+
+        // ==================== WORKSTATION PORT BONDING (RE-AUTH PROTECTED) ====================
+        document.getElementById('actionBondPortBtn')?.addEventListener('click', async () => {
+            if (!isSecurityReauthenticated) {
+                openReauthModal();
+                return;
+            }
+
+            const currentPort = localStorage.getItem('sessionPort');
+            if (!currentPort) {
+                showCustomAlert('Warning', 'No workstation port detected in local session.', 'error');
+                return;
+            }
+
+            try {
+                if (window.showBcsLoader) window.showBcsLoader("Bonding Workstation Port...");
+
+                const res = await fetchAPI('auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'trust_port',
+                        session_id: localStorage.getItem('sessionId'),
+                        portnumber: currentPort
+                    })
+                });
+
+                if (window.hideBcsLoader) window.hideBcsLoader();
+
+                if (res.success) {
+                    showCustomAlert('Workstation Bonded', `Your account is now securely bonded to Port ${currentPort}.`, 'success');
+                    await loadAccountDetails();
+                } else {
+                    showCustomAlert('Bonding Failed', res.error || 'Failed to bond workstation.', 'error');
+                }
+            } catch (err) {
+                if (window.hideBcsLoader) window.hideBcsLoader();
+                showCustomAlert('Error', err.message, 'error');
+            }
+        });
+
+        // Clear Workstation Bonding (Allow roaming)
+        document.getElementById('actionClearBondBtn')?.addEventListener('click', async () => {
+            if (!isSecurityReauthenticated) {
+                openReauthModal();
+                return;
+            }
+
+            if (!currentAccount || !currentAccount.id) return;
+            try {
+                if (window.showBcsLoader) window.showBcsLoader("Clearing Workstation Bond...");
+
+                currentAccount.trusted_port = null;
+                await updateDocument('users', currentAccount.id, {
+                    trusted_port: null
+                });
+
+                if (window.hideBcsLoader) window.hideBcsLoader();
+                showCustomAlert('Bonding Cleared', 'Workstation bonding removed. Roaming is now enabled.', 'info');
+                await loadAccountDetails();
+            } catch (err) {
+                if (window.hideBcsLoader) window.hideBcsLoader();
+                showCustomAlert('Error', err.message, 'error');
+            }
+        });
+
+        document.getElementById('refreshAccountBtn')?.addEventListener('click', loadAccountDetails);
+
+        document.addEventListener('DOMContentLoaded', loadAccountDetails);
+    </script>
+</body>
+</html>

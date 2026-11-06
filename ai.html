@@ -176,7 +176,7 @@
             <div>
                 <div class="d-flex align-items-center gap-2 mb-2">
                     <span class="badge rounded-pill px-3 py-1" style="background: rgba(0, 229, 255, 0.18); color: #00e5ff; border: 1px solid rgba(0, 229, 255, 0.4); font-size: 0.75rem; font-weight: 700;">
-                        <i class="bi bi-stars me-1"></i> GROQ LPU INFERENCE
+                        <i class="bi bi-stars me-1"></i> RULEARE NATIVE AI
                     </span>
                     <span class="badge rounded-pill bg-success bg-opacity-25 text-success border border-success border-opacity-25" id="aiPageModelBadge" style="font-size: 0.75rem;">
                         openai/gpt-oss-20b (Low-Token)
@@ -191,7 +191,7 @@
                 <div class="text-muted small text-uppercase fw-semibold mb-1">Your Hourly Quota</div>
                 <div class="d-flex align-items-baseline justify-content-end gap-2">
                     <h2 class="fw-bold text-info mb-0 quota-ring" id="aiPageRemainingText">150</h2>
-                    <span class="text-muted small">/ 150 reqs</span>
+                    <span class="text-muted small" id="aiPageLimitLabel">/ 150 reqs</span>
                 </div>
                 <div class="progress mt-2" style="height: 6px; background: rgba(255,255,255,0.1);">
                     <div id="aiPageQuotaBar" class="progress-bar bg-info" style="width: 100%;"></div>
@@ -263,7 +263,7 @@
                         <div class="chat-messages" id="aiPageChatMessages">
                             <div class="msg-bubble assistant">
                                 <div>👋 Welcome to <strong>BCS AI Intelligence Studio</strong>!</div>
-                                <div class="mt-1 small opacity-75">I am connected to your Cloudflare Backend Groq Vault with Primary & Backup failover. Ask questions about your inventory, sales, margin optimization, or use the pre-built intelligence tasks on the right.</div>
+                                <div class="mt-1 small opacity-75">I am connected to your Ruleare Native AI Engine with Real-Time Inventory Intelligence. Ask questions about your inventory, sales, margin optimization, or use the pre-built intelligence tasks on the right.</div>
                             </div>
                         </div>
 
@@ -291,7 +291,7 @@
                         <div class="d-flex flex-column gap-2 mb-4">
                             <div class="prompt-card" data-prompt="Add a new product named 'Logitech G102 Lightsync RGB Mouse', category 'Computer Accessories', brand 'Logitech', unit 'Pcs', buy price 1650, sell price 2150, wholesale price 1850, quantity 15.">
                                 <div class="fw-semibold text-white small"><i class="bi bi-plus-circle-fill text-success me-2"></i>Agent: Add Product</div>
-                                <div class="text-muted" style="font-size: 0.75rem;">Instruct AI to add a new product directly into D1.</div>
+                                <div class="text-muted" style="font-size: 0.75rem;">Instruct AI to add a new product directly into the database.</div>
                             </div>
 
                             <div class="prompt-card" data-prompt="Change the sell price of product 'Logitech' to 2200 and add 10 to its stock.">
@@ -368,22 +368,39 @@
             const rate = window.BCSAICopilot.getRateStatus();
             
             const remText = document.getElementById('aiPageRemainingText');
+            const limitLabel = document.getElementById('aiPageLimitLabel');
             const barEl = document.getElementById('aiPageQuotaBar');
             const timerEl = document.getElementById('aiPageResetTimer');
             const tokensEl = document.getElementById('aiPageTokensText');
             const maskEl = document.getElementById('aiPagePrimaryMasked');
             const modelBadge = document.getElementById('aiPageModelBadge');
+            const chatInput = document.getElementById('aiPageChatInput');
+            const sendBtn = document.getElementById('aiPageSendBtn');
 
-            if (remText) remText.textContent = rate.remainingThisHour;
+            if (remText) {
+                remText.textContent = rate.remainingThisHour;
+                remText.className = `fw-bold mb-0 quota-ring ${rate.isRateLimited ? 'text-danger' : 'text-info'}`;
+            }
+            if (limitLabel) limitLabel.textContent = `/ ${rate.hourlyLimit} reqs`;
             if (timerEl) timerEl.textContent = `Resets in ${rate.resetInMinutes} min (UTC Hour Bucket)`;
-            if (tokensEl) tokensEl.textContent = `${rate.tokensUsedThisHour || 0} tokens`;
+            if (tokensEl) tokensEl.textContent = `${rate.tokensUsedThisHour || 0} / ${rate.hourlyTokenLimit || 25000} tokens`;
             if (maskEl && rate.primaryMasked) maskEl.textContent = rate.primaryMasked;
             if (modelBadge && rate.activeModel) modelBadge.textContent = `${rate.activeModel} (Low-Token)`;
 
             if (barEl) {
-                const pct = Math.max(0, Math.min(100, Math.round((rate.remainingThisHour / rate.hourlyLimit) * 100)));
+                const reqPct = Math.round((rate.remainingThisHour / rate.hourlyLimit) * 100);
+                const tokPct = rate.hourlyTokenLimit ? Math.round((rate.tokensRemainingThisHour / rate.hourlyTokenLimit) * 100) : 100;
+                const pct = Math.max(0, Math.min(100, Math.min(reqPct, tokPct)));
                 barEl.style.width = `${pct}%`;
                 barEl.className = `progress-bar ${pct > 35 ? 'bg-info' : (pct > 10 ? 'bg-warning' : 'bg-danger')}`;
+            }
+
+            if (chatInput && sendBtn && !window.BCSAICopilot.isBusy) {
+                chatInput.disabled = rate.isRateLimited;
+                sendBtn.disabled = rate.isRateLimited;
+                chatInput.placeholder = rate.isRateLimited
+                    ? `Hourly AI quota exhausted (0 left). Resets in ${rate.resetInMinutes} min...`
+                    : 'Type a message or instruction for BCS AI...';
             }
         }
 
@@ -404,7 +421,7 @@
             msgBox.insertAdjacentHTML('beforeend', `
                 <div id="${loadingId}" class="msg-bubble assistant">
                     <span class="spinner-border spinner-border-sm text-info me-2"></span>
-                    Running low-token Groq inference...
+                    Running Ruleare AI inference...
                 </div>
             `);
             msgBox.scrollTop = msgBox.scrollHeight;
@@ -445,7 +462,7 @@
                             document.getElementById(actId)?.addEventListener('click', async function() {
                                 const btn = this;
                                 btn.disabled = true;
-                                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Executing Action in Cloudflare D1...';
+                                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Executing Action in Native Server Database...';
                                 try {
                                     const actRes = await window.BCSAgenticExecutor.executeAction(act);
                                     btn.className = 'btn btn-sm btn-success w-100 mt-2 text-start py-2';

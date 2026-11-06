@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://backend.bcs.bcsdeveloper.com/api';
+const API_BASE_URL = 'https://backend-bcs.bcsdeveloper.com/api';
 
 const DB_NAME = 'bcs_api_cache';
 const STORE_NAME = 'collections';
@@ -85,6 +85,19 @@ export async function fetchAPI(endpoint, options = {}) {
         throw new Error(err.error || "Authentication failed");
     }
 
+    if (response.status === 403) {
+        const err = await response.json().catch(() => ({}));
+        const forbiddenMsg = err.error || 'Access Denied (403): You do not have permission for this operation.';
+        console.warn('Backend RBAC Blocked Request (403):', forbiddenMsg);
+        
+        if (typeof showCustomAlert === 'function') {
+            showCustomAlert('Access Denied (403)', forbiddenMsg, 'failed');
+        } else if (typeof window.showCustomAlert === 'function') {
+            window.showCustomAlert('Access Denied (403)', forbiddenMsg, 'failed');
+        }
+        throw new Error(forbiddenMsg);
+    }
+
     if (!response.ok) {
         const err = await response.json().catch(() => ({}));
         throw new Error(err.error || `API Error: ${response.status} ${response.statusText}`);
@@ -94,6 +107,19 @@ export async function fetchAPI(endpoint, options = {}) {
 }
 
 let activeFetches = {};
+
+function createCollectionResult(items) {
+    const docs = (items || []).map(item => {
+        const docObj = {
+            ...item,
+            id: item.id || item.firestoreId,
+            data: () => item
+        };
+        return docObj;
+    });
+    docs.docs = docs;
+    return docs;
+}
 
 export async function getCollection(collectionName, forceRefresh = false) {
     const cached = await getCache(collectionName);
@@ -114,32 +140,31 @@ export async function getCollection(collectionName, forceRefresh = false) {
                 .finally(() => { delete activeFetches[collectionName]; });
         }
         
-        return {
-            docs: (cached.data || []).map(item => ({
-                id: item.id || item.firestoreId,
-                data: () => item
-            }))
-        };
+        return createCollectionResult(cached.data);
     }
 
     // No cache (or forced refresh), must await network
     const data = await fetchAPI(`database/read?table=${collectionName}`);
     if (data && data.success && data.data) {
         await setCache(collectionName, { timestamp: Date.now(), data: data.data });
-        return {
-            docs: data.data.map(item => ({
-                id: item.id || item.firestoreId,
-                data: () => item
-            }))
-        };
+        return createCollectionResult(data.data);
     }
-    return { docs: [] };
+    return createCollectionResult([]);
 }
 
 export async function getDocument(collectionName, id) {
     const coll = await getCollection(collectionName);
-    const doc = coll.docs.find(d => d.id === id);
-    if (doc) return { exists: () => true, data: () => doc.data(), id: doc.id };
+    const docs = coll.docs || coll;
+    const doc = Array.isArray(docs) ? docs.find(d => d.id === id) : null;
+    if (doc) {
+        const itemData = typeof doc.data === 'function' ? doc.data() : doc;
+        return {
+            ...itemData,
+            id: doc.id,
+            exists: () => true,
+            data: () => itemData
+        };
+    }
     return { exists: () => false };
 }
 

@@ -43,6 +43,15 @@ export async function loginUser(username, password, securityCode) {
         localStorage.setItem('userPermissions', JSON.stringify(loginData.permissions || []));
         localStorage.setItem('sessionId', loginData.session_id);
         localStorage.setItem('sessionPort', localPortNumber);
+
+        // Also cache valid workstation credentials for Fast Checkout PIN unlock
+        localStorage.setItem('bcsDeviceUser', loginData.username || username);
+        localStorage.setItem('bcsDeviceSessionId', loginData.session_id);
+        localStorage.setItem('bcsDeviceSessionPort', localPortNumber);
+        localStorage.setItem('bcsDeviceUserId', loginData.id || '');
+        localStorage.setItem('bcsDeviceUserRole', loginData.role || 'employee');
+        localStorage.setItem('bcsDeviceUserPerms', JSON.stringify(loginData.permissions || []));
+
         return loginData;
     }
     

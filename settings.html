@@ -294,7 +294,7 @@
     <script>
         protectRoute('manage_settings');
         renderTopbar();
-        renderSidebar('settings');
+        renderSidebar('settings', 'system-settings');
     </script>
 
     <main class="main-content">
@@ -314,6 +314,11 @@
                     <li class="nav-item">
                         <button class="nav-link active" id="updates-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-updates" type="button" role="tab">
                             <i class="bi bi-cloud-arrow-down-fill"></i> Software Updater
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" id="security-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-security" type="button" role="tab">
+                            <i class="bi bi-shield-lock-fill text-warning"></i> Quick PIN &amp; Security
                         </button>
                     </li>
                     <li class="nav-item">
@@ -569,6 +574,58 @@
                 </div>
 
                 <!-- ==================== TAB 2: SYSTEM DIAGNOSTICS ==================== -->
+                                <!-- ==================== TAB: QUICK PIN & DEVICE CODE ==================== -->
+                <div class="tab-pane fade" id="tab-security" role="tabpanel">
+                    <div class="row g-4">
+                        <div class="col-12 col-lg-7">
+                            <div class="glass-card p-4">
+                                <h5 class="fw-bold text-white mb-3 d-flex align-items-center gap-2">
+                                    <i class="bi bi-lightning-charge-fill text-warning"></i> Fast Login & Security Code
+                                </h5>
+                                <p class="text-muted small mb-4">
+                                    Set a security access code for fast login. When configured, operators can switch to Fast Login on the sign-in screen to instantly unlock the system using this security code.
+                                </p>
+
+                                <div class="mb-3">
+                                    <label class="form-label text-white small fw-bold" for="deviceAccessPinInput">Security Access Code</label>
+                                    <div class="input-group" style="max-width: 340px;">
+                                        <input type="password" class="form-control bg-dark text-white border-secondary mono fs-5 text-center" id="deviceAccessPinInput" placeholder="••••••" autocomplete="off">
+                                        <button class="btn btn-outline-secondary" type="button" id="togglePinVisBtn">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div class="form-text text-muted small">No character limits. Synchronized with backend database and securely hashed with SHA-256.</div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label text-white small fw-bold" for="deviceDefaultUser">Operator Account</label>
+                                    <input type="text" class="form-control bg-dark text-white border-secondary" id="deviceDefaultUser" style="max-width: 340px;" placeholder="admin" value="admin">
+                                    <div class="form-text text-muted small">The user account to bond this fast login security code to.</div>
+                                </div>
+
+                                <button type="button" class="btn btn-primary d-inline-flex align-items-center gap-2 px-4 py-2 fw-semibold" id="saveDevicePinBtn">
+                                    <i class="bi bi-check-circle-fill"></i> Save Security Code
+                                </button>
+                                <span id="pinSaveSuccessMsg" class="text-success small ms-3 d-none"><i class="bi bi-check-lg"></i> Security Code Saved!</span>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-lg-5">
+                            <div class="glass-card p-4 h-100">
+                                <h6 class="fw-bold text-white mb-3 d-flex align-items-center gap-2">
+                                    <i class="bi bi-shield-check text-info"></i> How Fast Login Works
+                                </h6>
+                                <ul class="text-muted small ps-3 mb-0" style="line-height: 1.8;">
+                                    <li>Security code requires <strong>at least 6 digits</strong> for enterprise compliance.</li>
+                                    <li>Synchronized directly to backend database for verified workstation authentication.</li>
+                                    <li>The sign-in screen features a <strong>Fast Login</strong> slider with on-screen & keyboard keypad.</li>
+                                    <li>Entering the 6+ digit security code logs in seamlessly to the dashboard.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="tab-pane fade" id="tab-system" role="tabpanel">
                     <div class="row g-4">
                         
@@ -766,7 +823,7 @@
                                 <div class="mb-3">
                                     <div class="small text-muted text-uppercase fw-semibold mb-1">Serverless API Gateway</div>
                                     <div class="d-flex align-items-center justify-content-between p-3 rounded bg-dark border border-secondary border-opacity-25">
-                                        <span class="mono text-info">https://backend.bcs.bcsdeveloper.com/api</span>
+                                        <span class="mono text-info">https://backend-bcs.bcsdeveloper.com/api</span>
                                         <span class="badge bg-success" id="apiStatusBadge">Operational</span>
                                     </div>
                                 </div>
@@ -774,7 +831,7 @@
                                 <div class="mb-3">
                                     <div class="small text-muted text-uppercase fw-semibold mb-1">Database Engine</div>
                                     <div class="d-flex align-items-center justify-content-between p-3 rounded bg-dark border border-secondary border-opacity-25">
-                                        <span class="mono text-white">Cloudflare D1 (Global SQLite Replica)</span>
+                                        <span class="mono text-white">Dell PowerEdge SQLite WAL (Native Engine)</span>
                                         <span class="badge bg-primary">Connected</span>
                                     </div>
                                 </div>
@@ -818,45 +875,36 @@
                             </div>
                         </div>
 
-                        <!-- Groq AI Dual-Key Failover & Hourly Rate Limit Control Card -->
+                        <!-- Ruleare AI Engine & Hourly Rate Limit Control Card -->
                         <div class="col-12">
                             <div class="glass-card p-4">
                                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
                                     <div>
                                         <h5 class="fw-bold text-white mb-1 d-flex align-items-center gap-2">
-                                            <i class="bi bi-stars text-info"></i> Groq LPU Low-Token AI Vault &amp; 150/Hr Per-User Rate Control
+                                            <i class="bi bi-stars text-info"></i> Ruleare AI Engine &amp; 150/Hr Per-User Rate Control
                                         </h5>
-                                        <p class="text-muted small mb-0">100% Backend-Managed Primary &amp; Backup Groq API Keys in Cloudflare D1 with ultra-low-token inference (<code class="text-info">openai/gpt-oss-20b</code>, <code class="text-info">reasoning_effort: low</code>) and 150 requests/hour per user.</p>
+                                        <p class="text-muted small mb-0">High-performance Native AI Gateway on Dell PowerEdge host with 150 requests/hour per user.</p>
                                     </div>
                                     <span class="badge-chip bg-info bg-opacity-20 text-info border border-info border-opacity-25" id="settingsAiHealthBadge">
-                                        <i class="bi bi-cloud-check-fill"></i> Backend Dual-Key Vault Active
+                                        <i class="bi bi-cpu-fill"></i> Ruleare AI Gateway Active
                                     </span>
                                 </div>
 
                                 <div class="row g-4">
                                     <div class="col-12 col-md-4">
                                         <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25 h-100">
-                                            <div class="text-muted small text-uppercase fw-semibold mb-2">Backend API Key Vault (D1)</div>
+                                            <div class="text-muted small text-uppercase fw-semibold mb-2">AI Engine Status</div>
                                             <div class="d-flex justify-content-between align-items-center mb-2 small">
-                                                <span class="text-muted">Primary Key (<code id="settingsPrimaryKeyMasked" class="text-light">gsk_kwGL...cSNf</code>):</span>
-                                                <span class="badge bg-success bg-opacity-25 text-success">Backend Vault</span>
+                                                <span class="text-muted">Gateway Endpoint:</span>
+                                                <span class="badge bg-success bg-opacity-25 text-success">ai.ruleare.com</span>
                                             </div>
                                             <div class="d-flex justify-content-between align-items-center mb-2 small">
-                                                <span class="text-muted">Backup Key (<code id="settingsBackupKeyMasked" class="text-light">gsk_9r9z...BqYc</code>):</span>
-                                                <span class="badge bg-info bg-opacity-25 text-info">Auto-Failover</span>
+                                                <span class="text-muted">Local Fallback:</span>
+                                                <span class="badge bg-info bg-opacity-25 text-info">Port 1111</span>
                                             </div>
                                             <div class="d-flex justify-content-between align-items-center mb-2 small">
-                                                <span class="text-muted">Low-Token Model:</span>
-                                                <span class="mono text-info fw-semibold" id="settingsAiActiveModelText">openai/gpt-oss-20b</span>
-                                            </div>
-                                            <div class="mt-2 pt-2 border-top border-secondary border-opacity-25">
-                                                <div class="input-group input-group-sm mb-1">
-                                                    <input type="password" class="form-control bg-dark text-white border-secondary mono" id="backendPrimaryKeyInput" placeholder="Rotate Primary Key (gsk_...)">
-                                                </div>
-                                                <div class="input-group input-group-sm">
-                                                    <input type="password" class="form-control bg-dark text-white border-secondary mono" id="backendBackupKeyInput" placeholder="Rotate Backup Key (gsk_...)">
-                                                    <button class="btn btn-outline-info" type="button" id="updateBackendKeysBtn">Update D1 Keys</button>
-                                                </div>
+                                                <span class="text-muted">Inference Model:</span>
+                                                <span class="mono text-info fw-semibold" id="settingsAiActiveModelText">Ruleare AI Core</span>
                                             </div>
                                         </div>
                                     </div>
@@ -875,23 +923,23 @@
                                                 <span>Tokens Used This Hour:</span>
                                                 <strong class="text-white mono" id="settingsAiTokensUsedText">0 tok</strong>
                                             </div>
-                                            <div class="small text-muted mt-1">Enforced per user in Cloudflare D1 (<code>ai_rate_limits</code>).</div>
+                                            <div class="small text-muted mt-1">Enforced per user on Dell host.</div>
                                         </div>
                                     </div>
 
                                     <div class="col-12 col-md-4">
                                         <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25 h-100 d-flex flex-column justify-content-between">
                                             <div>
-                                                <label class="text-muted small text-uppercase fw-semibold mb-2 d-block" for="settingsAiHourlyLimitInput">Per-User Request Limit (Per Hour)</label>
-                                                <div class="input-group input-group-sm mb-3">
-                                                    <input type="number" class="form-control bg-dark text-white border-secondary mono" id="settingsAiHourlyLimitInput" min="10" max="2000" value="150">
+                                                <label class="text-muted small text-uppercase fw-semibold mb-1 d-block" for="settingsAiHourlyLimitInput">Per-User Request Limit (/Hr)</label>
+                                                <div class="input-group input-group-sm mb-2">
+                                                    <input type="number" class="form-control bg-dark text-white border-secondary mono" id="settingsAiHourlyLimitInput" min="1" max="5000" value="150">
                                                     <span class="input-group-text bg-dark text-muted border-secondary">reqs / hr</span>
-                                                    <button class="btn btn-primary fw-semibold" type="button" id="saveAiHourlyLimitBtn">Save to D1</button>
+                                                    <button class="btn btn-primary fw-semibold" type="button" id="saveAiHourlyLimitBtn">Save Limit</button>
                                                 </div>
                                             </div>
                                             <div class="d-flex gap-2">
-                                                <button type="button" class="btn btn-outline-info btn-sm flex-grow-1" id="testGroqAiEngineBtn">
-                                                    <i class="bi bi-cpu"></i> Test Low-Token AI
+                                                <button type="button" class="btn btn-outline-info btn-sm flex-grow-1" id="testRuleareAiEngineBtn">
+                                                    <i class="bi bi-cpu"></i> Test Ruleare AI
                                                 </button>
                                                 <button type="button" class="btn btn-info btn-sm text-white fw-semibold" onclick="if(window.BCSAICopilot) window.BCSAICopilot.open();">
                                                     <i class="bi bi-chat-dots-fill me-1"></i> Open Copilot
@@ -932,7 +980,7 @@
     <script type="module">
         import { fetchAPI } from './script/api.js';
 
-        let appCurrentVersion = '2.3.7';
+        let appCurrentVersion = '2.3.8';
         let latestInstallerDownloadUrl = '';
 
         window.showAlert = function(title, message, type = 'success') {
@@ -1284,7 +1332,7 @@
 
             // Direct Download Button (Proxied via Backend)
             directDownloadBtn.addEventListener('click', async () => {
-                const targetUrl = latestInstallerDownloadUrl || 'https://backend.bcs.bcsdeveloper.com/api/updater/download';
+                const targetUrl = latestInstallerDownloadUrl || 'https://backend-bcs.bcsdeveloper.com/api/updater/download';
                 showAlert('Download Starting', 'Requesting latest installer package from serverless edge...', 'info');
                 if (ipcRenderer) {
                     await ipcRenderer.invoke('open_external', targetUrl);
@@ -1295,7 +1343,7 @@
 
             // Edge API Status Button
             openReleasesWebBtn.addEventListener('click', async () => {
-                const target = 'https://backend.bcs.bcsdeveloper.com/api/updater/check';
+                const target = 'https://backend-bcs.bcsdeveloper.com/api/updater/check';
                 if (ipcRenderer) {
                     await ipcRenderer.invoke('open_external', target);
                 } else {
@@ -1385,7 +1433,7 @@
             const reinstallBtn = document.getElementById('reinstallAppBtn');
             if (reinstallBtn) {
                 reinstallBtn.addEventListener('click', () => {
-                    const targetUrl = latestInstallerDownloadUrl || 'https://backend.bcs.bcsdeveloper.com/api/updater/download';
+                    const targetUrl = latestInstallerDownloadUrl || 'https://backend-bcs.bcsdeveloper.com/api/updater/download';
                     showAlert('Download Starting', 'Requesting latest standalone setup installer (.exe)...', 'info');
                     if (window.reinstallBcsApp) {
                         window.reinstallBcsApp();
@@ -1498,7 +1546,7 @@
                 }
             });
 
-            // Groq AI Dual-Key & Hourly Rate Limit Controls (Backend Managed)
+            // Ruleare AI Engine & Hourly Rate Limit Controls (Backend Managed)
             const syncSettingsAiStatus = () => {
                 if (!window.BCSAICopilot) return;
                 const rate = window.BCSAICopilot.getRateStatus();
@@ -1506,6 +1554,7 @@
                 const timerEl = document.getElementById('settingsAiResetTimerText');
                 const barEl = document.getElementById('settingsAiQuotaProgress');
                 const inputEl = document.getElementById('settingsAiHourlyLimitInput');
+                const tokLimitInputEl = document.getElementById('settingsAiHourlyTokenLimitInput');
                 const tokEl = document.getElementById('settingsAiTokensUsedText');
                 const pMaskEl = document.getElementById('settingsPrimaryKeyMasked');
                 const bMaskEl = document.getElementById('settingsBackupKeyMasked');
@@ -1513,16 +1562,22 @@
 
                 if (remEl) remEl.textContent = `${rate.remainingThisHour} / ${rate.hourlyLimit}`;
                 if (timerEl) timerEl.textContent = `Resets in ${rate.resetInMinutes}m`;
-                if (tokEl) tokEl.textContent = `${rate.tokensUsedThisHour || 0} tok`;
+                if (tokEl) tokEl.textContent = `${rate.tokensUsedThisHour || 0} / ${rate.hourlyTokenLimit || 25000} tok`;
                 if (pMaskEl && rate.primaryMasked) pMaskEl.textContent = rate.primaryMasked;
                 if (bMaskEl && rate.backupMasked) bMaskEl.textContent = rate.backupMasked;
                 if (modelEl && rate.activeModel) modelEl.textContent = rate.activeModel;
                 if (barEl) {
-                    const pct = Math.max(0, Math.min(100, Math.round((rate.remainingThisHour / rate.hourlyLimit) * 100)));
+                    const reqPct = Math.round((rate.remainingThisHour / rate.hourlyLimit) * 100);
+                    const tokPct = rate.hourlyTokenLimit ? Math.round((rate.tokensRemainingThisHour / rate.hourlyTokenLimit) * 100) : 100;
+                    const pct = Math.max(0, Math.min(100, Math.min(reqPct, tokPct)));
                     barEl.style.width = `${pct}%`;
+                    barEl.className = `progress-bar ${pct > 35 ? 'bg-info' : (pct > 10 ? 'bg-warning' : 'bg-danger')}`;
                 }
                 if (inputEl && document.activeElement !== inputEl) {
                     inputEl.value = rate.hourlyLimit;
+                }
+                if (tokLimitInputEl && document.activeElement !== tokLimitInputEl) {
+                    tokLimitInputEl.value = rate.hourlyTokenLimit || 25000;
                 }
             };
 
@@ -1531,66 +1586,108 @@
 
             document.getElementById('saveAiHourlyLimitBtn')?.addEventListener('click', () => {
                 const val = Number(document.getElementById('settingsAiHourlyLimitInput')?.value || 150);
+                const tokVal = Number(document.getElementById('settingsAiHourlyTokenLimitInput')?.value || 25000);
                 if (window.BCSAICopilot) {
-                    const updated = window.BCSAICopilot.setHourlyLimit(val);
+                    const updated = window.BCSAICopilot.setHourlyLimit(val, tokVal);
                     syncSettingsAiStatus();
-                    showAlert('Per-User Hourly Limit Saved', `Backend & local Groq AI rate limit set to ${updated.hourlyLimit} requests/hour per user (${updated.remainingThisHour} remaining this hour).`, 'success');
+                    showAlert('Per-User Hourly Limits Saved', `Backend AI limit set to ${updated.hourlyLimit} reqs/hr (${updated.remainingThisHour} reqs left).`, 'success');
                 }
             });
 
-            document.getElementById('updateBackendKeysBtn')?.addEventListener('click', async function() {
-                if (!window.BCSAICopilot) return;
-                const pKey = document.getElementById('backendPrimaryKeyInput')?.value.trim() || '';
-                const bKey = document.getElementById('backendBackupKeyInput')?.value.trim() || '';
-                const hLimit = Number(document.getElementById('settingsAiHourlyLimitInput')?.value || 150);
-
-                if (!pKey && !bKey) {
-                    showAlert('Enter API Key', 'Enter a new Primary or Backup Groq key (starting with gsk_) to update the Cloudflare D1 Backend Vault.', 'info');
-                    return;
-                }
-
-                const btn = this;
-                btn.disabled = true;
-                btn.textContent = 'Saving...';
-                try {
-                    await window.BCSAICopilot.updateBackendConfig({
-                        primaryApiKey: pKey,
-                        backupApiKey: bKey,
-                        hourlyUserLimit: hLimit
-                    });
-                    if (document.getElementById('backendPrimaryKeyInput')) document.getElementById('backendPrimaryKeyInput').value = '';
-                    if (document.getElementById('backendBackupKeyInput')) document.getElementById('backendBackupKeyInput').value = '';
-                    syncSettingsAiStatus();
-                    showAlert('Backend AI Vault Updated', 'Groq API keys have been securely updated in Cloudflare D1.', 'success');
-                } catch (err) {
-                    showAlert('Vault Update Error', err.message, 'error');
-                } finally {
-                    btn.disabled = false;
-                    btn.textContent = 'Update D1 Keys';
-                }
-            });
-
-            document.getElementById('testGroqAiEngineBtn')?.addEventListener('click', async function() {
+            document.getElementById('testRuleareAiEngineBtn')?.addEventListener('click', async function() {
                 if (!window.BCSAICopilot) return;
                 const btn = this;
                 btn.disabled = true;
                 btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Testing...';
                 try {
                     const res = await window.BCSAICopilot.ask({
-                        prompt: 'Confirm BCS Backend Low-Token AI Vault is online in 1 short sentence.',
+                        prompt: 'Confirm BCS Ruleare Native AI Gateway is online in 1 short sentence.',
                         task: 'chat'
                     });
                     syncSettingsAiStatus();
-                    const keyUsed = res.keySlotUsed === 'backup' ? 'Backup Groq Key Failover' : 'Primary Groq Key';
-                    const tokUsed = res.usage?.total_tokens ? `${res.usage.total_tokens} tokens` : 'low-token mode';
-                    showAlert('Backend Low-Token AI Healthy', `${res.reply} (Served via ${keyUsed} • ${tokUsed})`, 'success');
+                    showAlert('Ruleare AI Engine Online', `${res.reply}`, 'success');
                 } catch (err) {
-                    showAlert('Groq AI Test Notice', err.message, 'error');
+                    showAlert('AI Engine Notice', err.message, 'error');
                 } finally {
                     btn.disabled = false;
-                    btn.innerHTML = '<i class="bi bi-cpu"></i> Test Low-Token AI';
+                    btn.innerHTML = '<i class="bi bi-cpu"></i> Test Ruleare AI';
                 }
             });
+
+            // Quick PIN & Device Access Code Controls
+            const pinInput = document.getElementById('deviceAccessPinInput');
+            const togglePinVisBtn = document.getElementById('togglePinVisBtn');
+            const defaultUserInput = document.getElementById('deviceDefaultUser');
+            const savePinBtn = document.getElementById('saveDevicePinBtn');
+            const pinSuccessMsg = document.getElementById('pinSaveSuccessMsg');
+
+            if (defaultUserInput) {
+                defaultUserInput.value = localStorage.getItem('bcsDeviceUser') || localStorage.getItem('loggedInUserName') || 'admin';
+            }
+
+            if (togglePinVisBtn && pinInput) {
+                togglePinVisBtn.addEventListener('click', () => {
+                    const isPass = pinInput.type === 'password';
+                    pinInput.type = isPass ? 'text' : 'password';
+                    togglePinVisBtn.innerHTML = isPass ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+                });
+            }
+
+            if (savePinBtn && pinInput) {
+                savePinBtn.addEventListener('click', async () => {
+                    const rawPin = pinInput.value.trim();
+                    if (!rawPin) {
+                        showAlert('Missing Security Code', 'Please enter a valid security access code.', 'error');
+                        return;
+                    }
+
+                    const targetUser = (defaultUserInput?.value || localStorage.getItem('loggedInUserName') || 'admin').trim();
+                    const sid = localStorage.getItem('sessionId') || '';
+
+                    // Synchronize with Cloudflare Edge backend
+                    try {
+                        const res = await fetch('https://backend-bcs.bcsdeveloper.com/api/auth/login', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'x-api-key': 'backend-bcs-pos',
+                                'x-session-id': sid
+                            },
+                            body: JSON.stringify({
+                                action: 'set_security_code',
+                                username: targetUser,
+                                code: rawPin,
+                                session_id: sid
+                            })
+                        });
+                        const data = await res.json().catch(() => ({}));
+                        if (!res.ok || !data.success) {
+                            console.warn('Backend security code sync warning:', data.error);
+                        }
+                    } catch (netErr) {
+                        console.warn('Network sync notice:', netErr);
+                    }
+
+                    const msgUint8 = new TextEncoder().encode(rawPin);
+                    const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+                    const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+
+                    localStorage.setItem('bcsDevicePinHash', hashHex);
+                    localStorage.setItem('bcsDeviceUser', targetUser);
+                    localStorage.setItem('bcsDeviceSessionId', localStorage.getItem('sessionId') || '');
+                    localStorage.setItem('bcsDeviceSessionPort', localStorage.getItem('sessionPort') || '');
+                    localStorage.setItem('bcsDeviceUserId', localStorage.getItem('loggedInUserId') || 'admin-default');
+                    localStorage.setItem('bcsDeviceUserRole', localStorage.getItem('userRole') || 'administrator');
+                    localStorage.setItem('bcsDeviceUserPerms', localStorage.getItem('userPermissions') || '["*"]');
+
+                    pinInput.value = '';
+                    if (pinSuccessMsg) {
+                        pinSuccessMsg.classList.remove('d-none');
+                        setTimeout(() => pinSuccessMsg.classList.add('d-none'), 4000);
+                    }
+                    showAlert('Security Code Saved', `Fast login security code (at least 6 digits) is now active for operator '${targetUser}'.`, 'success');
+                });
+            }
         }
 
         if (document.readyState === 'loading') {

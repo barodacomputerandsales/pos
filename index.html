@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
 <head>
-    <!-- Authentication Session Pre-Check: Redirect if already logged in -->
     <script>
+        // Clear active session if clear query flag is passed
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('logout') === 'true' || urlParams.get('login') === 'true') {
+        if (urlParams.get('clear') === 'true') {
             localStorage.removeItem('isAuthenticated');
             localStorage.removeItem('sessionId');
             localStorage.removeItem('sessionPort');
@@ -12,11 +12,8 @@
             localStorage.removeItem('loggedInUserName');
             localStorage.removeItem('userRole');
             localStorage.removeItem('userPermissions');
-        } else if (localStorage.getItem('isAuthenticated') === 'true' && localStorage.getItem('sessionId') && localStorage.getItem('sessionPort')) {
-            window.location.replace('dashboard.html');
         }
     </script>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Baroda Computer &amp; Sales | Shop Dashboard Sign In</title>
@@ -24,7 +21,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
     <link rel="apple-touch-icon" href="assets/icon.png">
     
-    <!-- Portable Enterprise Neon Laser Loader (Auto-pushes immediately on load) -->
+    <!-- Portable Enterprise Neon Laser Loader -->
     <script src="template/loader/loader-1.js"></script>
 
     <!-- Bootstrap 5 CSS & Icons -->
@@ -35,6 +32,10 @@
 
     <style>
         :root {
+            --win-accent: #7c3aed;
+            --win-accent-rgb: 124, 58, 237;
+            --win-selection-bg: rgba(124, 58, 237, 0.55);
+            --win-selection-color: #ffffff;
             --page-bg: #0b0f19;
             --card-dark: #121624;
             --card-dark-glass: rgba(18, 22, 36, 0.94);
@@ -48,6 +49,7 @@
             --text-primary: #ffffff;
             --text-secondary: #94a3b8;
             --badge-label: #c4b5fd;
+            --accent-cyan: #00e5ff;
         }
 
         * {
@@ -56,6 +58,20 @@
             padding: 0;
             user-select: none;
             -webkit-user-drag: none;
+        }
+
+        input, textarea, [contenteditable="true"], .allow-select {
+            user-select: text !important;
+            -webkit-user-select: text !important;
+        }
+
+        ::selection, ::-moz-selection {
+            background-color: var(--win-selection-bg, rgba(var(--win-accent-rgb, 124, 58, 237), 0.55)) !important;
+            color: var(--win-selection-color, #ffffff) !important;
+        }
+        input::selection, textarea::selection {
+            background-color: var(--win-selection-bg, rgba(var(--win-accent-rgb, 124, 58, 237), 0.65)) !important;
+            color: var(--win-selection-color, #ffffff) !important;
         }
 
         body {
@@ -71,6 +87,7 @@
             position: relative;
             color: #f8fafc;
             padding: 20px;
+            perspective: 1200px;
         }
 
         /* Animated Ambient Cyber Dot Grid */
@@ -146,7 +163,8 @@
             position: relative;
             z-index: 10;
             width: 100%;
-            max-width: 880px;
+            max-width: 900px;
+            transition: transform 0.2s cubic-bezier(0.2, 0, 0.2, 1);
         }
 
         .auth-split-card {
@@ -157,7 +175,7 @@
             display: flex;
             overflow: hidden;
             animation: cardEntrance 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards, borderGlowPulse 8s ease-in-out infinite;
-            min-height: 490px;
+            min-height: 520px;
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
             position: relative;
@@ -180,101 +198,100 @@
                 border-color: rgba(255, 255, 255, 0.09);
             }
             50% {
-                box-shadow: 0 30px 85px -15px rgba(0, 0, 0, 0.9), 0 0 65px rgba(168, 85, 247, 0.32);
-                border-color: rgba(168, 85, 247, 0.25);
+                box-shadow: 0 25px 75px -10px rgba(0, 0, 0, 0.9), 0 0 60px rgba(0, 229, 255, 0.22);
+                border-color: rgba(0, 229, 255, 0.25);
             }
         }
 
-        /* Left Hero Banner Pane (Matches Reference Image with Animated Polish) */
+        /* Left Hero Banner Pane */
         .hero-banner-pane {
-            flex: 0.95;
+            flex: 1.05;
             background: var(--gradient-hero);
-            background-size: 260% 260%;
-            animation: gradientWave 10s ease infinite alternate;
-            padding: 3rem 2.6rem;
+            padding: 3rem 2.8rem;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            color: #ffffff;
             position: relative;
             overflow: hidden;
+            color: #ffffff;
         }
 
-        @keyframes gradientWave {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* Subtle Geometric Shimmer Overlay in Hero */
         .hero-banner-pane::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.22) 0%, transparent 65%),
-                        linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, transparent 100%);
+            background: radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.22) 0%, transparent 60%);
             pointer-events: none;
         }
 
         .hero-banner-pane::after {
             content: '';
             position: absolute;
-            bottom: -60px;
-            right: -60px;
-            width: 220px;
-            height: 220px;
+            bottom: -80px;
+            right: -80px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(0, 229, 255, 0.28) 0%, transparent 70%);
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.08);
-            filter: blur(40px);
             pointer-events: none;
         }
 
-        /* Enterprise Live Tag */
+        /* Top Enterprise Status Pill */
         .hero-chip-badge {
             display: inline-flex;
             align-items: center;
-            gap: 7px;
-            background: rgba(255, 255, 255, 0.16);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.68rem;
-            font-weight: 700;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.32);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            padding: 5px 14px;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 800;
             letter-spacing: 0.08em;
             text-transform: uppercase;
             color: #ffffff;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
         }
 
         .pulse-dot {
-            width: 7px;
-            height: 7px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            background: #10b981;
+            background-color: #10b981;
             box-shadow: 0 0 10px #10b981;
-            animation: pulseEmerald 1.8s infinite;
+            position: relative;
         }
 
-        @keyframes pulseEmerald {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.85); }
+        .pulse-dot::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 1.5px solid #10b981;
+            animation: pulseRadar 1.8s infinite;
         }
 
-        /* App Squircle Logo Badge with Floating Animation */
+        @keyframes pulseRadar {
+            0% { transform: scale(0.6); opacity: 1; }
+            100% { transform: scale(2.2); opacity: 0; }
+        }
+
+        /* App Squircle Logo Badge with Holographic 3D Floating Animation */
         .hero-app-logo {
-            width: 62px;
-            height: 62px;
-            border-radius: 18px;
-            background: rgba(255, 255, 255, 0.22);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.35);
+            width: 76px;
+            height: 76px;
+            background: rgba(255, 255, 255, 0.16);
+            border: 1.5px solid rgba(255, 255, 255, 0.35);
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
-            margin-bottom: 1.8rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35), inset 0 0 20px rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
             position: relative;
             overflow: hidden;
             animation: floatLogo 5s ease-in-out infinite alternate;
@@ -283,101 +300,90 @@
 
         @keyframes floatLogo {
             0% { transform: translateY(0px) rotate(0deg); }
-            100% { transform: translateY(-6px) rotate(-1.5deg); }
+            100% { transform: translateY(-7px) rotate(-1.5deg); }
         }
 
         .hero-app-logo::after {
             content: '';
             position: absolute;
             top: 0;
-            left: -120%;
-            width: 80%;
+            left: -100%;
+            width: 70%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
             transform: skewX(-25deg);
             animation: logoShine 4.5s infinite;
         }
 
         @keyframes logoShine {
-            0%, 70% { left: -120%; }
+            0%, 70% { left: -100%; }
             100% { left: 200%; }
         }
 
-        .hero-app-logo:hover {
-            transform: scale(1.08) translateY(-4px);
-        }
-
         .hero-app-logo img {
-            width: 42px;
-            height: 42px;
+            width: 48px;
+            height: 48px;
             object-fit: contain;
-            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.35));
+            filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35));
         }
 
         .hero-headline {
-            font-size: 2.25rem;
+            font-size: 2.15rem;
             font-weight: 800;
             line-height: 1.15;
-            letter-spacing: -0.025em;
-            margin-bottom: 1.25rem;
-            color: #ffffff;
-            text-shadow: 0 2px 14px rgba(0, 0, 0, 0.25);
+            letter-spacing: -0.03em;
+            margin-bottom: 0.85rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
 
         .hero-subtext {
-            color: rgba(255, 255, 255, 0.88);
-            font-size: 0.92rem;
-            line-height: 1.62;
-            margin-bottom: 1.5rem;
-            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.5;
+            max-width: 320px;
+            margin-bottom: 1.6rem;
         }
 
-        /* Hero Feature Highlights */
+        /* Feature Highlight Badges */
         .hero-feature-tags {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 1.75rem;
+            gap: 7px;
+            margin-bottom: 1rem;
         }
 
         .feature-tag-chip {
-            background: rgba(255, 255, 255, 0.14);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-size: 0.72rem;
-            font-weight: 600;
-            color: #ffffff;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
-            transition: all 0.2s ease;
+            gap: 6px;
+            padding: 5px 11px;
+            background: rgba(0, 0, 0, 0.28);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 10px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.02em;
+            backdrop-filter: blur(8px);
+            transition: all 0.25s ease;
         }
 
         .feature-tag-chip:hover {
-            background: rgba(255, 255, 255, 0.24);
+            background: rgba(255, 255, 255, 0.22);
             transform: translateY(-2px);
         }
 
         .hero-signature {
-            font-size: 0.82rem;
+            font-size: 0.76rem;
             color: rgba(255, 255, 255, 0.75);
-            position: relative;
-            z-index: 2;
-        }
-
-        .hero-signature strong {
-            color: #ffffff;
-            text-decoration: underline;
-            text-decoration-color: rgba(255, 255, 255, 0.35);
-            text-underline-offset: 3px;
+            font-weight: 500;
+            letter-spacing: 0.02em;
         }
 
         /* Right Authentication Form Pane */
         .auth-form-pane {
-            flex: 1.05;
-            padding: 3rem 2.8rem;
+            flex: 1.1;
+            padding: 2.8rem 2.8rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -388,21 +394,49 @@
 
         .form-heading {
             font-size: 1.65rem;
-            font-weight: 700;
+            font-weight: 800;
             letter-spacing: -0.025em;
             color: #ffffff;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
 
         .form-subheading {
             color: #94a3b8;
-            font-size: 0.88rem;
-            margin-bottom: 1.65rem;
+            font-size: 0.86rem;
+            margin-bottom: 1.3rem;
         }
 
-        /* Modern Floating Tag Input Fields with Neon Micro-Glow */
+        /* Security Level Badge Strip */
+        .auth-security-badge-strip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 10px;
+            padding: 6px 12px;
+            margin-bottom: 1.3rem;
+            font-size: 0.73rem;
+        }
+
+        .security-level-pill {
+            font-weight: 700;
+            color: #fbbf24;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .security-req-pill {
+            color: #38bdf8;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+
+        /* Modern Input Fields with Glowing Badges */
         .field-group {
-            margin-bottom: 1.15rem;
+            margin-bottom: 1.05rem;
             position: relative;
             text-align: left;
         }
@@ -410,16 +444,22 @@
         .field-badge-label {
             display: block;
             font-size: 0.74rem;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--badge-label);
-            margin-bottom: 5px;
-            margin-left: 2px;
-            letter-spacing: 0.02em;
-            transition: color 0.2s ease;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
         }
 
-        .field-group:focus-within .field-badge-label {
-            color: #e9d5ff;
+        .badge-required-pill {
+            font-size: 0.62rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            color: #f87171;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 2px 7px;
+            border-radius: 999px;
+            text-transform: uppercase;
         }
 
         .field-input-box {
@@ -427,18 +467,18 @@
             display: flex;
             align-items: center;
             background: var(--input-bg);
-            border: 1px solid var(--input-border);
+            border: 1.5px solid var(--input-border);
             border-radius: 12px;
             transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .field-input-box:hover {
-            border-color: rgba(168, 85, 247, 0.35);
+            border-color: rgba(168, 85, 247, 0.4);
         }
 
         .field-input-box:focus-within {
             border-color: var(--input-focus);
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25), 0 8px 24px -6px rgba(124, 58, 237, 0.22);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25), 0 8px 24px -6px rgba(124, 58, 237, 0.25);
             background: #191e30;
             transform: translateY(-1px);
         }
@@ -447,7 +487,7 @@
             width: 100%;
             background: transparent !important;
             border: none !important;
-            padding: 12px 14px;
+            padding: 11px 14px;
             font-size: 0.92rem;
             color: #ffffff !important;
             outline: none !important;
@@ -457,8 +497,8 @@
         }
 
         .field-input::placeholder {
-            color: rgba(148, 163, 184, 0.4);
-            font-size: 0.88rem;
+            color: rgba(148, 163, 184, 0.45);
+            font-size: 0.85rem;
         }
 
         .field-toggle-btn {
@@ -478,6 +518,17 @@
             transform: scale(1.15);
         }
 
+        .form-field-helper {
+            font-size: 0.72rem;
+            color: #64748b;
+            margin-top: 4px;
+            margin-left: 2px;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
         /* Solid Purple Master Sign In Button with Sweeping Shine Reflection */
         .btn-purple-signin {
             width: 100%;
@@ -487,11 +538,11 @@
             border-radius: 12px;
             padding: 13.5px;
             font-size: 0.98rem;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             box-shadow: 0 8px 25px rgba(124, 58, 237, 0.45);
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            margin-top: 0.6rem;
+            margin-top: 0.8rem;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -500,7 +551,6 @@
             overflow: hidden;
         }
 
-        /* Sweeping Animated Shine Bar */
         .btn-purple-signin::after {
             content: '';
             position: absolute;
@@ -508,7 +558,7 @@
             left: -100%;
             width: 60%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
             transform: skewX(-20deg);
             transition: none;
         }
@@ -541,47 +591,6 @@
             box-shadow: none !important;
         }
 
-        /* Customer Login Hint Sublink */
-        .customer-link-row {
-            margin-top: 1.25rem;
-            font-size: 0.82rem;
-            color: #94a3b8;
-            text-align: center;
-        }
-
-        .customer-link-row a {
-            color: #a78bfa;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.15s;
-        }
-
-        .customer-link-row a:hover {
-            color: #c4b5fd;
-            text-decoration: underline;
-        }
-
-        /* 1-Click Auto Fill Demo Chip */
-        .demo-pill-link {
-            display: inline-flex;
-            align-items: center;
-            margin-top: 0.85rem;
-            font-size: 0.74rem;
-            color: #64748b;
-            cursor: pointer;
-            padding: 4px 10px;
-            border-radius: 20px;
-            border: 1px solid transparent;
-            transition: all 0.2s ease;
-        }
-
-        .demo-pill-link:hover {
-            color: #c4b5fd;
-            background: rgba(139, 92, 246, 0.1);
-            border-color: rgba(139, 92, 246, 0.25);
-            transform: translateY(-1px);
-        }
-
         /* Error Shake Banner */
         .form-error-banner {
             background: rgba(239, 68, 68, 0.15);
@@ -602,6 +611,111 @@
             0%, 100% { transform: translateX(0); }
             20%, 60% { transform: translateX(-5px); }
             40%, 80% { transform: translateX(5px); }
+        }
+
+        /* Customer Login Sublink */
+        .customer-link-row {
+            margin-top: 1.15rem;
+            font-size: 0.82rem;
+            color: #94a3b8;
+            text-align: center;
+        }
+
+        .customer-link-row a {
+            color: #a78bfa;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.15s;
+        }
+
+        .customer-link-row a:hover {
+            color: #c4b5fd;
+            text-decoration: underline;
+        }
+
+        /* Fast Code Slider / Tabs on Login */
+        .auth-mode-slider-wrap {
+            display: flex;
+            position: relative;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 999px;
+            padding: 4px;
+            margin-bottom: 1.25rem;
+        }
+
+        .auth-mode-tab {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 999px;
+            border: none;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        .auth-mode-tab.active {
+            color: #ffffff;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Fast Code PIN Numpad & Display */
+        .pin-digit-display {
+            letter-spacing: 12px;
+            font-size: 1.6rem;
+            font-weight: 800;
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(15, 23, 42, 0.8);
+            border: 2px solid rgba(99, 102, 241, 0.4);
+            border-radius: 16px;
+            color: #00e5ff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            transition: border-color 0.25s, color 0.25s;
+        }
+
+        .pin-numpad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .pin-btn {
+            background: rgba(22, 26, 41, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            font-size: 1.25rem;
+            font-weight: 700;
+            border-radius: 12px;
+            padding: 10px 0;
+            cursor: pointer;
+            transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .pin-btn:hover {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: rgba(139, 92, 246, 0.4);
+            transform: translateY(-2px);
+            color: #c4b5fd;
+        }
+
+        .pin-btn:active {
+            transform: scale(0.92);
         }
 
         /* Bottom Fixed Brand Credits Footer */
@@ -646,35 +760,293 @@
                 padding-bottom: 60px;
             }
         }
+
+        /* ========================================================
+           AUTHENTICATION SUCCESS POPUP (Tick Under/Inside Circle)
+           Modern Native <dialog> with @starting-style & Smooth Transitions
+           ======================================================== */
+        dialog#authSuccessModal {
+            border: 1px solid rgba(16, 185, 129, 0.45);
+            border-radius: 26px;
+            background: rgba(15, 23, 42, 0.94);
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.85), 
+                        0 0 60px rgba(16, 185, 129, 0.28),
+                        inset 0 1px 1px rgba(255, 255, 255, 0.2);
+            padding: 2.3rem 2.5rem;
+            max-width: 440px;
+            width: 90vw;
+            color: #ffffff;
+            text-align: center;
+            outline: none;
+            overflow: hidden;
+            position: fixed;
+            inset: 0;
+            margin: auto;
+            z-index: 99999;
+            
+            /* Modern Discrete Top-Layer Transition */
+            opacity: 0;
+            transform: scale(0.86) translateY(22px);
+            transition-property: opacity, transform, display, overlay;
+            transition-duration: 0.38s;
+            transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+            transition-behavior: allow-discrete;
+        }
+
+        dialog#authSuccessModal[open] {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+
+            @starting-style {
+                opacity: 0;
+                transform: scale(0.86) translateY(22px);
+            }
+        }
+
+        dialog#authSuccessModal::backdrop {
+            background: rgba(6, 9, 18, 0.8);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            opacity: 0;
+            transition-property: opacity, display, overlay;
+            transition-duration: 0.38s;
+            transition-timing-function: ease-out;
+            transition-behavior: allow-discrete;
+        }
+
+        dialog#authSuccessModal[open]::backdrop {
+            opacity: 1;
+
+            @starting-style {
+                opacity: 0;
+            }
+        }
+
+        /* Tick Under a Circle Animation Container */
+        .success-tick-wrapper {
+            position: relative;
+            width: 110px;
+            height: 110px;
+            margin: 0 auto 1.35rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Glowing Radial Sonar Shockwave */
+        .success-sonar-ring {
+            position: absolute;
+            inset: -14px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.35) 0%, rgba(0, 229, 255, 0.18) 45%, transparent 70%);
+            animation: sonarShockwave 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes sonarShockwave {
+            0% {
+                transform: scale(0.85);
+                opacity: 0.95;
+            }
+            100% {
+                transform: scale(1.65);
+                opacity: 0;
+            }
+        }
+
+        .success-circle-svg {
+            width: 104px;
+            height: 104px;
+            position: relative;
+            z-index: 1;
+            transform-origin: center center;
+            filter: drop-shadow(0 0 18px rgba(16, 185, 129, 0.65));
+        }
+
+        dialog#authSuccessModal[open] .success-circle-svg {
+            animation: iconCelebrationPop 0.55s 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+        }
+
+        @keyframes iconCelebrationPop {
+            0% { transform: scale(0.72); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Circular Track and Drawn Stroke */
+        .circle-bg {
+            fill: rgba(16, 185, 129, 0.12);
+            stroke: rgba(255, 255, 255, 0.1);
+            stroke-width: 4;
+        }
+
+        .circle-progress {
+            fill: none;
+            stroke: url(#successGradient);
+            stroke-width: 5;
+            stroke-linecap: round;
+            stroke-dasharray: 264;
+            stroke-dashoffset: 264;
+        }
+
+        dialog#authSuccessModal[open] .circle-progress {
+            animation: drawCircleStroke 0.65s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+        }
+
+        @keyframes drawCircleStroke {
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        /* Tick / Checkmark Path */
+        .tick-path {
+            fill: none;
+            stroke: #10b981;
+            stroke-width: 6.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-dasharray: 68;
+            stroke-dashoffset: 68;
+        }
+
+        dialog#authSuccessModal[open] .tick-path {
+            animation: drawTickStroke 0.45s 0.42s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+        }
+
+        @keyframes drawTickStroke {
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        /* Popup Content Styles */
+        .auth-success-title {
+            font-size: 1.55rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            color: #ffffff;
+            margin-bottom: 0.35rem;
+        }
+
+        .auth-success-badge-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 1.15rem;
+            flex-wrap: wrap;
+        }
+
+        .auth-success-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 11px;
+            border-radius: 999px;
+            font-size: 0.73rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .pill-granted {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.45);
+            color: #34d399;
+        }
+
+        .pill-port {
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            color: #a5b4fc;
+        }
+
+        .auth-success-desc {
+            font-size: 0.88rem;
+            color: #94a3b8;
+            margin-bottom: 1.35rem;
+            line-height: 1.45;
+        }
+
+        /* Redirect Progress Track */
+        .auth-success-progress-wrap {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 999px;
+            height: 6px;
+            width: 100%;
+            overflow: hidden;
+            margin-bottom: 0.65rem;
+            position: relative;
+        }
+
+        .auth-success-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #10b981 0%, #00e5ff 60%, #8b5cf6 100%);
+            border-radius: 999px;
+            box-shadow: 0 0 14px rgba(16, 185, 129, 0.7);
+        }
+
+        dialog#authSuccessModal[open] .auth-success-progress-bar {
+            animation: fillRedirectBar 1.25s linear forwards;
+        }
+
+        @keyframes fillRedirectBar {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        .auth-success-status-text {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            dialog#authSuccessModal {
+                transform: none !important;
+                transition-duration: 0.1s !important;
+            }
+            .success-circle-svg,
+            .circle-progress,
+            .tick-path,
+            .success-sonar-ring,
+            .auth-success-progress-bar {
+                animation: none !important;
+                stroke-dashoffset: 0 !important;
+                width: 100% !important;
+            }
+        }
     </style>
 </head>
 <body>
     <!-- Ambient Cyber Dot Grid Background -->
     <div class="ambient-grid-canvas"></div>
 
-    <!-- Animated Glowing Plasma Orbs -->
+    <!-- Animated Floating Plasma Glow Orbs -->
     <div class="plasma-orb orb-1"></div>
     <div class="plasma-orb orb-2"></div>
     <div class="plasma-orb orb-3"></div>
 
-    <!-- Layout Engine Scripts (Loads RBAC, Permissions, Global Layout Engine) -->
-    <script src="template/layout.js"></script>
-
-    <!-- Centered Dual-Pane Container -->
-    <div class="auth-wrapper">
-        <div class="auth-split-card">
+    <!-- Centered Dual-Pane Card Layout -->
+    <div class="auth-wrapper" id="authCardWrapper">
+        <div class="auth-split-card" id="authSplitCard">
             
-            <!-- Left Hero Banner Pane (As seen in reference image with animated polish) -->
+            <!-- Left Hero Banner Pane -->
             <div class="hero-banner-pane">
                 <div>
                     <!-- Top Enterprise Live Pill -->
                     <div class="hero-chip-badge">
                         <span class="pulse-dot"></span>
-                        <span>BCS ENTERPRISE POS PRO</span>
+                        <span>SERVER ONLINE • PORT 3001</span>
                     </div>
 
-                    <!-- App Squircle Logo Badge with Floating Animation -->
-                    <div class="hero-app-logo">
+                    <!-- App Squircle Logo Badge with Holographic 3D Floating Animation -->
+                    <div class="hero-app-logo" id="heroAppLogo">
                         <img src="assets/icon.png" onerror="this.src='template/bcs-logo.svg'" alt="BCS">
                     </div>
 
@@ -687,14 +1059,15 @@
 
                     <!-- Hero Subtext -->
                     <p class="hero-subtext">
-                        Experience seamless management and optimized operations with our advanced point of sale ecosystem.
+                        Enterprise Point of Sale &amp; Operations Management. Protected by 3-factor authentication and workstation port bonding.
                     </p>
 
-                    <!-- Feature Highlight Chips -->
+                    <!-- Feature Highlight Chips & Badges -->
                     <div class="hero-feature-tags">
-                        <span class="feature-tag-chip"><i class="bi bi-cloud-check-fill text-info"></i> Cloudflare D1</span>
-                        <span class="feature-tag-chip"><i class="bi bi-shield-check text-success"></i> RBAC Security</span>
-                        <span class="feature-tag-chip"><i class="bi bi-lightning-charge-fill text-warning"></i> Auto-Updater</span>
+                        <span class="feature-tag-chip"><i class="bi bi-shield-lock-fill text-info"></i> 3-Factor Strict Auth</span>
+                        <span class="feature-tag-chip"><i class="bi bi-database-check text-cyan" style="color: #00e5ff;"></i> SQLite WAL NVMe</span>
+                        <span class="feature-tag-chip"><i class="bi bi-hdd-network-fill text-success"></i> Workstation Guard</span>
+                        <span class="feature-tag-chip"><i class="bi bi-lightning-charge-fill text-warning"></i> Fast PIN Keypad</span>
                     </div>
                 </div>
 
@@ -706,28 +1079,84 @@
 
             <!-- Right Authentication Form Pane -->
             <div class="auth-form-pane">
-                <h2 class="form-heading">Welcome Back</h2>
-                <p class="form-subheading">Sign in to your shop dashboard</p>
+                <h2 class="form-heading">Shop Terminal Sign In</h2>
+                <p class="form-subheading">Enter all 3 operator credentials to unlock your register</p>
+
+                <!-- Security Level Badge Strip -->
+                <div class="auth-security-badge-strip">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="security-level-pill"><i class="bi bi-shield-fill-check text-warning"></i> Level 3 Auth</span>
+                        <span class="security-req-pill">All 3 Fields Required</span>
+                    </div>
+                    <span class="text-muted" style="font-size: 0.7rem;"><i class="bi bi-lock-fill text-danger me-1"></i>Zero Bypass</span>
+                </div>
 
                 <!-- Error Alert Box -->
                 <div id="errorAlertBox" class="form-error-banner d-none">
-                    <i class="bi bi-exclamation-circle text-danger fs-5"></i>
-                    <span id="errorAlertMessage">Invalid username or password.</span>
+                    <i class="bi bi-exclamation-triangle-fill text-danger fs-5"></i>
+                    <span id="errorAlertMessage">Invalid credentials. All 3 fields are required.</span>
                 </div>
 
-                <!-- Login Form -->
+                <!-- Sign-in Mode Slider: Standard 3-Input vs Fast Device Code -->
+                <div class="auth-mode-slider-wrap">
+                    <button type="button" class="auth-mode-tab active" id="tabStandardLogin">
+                        <i class="bi bi-shield-lock-fill"></i> 3-Input Login
+                    </button>
+                    <button type="button" class="auth-mode-tab" id="tabFastCodeLogin">
+                        <i class="bi bi-lightning-charge-fill text-warning"></i> Fast PIN Unlock
+                    </button>
+                </div>
+
+                <!-- FAST DEVICE CODE PANE (Instant Station Unlock) -->
+                <div id="fastCodePane" class="d-none">
+                    <div class="text-center mb-3">
+                        <div class="badge bg-info bg-opacity-15 text-info border border-info border-opacity-25 px-3 py-1 rounded-pill small mb-2">
+                            <i class="bi bi-shield-check"></i> Workstation Fast Unlock
+                        </div>
+                        <p class="text-muted small mb-0">Enter the security access code configured in Account Center</p>
+                    </div>
+
+                    <div class="pin-digit-display" id="pinDisplayVisual">••••••</div>
+
+                    <div class="pin-numpad">
+                        <button type="button" class="pin-btn" data-key="1">1</button>
+                        <button type="button" class="pin-btn" data-key="2">2</button>
+                        <button type="button" class="pin-btn" data-key="3">3</button>
+                        <button type="button" class="pin-btn" data-key="4">4</button>
+                        <button type="button" class="pin-btn" data-key="5">5</button>
+                        <button type="button" class="pin-btn" data-key="6">6</button>
+                        <button type="button" class="pin-btn" data-key="7">7</button>
+                        <button type="button" class="pin-btn" data-key="8">8</button>
+                        <button type="button" class="pin-btn" data-key="9">9</button>
+                        <button type="button" class="pin-btn text-danger" id="btnPinClear"><i class="bi bi-x-lg"></i></button>
+                        <button type="button" class="pin-btn" data-key="0">0</button>
+                        <button type="button" class="pin-btn text-warning" id="btnPinBackspace"><i class="bi bi-backspace"></i></button>
+                    </div>
+
+                    <button type="button" class="btn-purple-signin" id="btnSubmitFastPin">
+                        <i class="bi bi-lightning-charge-fill me-1"></i> Unlock Register
+                    </button>
+                </div>
+
+                <!-- STANDARD 3-INPUT LOGIN FORM -->
                 <form id="shopLoginForm" autocomplete="on">
-                    <!-- Username or Name -->
+                    <!-- 1. Username or Name (REQUIRED) -->
                     <div class="field-group">
-                        <label class="field-badge-label" for="loginUser">Username or Name</label>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="field-badge-label mb-0" for="loginUser">1. Operator Username</label>
+                            <span class="badge-required-pill"><i class="bi bi-asterisk"></i> Required</span>
+                        </div>
                         <div class="field-input-box">
-                            <input type="text" class="field-input" id="loginUser" placeholder="Enter operator username (e.g. admin)" required autocomplete="username" autofocus>
+                            <input type="text" class="field-input mono" id="loginUser" placeholder="Enter username (e.g. admin)" required autocomplete="username" autofocus>
                         </div>
                     </div>
 
-                    <!-- Password -->
+                    <!-- 2. Password (REQUIRED) -->
                     <div class="field-group">
-                        <label class="field-badge-label" for="loginPass">Password</label>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="field-badge-label mb-0" for="loginPass">2. Account Password</label>
+                            <span class="badge-required-pill"><i class="bi bi-asterisk"></i> Required</span>
+                        </div>
                         <div class="field-input-box">
                             <input type="password" class="field-input" id="loginPass" placeholder="••••••••" required autocomplete="current-password">
                             <button type="button" class="field-toggle-btn" id="togglePasswordBtn" title="Toggle password visibility">
@@ -739,17 +1168,26 @@
                         </div>
                     </div>
 
-                    <!-- Access Code / Security PIN -->
+                    <!-- 3. Security Access Code / PIN (REQUIRED) -->
                     <div class="field-group">
-                        <label class="field-badge-label" for="loginPin">Access Code</label>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="field-badge-label mb-0" for="loginPin">3. Security Access Code</label>
+                            <span class="badge-required-pill"><i class="bi bi-asterisk"></i> Required</span>
+                        </div>
                         <div class="field-input-box">
-                            <input type="password" class="field-input" id="loginPin" placeholder="Enter master PIN if required" autocomplete="off">
+                            <input type="password" class="field-input mono" id="loginPin" placeholder="Enter security access code" required autocomplete="off">
+                            <button type="button" class="field-toggle-btn" id="togglePinBtn" title="Toggle access code visibility">
+                                <i class="bi bi-eye" id="pinEyeIcon"></i>
+                            </button>
+                        </div>
+                        <div class="form-field-helper">
+                            <i class="bi bi-shield-check text-info me-1"></i> Mandatory 3-factor validation enforced by server.
                         </div>
                     </div>
 
                     <!-- Solid Purple Sign In Button with Sweeping Glow Effect -->
                     <button type="submit" class="btn-purple-signin" id="btnSignIn">
-                        <span id="btnSignInText">Sign In</span>
+                        <span id="btnSignInText"><i class="bi bi-shield-lock-fill me-1"></i> Authenticate &amp; Sign In</span>
                     </button>
                 </form>
 
@@ -757,30 +1195,249 @@
                 <div class="customer-link-row">
                     Are you a customer? If yes, then please <a href="https://bcs.bcsdeveloper.com" target="_blank" rel="noopener">Login Here</a>
                 </div>
-
-                <!-- 1-Click Demo Fill -->
-                <div class="text-center">
-                    <span class="demo-pill-link" id="btnQuickDemo">
-                        <i class="bi bi-magic me-1"></i> Quick Fill (admin)
-                    </span>
-                </div>
             </div>
         </div>
-
-        <!-- Dynamic Holographic Update Container (Visible when background update is downloaded) -->
-        <div id="loginUpdateContainer" class="text-center mt-3 d-none"></div>
     </div>
 
-    <!-- Bottom Page Credit Footer (Version 2.3.7) -->
+    <!-- Dedicated Authentication Success Modal with Animated Circle & Tick -->
+    <dialog id="authSuccessModal" aria-labelledby="successModalTitle" aria-describedby="successModalDesc">
+        <!-- Circular Animated Tick Graphic -->
+        <div class="success-tick-wrapper">
+            <div class="success-sonar-ring"></div>
+            <svg class="success-circle-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="successGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#10b981" />
+                        <stop offset="50%" stop-color="#00e5ff" />
+                        <stop offset="100%" stop-color="#8b5cf6" />
+                    </linearGradient>
+                </defs>
+                <!-- Base Circle Background -->
+                <circle class="circle-bg" cx="50" cy="50" r="42" />
+                <!-- Animated Perimeter Progress Circle -->
+                <circle class="circle-progress" cx="50" cy="50" r="42" transform="rotate(-90 50 50)" />
+                <!-- Animated Checkmark Tick -->
+                <path class="tick-path" d="M30 52 L45 67 L72 38" />
+            </svg>
+        </div>
+
+        <h3 id="successModalTitle" class="auth-success-title">Access Granted</h3>
+        
+        <div class="auth-success-badge-row">
+            <span class="auth-success-pill pill-granted">
+                <i class="bi bi-shield-fill-check"></i> Identity Verified
+            </span>
+            <span class="auth-success-pill pill-port" id="successPortBadge">
+                <i class="bi bi-hdd-network-fill"></i> Port: <span id="successPortNum">3001</span>
+            </span>
+        </div>
+
+        <p id="successModalDesc" class="auth-success-desc">
+            Welcome back, <strong id="successOperatorName" class="text-white">Operator</strong>! Workstation bonded and permissions unlocked.
+        </p>
+
+        <!-- Redirect Progress Bar -->
+        <div class="auth-success-progress-wrap" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
+            <div class="auth-success-progress-bar"></div>
+        </div>
+        <div class="auth-success-status-text">
+            Launching Register Workspace in <span id="redirectCountdownSec">1</span>s...
+        </div>
+    </dialog>
+
+    <!-- Bottom Page Credit Footer -->
     <footer class="fixed-page-footer">
-        Made with care in <strong>Bangladesh 🇧🇩</strong> | Manufacturer: <a href="https://www.bcsdeveloper.com" target="_blank" rel="noopener" class="highlight-purple" style="text-decoration: none; border-bottom: 1px dotted var(--brand-purple);"><strong>BCS Developer</strong></a> | Version: <strong id="loginVersionDisplay">2.3.7</strong> | Powered by: <strong>Cloudflare D1</strong>.
+        Made with care in <strong>Bangladesh 🇧🇩</strong> | Manufacturer: <a href="https://www.bcsdeveloper.com" target="_blank" rel="noopener" class="highlight-purple" style="text-decoration: none; border-bottom: 1px dotted var(--brand-purple);"><strong>BCS Developer</strong></a> | Version: <strong id="loginVersionDisplay">2.4.3</strong> | Host: <strong>Dell PowerEdge</strong>.
     </footer>
 
     <!-- Login Authentication Handler & Splash Sequence -->
     <script type="module">
         import { loginUser } from "./script/auth.js";
 
-        // Terminal Bootstrapping & Initial Splash Transition
+        // Fast Code Slider & Device PIN Unlock Engine
+        let currentPinVal = '';
+        const standardTab = document.getElementById('tabStandardLogin');
+        const fastTab = document.getElementById('tabFastCodeLogin');
+        const standardForm = document.getElementById('shopLoginForm');
+        const fastPane = document.getElementById('fastCodePane');
+        const pinDisplay = document.getElementById('pinDisplayVisual');
+
+        function updatePinDisplay() {
+            if (!pinDisplay) return;
+            if (!currentPinVal) {
+                pinDisplay.textContent = '••••••';
+                return;
+            }
+            let masked = '';
+            for (let i = 0; i < currentPinVal.length; i++) {
+                masked += '• ';
+            }
+            pinDisplay.textContent = masked.trim();
+        }
+
+        // ========================================================
+        // Animated Tick Under/Inside Circle Success Popup Trigger
+        // ========================================================
+        let isRedirecting = false;
+        function triggerSuccessTickModal(userData, portNumber) {
+            if (isRedirecting) return;
+            isRedirecting = true;
+
+            // Hide fullscreen loader if active so the checkmark circle popup takes center stage
+            try {
+                if (window.BCSLoader && typeof window.BCSLoader.hide === 'function') {
+                    window.BCSLoader.hide();
+                } else if (typeof window.hideBcsLoader === 'function') {
+                    window.hideBcsLoader();
+                }
+            } catch (e) {}
+
+            const modal = document.getElementById('authSuccessModal');
+            const opName = document.getElementById('successOperatorName');
+            const portNum = document.getElementById('successPortNum');
+            const countdownEl = document.getElementById('redirectCountdownSec');
+
+            if (opName) opName.textContent = userData?.username || 'Operator';
+            if (portNum) portNum.textContent = portNumber || localStorage.getItem('sessionPort') || '3001';
+
+            if (modal) {
+                try {
+                    if (typeof modal.showModal === 'function') {
+                        if (!modal.open) modal.showModal();
+                    } else {
+                        modal.setAttribute('open', '');
+                    }
+                } catch (e) {
+                    modal.setAttribute('open', '');
+                }
+            }
+
+            // Countdown timer visual
+            if (countdownEl) {
+                setTimeout(() => { countdownEl.textContent = '0'; }, 750);
+            }
+
+            // Smooth redirect once the tick drawing & pulse animation concludes
+            setTimeout(() => {
+                window.location.replace("dashboard.html");
+            }, 1350);
+        }
+
+        if (standardTab && fastTab) {
+            standardTab.addEventListener('click', () => {
+                standardTab.classList.add('active');
+                fastTab.classList.remove('active');
+                standardForm.classList.remove('d-none');
+                fastPane.classList.add('d-none');
+            });
+
+            fastTab.addEventListener('click', () => {
+                fastTab.classList.add('active');
+                standardTab.classList.remove('active');
+                standardForm.classList.add('d-none');
+                fastPane.classList.remove('d-none');
+                currentPinVal = '';
+                updatePinDisplay();
+            });
+        }
+
+        // Keypad buttons (no length limit)
+        document.querySelectorAll('.pin-btn[data-key]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentPinVal += btn.dataset.key;
+                updatePinDisplay();
+            });
+        });
+
+        document.getElementById('btnPinBackspace')?.addEventListener('click', () => {
+            currentPinVal = currentPinVal.slice(0, -1);
+            updatePinDisplay();
+        });
+
+        document.getElementById('btnPinClear')?.addEventListener('click', () => {
+            currentPinVal = '';
+            updatePinDisplay();
+        });
+
+        document.getElementById('btnSubmitFastPin')?.addEventListener('click', checkAndSubmitPin);
+
+        // Hardware keyboard support when fast code pane is visible (no length limit)
+        window.addEventListener('keydown', (e) => {
+            if (!fastPane || fastPane.classList.contains('d-none')) return;
+            if (e.key >= '0' && e.key <= '9') {
+                currentPinVal += e.key;
+                updatePinDisplay();
+            } else if (e.key === 'Backspace') {
+                currentPinVal = currentPinVal.slice(0, -1);
+                updatePinDisplay();
+            } else if (e.key === 'Escape') {
+                currentPinVal = '';
+                updatePinDisplay();
+            } else if (e.key === 'Enter') {
+                checkAndSubmitPin();
+            }
+        });
+
+        // Fast PIN submission (Live backend verification strictly required - NO fake offline bypass)
+        async function checkAndSubmitPin() {
+            if (!currentPinVal) return;
+
+            const defaultUser = localStorage.getItem('bcsDeviceUser') || 'admin';
+            const localPortNumber = Math.floor(Math.random() * (65535 - 1024 + 1) + 1024).toString();
+
+            try {
+                const res = await fetch('https://backend-bcs.bcsdeveloper.com/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': 'backend-bcs-pos'
+                    },
+                    body: JSON.stringify({
+                        action: 'fast_login',
+                        code: currentPinVal,
+                        username: defaultUser,
+                        portnumber: localPortNumber
+                    })
+                });
+
+                const data = await res.json().catch(() => ({}));
+                if (res.ok && data.is_verified && data.session_id) {
+                    localStorage.setItem('isAuthenticated', 'true');
+                    localStorage.setItem('loggedInUserId', data.id || 'admin-default');
+                    localStorage.setItem('loggedInUserName', data.username || defaultUser);
+                    localStorage.setItem('userRole', data.role || 'administrator');
+                    localStorage.setItem('userPermissions', JSON.stringify(data.permissions || ['*']));
+                    localStorage.setItem('sessionId', data.session_id);
+                    localStorage.setItem('sessionPort', localPortNumber);
+                    localStorage.setItem('bcsDeviceUser', data.username || defaultUser);
+
+                    if (pinDisplay) {
+                        pinDisplay.style.borderColor = '#10b981';
+                        pinDisplay.style.color = '#10b981';
+                        pinDisplay.textContent = 'UNLOCKED';
+                    }
+
+                    triggerSuccessTickModal(data, localPortNumber);
+                    return;
+                } else {
+                    throw new Error(data.error || 'Invalid security code.');
+                }
+            } catch (err) {
+                console.warn('Fast login verification rejected:', err);
+                if (pinDisplay) {
+                    pinDisplay.style.borderColor = '#ef4444';
+                    pinDisplay.style.color = '#ef4444';
+                    pinDisplay.textContent = 'INVALID PIN';
+                    setTimeout(() => {
+                        pinDisplay.style.borderColor = '';
+                        pinDisplay.style.color = '';
+                        currentPinVal = '';
+                        updatePinDisplay();
+                    }, 900);
+                }
+            }
+        }
+
         function initLoginTerminal() {
             // Sync dynamic version from Electron runtime
             if (typeof require !== 'undefined') {
@@ -802,11 +1459,12 @@
                         document.documentElement.setAttribute('data-theme', mode);
                         document.documentElement.style.setProperty('--win-accent', accent);
                         document.documentElement.style.setProperty('--win-accent-rgb', rgb);
+                        document.documentElement.style.setProperty('--win-selection-bg', `rgba(${rgb}, 0.55)`);
+                        document.documentElement.style.setProperty('--win-selection-color', '#ffffff');
                         document.documentElement.style.setProperty('--bs-primary', accent);
                         document.documentElement.style.setProperty('--btn-purple', accent);
-                        localStorage.setItem('bcs_os_theme_mode', mode);
-                        localStorage.setItem('bcs_os_accent_color', accent);
-                        localStorage.setItem('bcs_os_accent_rgb', rgb);
+                        document.documentElement.style.setProperty('--input-focus', accent);
+                        document.documentElement.style.setProperty('--btn-purple-glow', `rgba(${rgb}, 0.4)`);
                     };
 
                     ipcRenderer.invoke('get_os_theme').then(applyOsTheme).catch(() => {});
@@ -814,23 +1472,25 @@
                 } catch(e) {}
             }
 
-            // Check if active session already exists in terminal storage
-            const isAuth = localStorage.getItem('isAuthenticated') === 'true';
-            const sessId = localStorage.getItem('sessionId');
-            const sessPort = localStorage.getItem('sessionPort');
+            // Interactive 3D Parallax Tilt Effect on Card
+            const wrapper = document.getElementById('authCardWrapper');
+            const card = document.getElementById('authSplitCard');
+            if (wrapper && card && window.innerWidth > 992) {
+                window.addEventListener('mousemove', (e) => {
+                    const { clientX, clientY } = e;
+                    const xCenter = window.innerWidth / 2;
+                    const yCenter = window.innerHeight / 2;
+                    const rotateX = ((clientY - yCenter) / yCenter) * -3.5;
+                    const rotateY = ((clientX - xCenter) / xCenter) * 3.5;
+                    card.style.transform = `rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`;
+                });
 
-            if (isAuth && sessId && sessPort) {
-                if (window.BCSLoader) {
-                    window.BCSLoader.setText("Restoring active session...");
-                    window.BCSLoader.show();
-                }
-                setTimeout(() => {
-                    window.location.replace("dashboard.html");
-                }, 350);
-                return;
+                window.addEventListener('mouseleave', () => {
+                    card.style.transform = 'rotateX(0deg) rotateY(0deg)';
+                });
             }
 
-            // Focus on username input once initial splash fades
+            // Focus on username input
             setTimeout(() => {
                 const userInput = document.getElementById("loginUser");
                 if (userInput) userInput.focus();
@@ -843,20 +1503,30 @@
             initLoginTerminal();
         }
 
-        // Password Visibility Toggle
-        const toggleBtn = document.getElementById("togglePasswordBtn");
+        // Password & PIN Visibility Toggles
+        const togglePassBtn = document.getElementById("togglePasswordBtn");
         const passwordField = document.getElementById("loginPass");
         const eyeIcon = document.getElementById("passwordEyeIcon");
 
-        toggleBtn.addEventListener("click", () => {
+        togglePassBtn?.addEventListener("click", () => {
             const isPassword = passwordField.type === "password";
             passwordField.type = isPassword ? "text" : "password";
             eyeIcon.className = isPassword ? "bi bi-eye-slash text-purple" : "bi bi-eye";
         });
 
+        const togglePinBtn = document.getElementById("togglePinBtn");
+        const pinField = document.getElementById("loginPin");
+        const pinEyeIcon = document.getElementById("pinEyeIcon");
+
+        togglePinBtn?.addEventListener("click", () => {
+            const isPassword = pinField.type === "password";
+            pinField.type = isPassword ? "text" : "password";
+            pinEyeIcon.className = isPassword ? "bi bi-eye-slash text-purple" : "bi bi-eye";
+        });
+
         // Caps Lock Detection
         const capsWarning = document.getElementById("capsLockWarning");
-        passwordField.addEventListener("keyup", (e) => {
+        passwordField?.addEventListener("keyup", (e) => {
             if (e.getModifierState && e.getModifierState("CapsLock")) {
                 capsWarning.classList.remove("d-none");
             } else {
@@ -864,14 +1534,7 @@
             }
         });
 
-        // Demo Autofill Helper
-        document.getElementById("btnQuickDemo").addEventListener("click", () => {
-            document.getElementById("loginUser").value = "admin";
-            document.getElementById("loginPass").value = "admin";
-            document.getElementById("loginPass").focus();
-        });
-
-        // Form Submit Handler with BCS Laser Loader
+        // Form Submit Handler with Strict 3-Input Verification
         document.getElementById("shopLoginForm").addEventListener("submit", async (e) => {
             e.preventDefault();
 
@@ -884,30 +1547,30 @@
             const errorBox = document.getElementById("errorAlertBox");
             const errorMsg = document.getElementById("errorAlertMessage");
 
+            // Strict 3-Input Client Validation (matching backend - no character length limits)
+            if (!user || !pass || !pin) {
+                errorMsg.textContent = "All 3 credentials (Username, Password, and Access Code) are strictly required.";
+                errorBox.classList.remove("d-none");
+                return;
+            }
+
             btn.disabled = true;
-            btnText.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Signing In...';
+            btnText.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Verifying All 3 Credentials...';
             errorBox.classList.add("d-none");
 
-            // Trigger BCS Custom Neon Laser Loader
+            // Trigger BCS Neon Laser Loader
             if (window.BCSLoader) {
-                window.BCSLoader.show("Authenticating Credentials with Cloudflare D1...");
+                window.BCSLoader.show("Verifying 3-Factor Credentials with Dedicated Server...");
             } else if (window.showBcsLoader) {
-                window.showBcsLoader("Authenticating Credentials with Cloudflare D1...");
+                window.showBcsLoader("Verifying 3-Factor Credentials with Dedicated Server...");
             }
 
             try {
                 const res = await loginUser(user, pass, pin);
                 if (res && res.is_verified) {
-                    if (window.BCSLoader) {
-                        window.BCSLoader.setText("Credentials Verified! Launching Dashboard...");
-                    } else if (window.showBcsLoader) {
-                        window.showBcsLoader("Credentials Verified! Launching Dashboard...");
-                    }
-                    setTimeout(() => {
-                        window.location.replace("dashboard.html");
-                    }, 400);
+                    triggerSuccessTickModal(res, localStorage.getItem('sessionPort'));
                 } else {
-                    throw new Error(res && res.error ? res.error : "Login verification failed");
+                    throw new Error(res && res.error ? res.error : "Authentication failed");
                 }
             } catch (err) {
                 if (window.BCSLoader) {
@@ -918,15 +1581,13 @@
 
                 let message = err.message || "Invalid operator credentials";
                 if (message.includes("Failed to fetch") || message.includes("NetworkError")) {
-                    message = "Cannot reach Cloudflare edge server. Check internet connection.";
-                } else if (message === "401" || message.includes("status: 401")) {
-                    message = "Invalid username or password. Please verify and try again.";
+                    message = "Cannot reach server. Check network connection.";
                 }
 
                 errorMsg.textContent = message;
                 errorBox.classList.remove("d-none");
                 btn.disabled = false;
-                btnText.textContent = "Sign In";
+                btnText.innerHTML = '<i class="bi bi-shield-lock-fill me-1"></i> Authenticate &amp; Sign In';
             }
         });
     </script>

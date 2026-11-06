@@ -1,16 +1,27 @@
 /**
- * Baroda Computers And Sales - Enterprise Groq AI Copilot Engine
+ * Baroda Computers And Sales - Enterprise AI Copilot Engine
  * Features:
- * 1. 100% Backend-Managed API Keys (/api/ai/chat) — Zero API keys stored in client code
- * 2. Ultra-Low-Token Model (`openai/gpt-oss-20b` with `reasoning_effort: "low"`)
- * 3. Strict 150 Requests / Hour Per-User Rate Limit Enforcement (Cloudflare D1 + Local Guard)
+ * 1. 100% Backend-Managed AI Inference (/api/ai/chat) — Zero credentials stored in client code
+ * 2. Ruleare Native AI Gateway integration with high-performance C++ & Rust backend
+ * 3. Strict 150 Requests / Hour Per-User Rate Limit Enforcement (Native Server Database + Local Guard)
  */
 (function () {
     if (window.BCSAICopilot) return;
 
-    const API_BASE_URL = 'https://backend.bcs.bcsdeveloper.com/api';
+    const API_BASE_URL = 'https://backend-bcs.bcsdeveloper.com/api';
     const DEFAULT_HOURLY_LIMIT = 150;
+    const DEFAULT_HOURLY_TOKEN_LIMIT = 25000;
     const DEFAULT_LOW_TOKEN_MODEL = 'openai/gpt-oss-20b';
+
+    function getAuthHeaders() {
+        return {
+            'Content-Type': 'application/json',
+            'x-api-key': 'backend-bcs-pos',
+            'x-session-id': localStorage.getItem('sessionId') || '',
+            'x-session-port': localStorage.getItem('sessionPort') || '',
+            'x-user-id': localStorage.getItem('loggedInUserName') || localStorage.getItem('loggedInUserId') || 'admin'
+        };
+    }
 
     function getCurrentHourBucket() {
         const now = new Date();
@@ -26,10 +37,15 @@
     function getLocalRateState() {
         const currentBucket = getCurrentHourBucket();
         let rawLimit = Number(localStorage.getItem('bcs_ai_hourly_limit'));
-        // Auto-upgrade previous 40 default to 150 requests/hour per user
-        if (!rawLimit || rawLimit === 40) {
+        if (!rawLimit || rawLimit <= 0) {
             rawLimit = DEFAULT_HOURLY_LIMIT;
             localStorage.setItem('bcs_ai_hourly_limit', String(DEFAULT_HOURLY_LIMIT));
+        }
+
+        let rawTokenLimit = Number(localStorage.getItem('bcs_ai_hourly_token_limit'));
+        if (!rawTokenLimit || rawTokenLimit <= 0) {
+            rawTokenLimit = DEFAULT_HOURLY_TOKEN_LIMIT;
+            localStorage.setItem('bcs_ai_hourly_token_limit', String(DEFAULT_HOURLY_TOKEN_LIMIT));
         }
 
         let stored = null;
@@ -52,20 +68,31 @@
             localStorage.setItem('bcs_ai_rate_bucket', JSON.stringify(stored));
         }
 
-        const remaining = Math.max(0, rawLimit - (stored.usedThisHour || 0));
+        const usedReqs = Number(stored.usedThisHour || 0);
+        const usedTokens = Number(stored.tokensUsedThisHour || 0);
+        const reqsRemaining = Math.max(0, rawLimit - usedReqs);
+        const tokensRemaining = Math.max(0, rawTokenLimit - usedTokens);
+        const isRequestLimited = reqsRemaining <= 0;
+        const isTokenLimited = rawTokenLimit > 0 && tokensRemaining <= 0;
+        const isRateLimited = isRequestLimited || isTokenLimited;
+
         return {
             hourBucket: currentBucket,
-            usedThisHour: stored.usedThisHour || 0,
-            tokensUsedThisHour: stored.tokensUsedThisHour || 0,
+            usedThisHour: usedReqs,
+            tokensUsedThisHour: usedTokens,
             hourlyLimit: rawLimit,
-            remainingThisHour: remaining,
+            hourlyTokenLimit: rawTokenLimit,
+            remainingThisHour: isTokenLimited ? 0 : reqsRemaining,
+            tokensRemainingThisHour: tokensRemaining,
             primaryHitsThisHour: stored.primaryHits || 0,
             backupHitsThisHour: stored.backupHits || 0,
             lastKeyUsed: stored.lastKeyUsed || 'primary',
             primaryMasked: stored.primaryMasked || 'gsk_kwGL...cSNf',
             backupMasked: stored.backupMasked || 'gsk_9r9z...BqYc',
             activeModel: stored.activeModel || DEFAULT_LOW_TOKEN_MODEL,
-            isRateLimited: remaining <= 0,
+            isRequestLimited,
+            isTokenLimited,
+            isRateLimited,
             resetInMinutes: getResetMinutes()
         };
     }
@@ -74,6 +101,9 @@
         const local = getLocalRateState();
         if (serverRate && serverRate.hourlyLimit) {
             localStorage.setItem('bcs_ai_hourly_limit', String(serverRate.hourlyLimit));
+        }
+        if (serverRate && serverRate.hourlyTokenLimit) {
+            localStorage.setItem('bcs_ai_hourly_token_limit', String(serverRate.hourlyTokenLimit));
         }
         const updated = {
             hourBucket: (serverRate && serverRate.hourBucket) ? serverRate.hourBucket : local.hourBucket,
@@ -111,37 +141,50 @@
             return getLocalRateState();
         },
 
-        async updateBackendConfig({ primaryApiKey = '', backupApiKey = '', hourlyUserLimit = 150, defaultModel = DEFAULT_LOW_TOKEN_MODEL }) {
-            const num = Math.max(10, Math.min(2000, Number(hourlyUserLimit) || DEFAULT_HOURLY_LIMIT));
-            localStorage.setItem('bcs_ai_hourly_limit', String(num));
+        async updateBackendConfig({ primaryApiKey = '', backupApiKey = '', hourlyUserLimit, hourlyTokenLimit, defaultModel = DEFAULT_LOW_TOKEN_MODEL }) {
+            const payload = { defaultModel };
+            if (primaryApiKey && primaryApiKey.trim()) payload.primaryApiKey = primaryApiKey.trim();
+            if (backupApiKey && backupApiKey.trim()) payload.backupApiKey = backupApiKey.trim();
+
+            if (hourlyUserLimit !== undefined) {
+                const num = Math.max(1, Math.min(5000, Number(hourlyUserLimit) || DEFAULT_HOURLY_LIMIT));
+                localStorage.setItem('bcs_ai_hourly_limit', String(num));
+                payload.hourlyUserLimit = num;
+            }
+            if (hourlyTokenLimit !== undefined) {
+                const tokNum = Math.max(100, Math.min(1000000, Number(hourlyTokenLimit) || DEFAULT_HOURLY_TOKEN_LIMIT));
+                localStorage.setItem('bcs_ai_hourly_token_limit', String(tokNum));
+                payload.hourlyTokenLimit = tokNum;
+            }
 
             const res = await fetch(`${API_BASE_URL}/ai/chat`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-api-key': 'backend-bcs-pos',
-                    'x-session-id': localStorage.getItem('sessionId') || '',
-                    'x-session-port': localStorage.getItem('sessionPort') || ''
-                },
-                body: JSON.stringify({
-                    primaryApiKey: primaryApiKey ? primaryApiKey.trim() : undefined,
-                    backupApiKey: backupApiKey ? backupApiKey.trim() : undefined,
-                    hourlyUserLimit: num,
-                    defaultModel
-                })
+                headers: getAuthHeaders(),
+                body: JSON.stringify(payload)
             });
             const data = await res.json().catch(() => ({}));
             if (!res.ok || !data.success) {
                 throw new Error(data.error || 'Failed to update backend AI configuration');
             }
-            await this.fetchRemoteStatus();
+            if (data.rateLimit) {
+                syncServerRateState(data.rateLimit, data.keysConfigured, data.activeModel);
+            } else {
+                await this.fetchRemoteStatus();
+            }
+            this.updateStatusUI();
             return data;
         },
 
-        setHourlyLimit(newLimit) {
-            const num = Math.max(10, Math.min(2000, Number(newLimit) || DEFAULT_HOURLY_LIMIT));
+        setHourlyLimit(newLimit, newTokenLimit) {
+            const num = Math.max(1, Math.min(5000, Number(newLimit) || DEFAULT_HOURLY_LIMIT));
             localStorage.setItem('bcs_ai_hourly_limit', String(num));
-            this.updateBackendConfig({ hourlyUserLimit: num }).catch(() => {});
+            const cfg = { hourlyUserLimit: num };
+            if (newTokenLimit !== undefined) {
+                const tokNum = Math.max(100, Math.min(1000000, Number(newTokenLimit) || DEFAULT_HOURLY_TOKEN_LIMIT));
+                localStorage.setItem('bcs_ai_hourly_token_limit', String(tokNum));
+                cfg.hourlyTokenLimit = tokNum;
+            }
+            this.updateBackendConfig(cfg).catch(() => {});
             this.updateStatusUI();
             return this.getRateStatus();
         },
@@ -150,12 +193,7 @@
             try {
                 const res = await fetch(`${API_BASE_URL}/ai/chat`, {
                     method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-api-key': 'backend-bcs-pos',
-                        'x-session-id': localStorage.getItem('sessionId') || '',
-                        'x-session-port': localStorage.getItem('sessionPort') || ''
-                    }
+                    headers: getAuthHeaders()
                 });
                 if (res.ok) {
                     const data = await res.json();
@@ -169,20 +207,19 @@
         },
 
         async ask({ prompt = '', task = 'chat', contextData = null, model = DEFAULT_LOW_TOKEN_MODEL, temperature = 0.3 }) {
+            // Sync latest state from local storage first
             const rateBefore = this.getRateStatus();
             if (rateBefore.isRateLimited) {
-                throw new Error(`Hourly AI Rate Limit reached (${rateBefore.hourlyLimit}/${rateBefore.hourlyLimit} requests/hour for your account). Quota resets in ${rateBefore.resetInMinutes} min.`);
+                const reason = rateBefore.isTokenLimited
+                    ? `Hourly AI token quota exhausted (${rateBefore.tokensUsedThisHour}/${rateBefore.hourlyTokenLimit} tokens used this hour).`
+                    : `Hourly AI request limit reached (${rateBefore.usedThisHour}/${rateBefore.hourlyLimit} requests/hour for your account).`;
+                throw new Error(`${reason} Quota resets in ${rateBefore.resetInMinutes} min.`);
             }
 
-            // All AI requests & API keys are strictly managed on the Cloudflare Backend (/api/ai/chat)
+            // All AI requests are strictly managed by the native server backend (/api/ai/chat)
             const res = await fetch(`${API_BASE_URL}/ai/chat`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-api-key': 'backend-bcs-pos',
-                    'x-session-id': localStorage.getItem('sessionId') || '',
-                    'x-session-port': localStorage.getItem('sessionPort') || ''
-                },
+                headers: getAuthHeaders(),
                 body: JSON.stringify({
                     prompt,
                     messages: task === 'chat' ? this.history.slice(-4) : [],
@@ -197,20 +234,43 @@
             const data = await res.json().catch(() => ({}));
 
             if (res.status === 429) {
-                if (data.rateLimit) syncServerRateState(data.rateLimit);
+                if (data.rateLimit) {
+                    syncServerRateState(data.rateLimit);
+                } else {
+                    // Force mark exhausted locally so UI blocks further tries until reset
+                    const local = getLocalRateState();
+                    const bucket = JSON.parse(localStorage.getItem('bcs_ai_rate_bucket') || '{}');
+                    bucket.usedThisHour = local.hourlyLimit;
+                    localStorage.setItem('bcs_ai_rate_bucket', JSON.stringify(bucket));
+                }
                 this.updateStatusUI();
-                throw new Error(data.error || 'Hourly AI Rate Limit (150 reqs/hr) reached.');
+                throw new Error(data.error || 'Hourly AI Rate Limit reached. Please wait for the next hour.');
             }
 
             if (!res.ok || !data.success) {
                 throw new Error(data.error || `Backend AI Error (${res.status})`);
             }
 
-            if (data.rateLimit) {
+            // Always deduct request & token usage immediately (from server rateLimit or local fallback)
+            const tokensFromCall = Number(data.usage?.total_tokens || 120);
+            if (data.rateLimit && typeof data.rateLimit.usedThisHour === 'number') {
                 const local = getLocalRateState();
-                local.lastKeyUsed = data.keySlotUsed || 'primary';
-                localStorage.setItem('bcs_ai_rate_bucket', JSON.stringify(local));
-                syncServerRateState(data.rateLimit, null, data.model);
+                const updatedServerRate = {
+                    ...data.rateLimit,
+                    usedThisHour: Math.max(Number(data.rateLimit.usedThisHour), local.usedThisHour + 1),
+                    tokensUsedThisHour: Math.max(Number(data.rateLimit.tokensUsedThisHour || 0), (local.tokensUsedThisHour || 0) + tokensFromCall)
+                };
+                const rawBucket = JSON.parse(localStorage.getItem('bcs_ai_rate_bucket') || '{}');
+                rawBucket.lastKeyUsed = data.keySlotUsed || 'primary';
+                localStorage.setItem('bcs_ai_rate_bucket', JSON.stringify(rawBucket));
+                syncServerRateState(updatedServerRate, null, data.model);
+            } else {
+                const rawBucket = JSON.parse(localStorage.getItem('bcs_ai_rate_bucket') || '{}');
+                rawBucket.hourBucket = getCurrentHourBucket();
+                rawBucket.usedThisHour = Number(rawBucket.usedThisHour || 0) + 1;
+                rawBucket.tokensUsedThisHour = Number(rawBucket.tokensUsedThisHour || 0) + tokensFromCall;
+                rawBucket.lastKeyUsed = data.keySlotUsed || 'primary';
+                localStorage.setItem('bcs_ai_rate_bucket', JSON.stringify(rawBucket));
             }
             this.updateStatusUI();
             return data;
@@ -223,18 +283,36 @@
             const drawerQuotaText = document.getElementById('bcsAiDrawerQuotaText');
             const drawerQuotaBar = document.getElementById('bcsAiDrawerQuotaBar');
             const drawerKeyBadge = document.getElementById('bcsAiKeyStatusBadge');
+            const drawerInput = document.getElementById('bcsAiInput');
+            const drawerSendBtn = document.getElementById('bcsAiSendBtn');
 
             const ratio = `${rate.remainingThisHour}/${rate.hourlyLimit}`;
             if (fabQuota) fabQuota.textContent = `${ratio}/hr`;
-            if (topbarQuota) topbarQuota.textContent = `${rate.remainingThisHour}/hr`;
+            if (topbarQuota) {
+                topbarQuota.textContent = rate.isRateLimited ? `0/${rate.hourlyLimit} (Locked)` : `${rate.remainingThisHour}/hr`;
+                topbarQuota.className = rate.isRateLimited
+                    ? 'badge rounded-pill bg-danger text-white'
+                    : 'badge rounded-pill bg-dark bg-opacity-50 text-info border border-info border-opacity-25';
+            }
 
             if (drawerQuotaText) {
-                drawerQuotaText.textContent = `${rate.remainingThisHour} of ${rate.hourlyLimit} reqs left/hr • ${rate.tokensUsedThisHour || 0} tok (resets in ${rate.resetInMinutes}m)`;
+                drawerQuotaText.textContent = `${rate.remainingThisHour}/${rate.hourlyLimit} reqs left • ${rate.tokensUsedThisHour || 0}/${rate.hourlyTokenLimit || 25000} tok (${rate.resetInMinutes}m)`;
             }
             if (drawerQuotaBar) {
-                const pct = Math.max(0, Math.min(100, Math.round((rate.remainingThisHour / rate.hourlyLimit) * 100)));
+                const reqPct = Math.round((rate.remainingThisHour / rate.hourlyLimit) * 100);
+                const tokPct = rate.hourlyTokenLimit ? Math.round((rate.tokensRemainingThisHour / rate.hourlyTokenLimit) * 100) : 100;
+                const pct = Math.max(0, Math.min(100, Math.min(reqPct, tokPct)));
                 drawerQuotaBar.style.width = `${pct}%`;
                 drawerQuotaBar.className = `progress-bar ${pct > 35 ? 'bg-info' : (pct > 10 ? 'bg-warning' : 'bg-danger')}`;
+            }
+            if (drawerInput && drawerSendBtn && !this.isBusy) {
+                drawerInput.disabled = rate.isRateLimited;
+                drawerSendBtn.disabled = rate.isRateLimited;
+                if (rate.isRateLimited) {
+                    drawerInput.placeholder = `Hourly quota exhausted. Resets in ${rate.resetInMinutes}m...`;
+                } else {
+                    drawerInput.placeholder = 'Ask BCS AI Copilot anything...';
+                }
             }
             if (drawerKeyBadge) {
                 const isBackup = rate.lastKeyUsed === 'backup';
@@ -256,7 +334,7 @@
             const html = `
             <div id="bcsAiBackdrop" class="bcs-ai-drawer-backdrop"></div>
 
-            <aside id="bcsAiCopilotDrawer" class="bcs-ai-drawer" aria-label="BCS Groq AI Copilot">
+            <aside id="bcsAiCopilotDrawer" class="bcs-ai-drawer" aria-label="BCS AI Copilot">
                 <div class="bcs-ai-header d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-2">
                         <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: linear-gradient(135deg, var(--win-accent, #6366f1), #00e5ff); color: #fff;">
@@ -264,12 +342,12 @@
                         </div>
                         <div>
                             <div class="fw-bold d-flex align-items-center gap-2" style="font-size: 0.96rem;">
-                                BCS Groq AI Copilot
+                                BCS AI Copilot
                                 <span id="bcsAiKeyStatusBadge" class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25" style="font-size: 0.65rem;">
-                                    <i class="bi bi-cloud-check-fill me-1"></i>Backend Dual-Key Vault
+                                    <i class="bi bi-cpu-fill me-1"></i>Ruleare AI Engine
                                 </span>
                             </div>
-                            <div class="text-muted" style="font-size: 0.72rem;">Low-Token Engine (<code>gpt-oss-20b</code>) • 150 Reqs/Hr Per User</div>
+                            <div class="text-muted" style="font-size: 0.72rem;">Ruleare AI Core • 150 Reqs/Hr Per User</div>
                         </div>
                     </div>
                     <div class="d-flex align-items-center gap-1">
@@ -294,7 +372,7 @@
 
                 <div id="bcsAiMessages" class="bcs-ai-messages">
                     <div class="bcs-ai-msg assistant">
-                        <div>👋 Hello! I'm <strong>BCS Groq AI Copilot</strong>. My Primary &amp; Backup Groq keys are securely managed on your Cloudflare Backend using the ultra-low-token <code>openai/gpt-oss-20b</code> engine (<strong>150 requests/hour per user</strong>).</div>
+                        <div>👋 Hello! I'm <strong>BCS AI Copilot</strong>, powered by the high-performance <strong>Ruleare Native AI Engine</strong> running directly on your dedicated server.</div>
                         <div class="mt-2 small opacity-75">Ask me about product pricing, inventory alerts, profit margins, or shop operations!</div>
                     </div>
                 </div>
@@ -399,7 +477,7 @@
                 msgBox.insertAdjacentHTML('beforeend', `
                     <div id="${loadingId}" class="bcs-ai-msg assistant">
                         <span class="spinner-border spinner-border-sm text-info me-2" role="status"></span>
-                        Running low-token Groq inference on backend...
+                        Running AI inference on Ruleare Gateway...
                     </div>
                 `);
                 msgBox.scrollTop = msgBox.scrollHeight;

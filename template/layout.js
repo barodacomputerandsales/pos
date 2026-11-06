@@ -52,7 +52,7 @@ function loadGlobalSpotlightSearch() {
     loadScript('spotlight-search').catch(() => {});
 }
 
-// Auto-inject global styling, icons, animation engine, holographic auto-updater, Groq AI Copilot, spotlight search, and neon laser loader
+// Auto-inject global styling, icons, animation engine, holographic auto-updater, BCS AI Copilot, spotlight search, and neon laser loader
 loadGlobalIcons();
 loadGlobalAnimations();
 loadGlobalUpdater();
@@ -182,6 +182,7 @@ window.applyUIPermissions = function(root = document) {
         }
     });
 
+    // Auto-hide menu groups if all submenu children are hidden
     const menuGroups = root.querySelectorAll('.menu-group');
     menuGroups.forEach(group => {
         const submenuItems = Array.from(group.querySelectorAll('.submenu-item'));
@@ -189,16 +190,20 @@ window.applyUIPermissions = function(root = document) {
             const allHidden = submenuItems.every(item => item.style.display === 'none' || item.classList.contains('d-none'));
             if (allHidden) {
                 group.style.display = 'none';
+            } else {
+                group.style.removeProperty('display');
             }
         }
     });
 
+    // Auto-hide section headers (e.g. MAIN MENU, MANAGEMENT) if all adjacent items are hidden
     const mgmtLabels = root.querySelectorAll('.menu-label');
     mgmtLabels.forEach(label => {
         let sibling = label.nextElementSibling;
         let hasVisibleItem = false;
         while (sibling && !sibling.classList.contains('menu-label')) {
-            if (sibling.style.display !== 'none' && !sibling.classList.contains('d-none')) {
+            const isItem = sibling.classList.contains('menu-item') || sibling.classList.contains('menu-group');
+            if (isItem && sibling.style.display !== 'none' && !sibling.classList.contains('d-none')) {
                 hasVisibleItem = true;
                 break;
             }
@@ -206,15 +211,40 @@ window.applyUIPermissions = function(root = document) {
         }
         if (!hasVisibleItem) {
             label.style.display = 'none';
+        } else {
+            label.style.removeProperty('display');
         }
     });
 };
 
-window.protectRoute = function(requiredPermission, fallbackUrl = 'dashboard.html') {
+/**
+ * Returns the best fallback destination page based on the current user's granted permissions.
+ */
+window.getDefaultAuthorizedRoute = function() {
+    if (window.isAdmin()) return 'dashboard.html';
+    if (window.hasPermission('view_products')) return 'all-product.html';
+    if (window.hasPermission('pos_access') || window.hasPermission('make_sales')) return 'dashboard.html';
+    if (window.hasPermission('view_purchases')) return 'purchase-history.html';
+    if (window.hasPermission('view_production')) return 'production-history.html';
+    if (window.hasPermission('view_suppliers')) return 'all-suppliers.html';
+    if (window.hasPermission('manage_settings')) return 'settings.html';
+    if (window.hasPermission('manage_users')) return 'employee.html';
+    return 'dashboard.html';
+};
+
+window.protectRoute = function(requiredPermission, fallbackUrl = null) {
     if (window.isAdmin()) return; // Admin bypass!
     if (!window.hasPermission(requiredPermission)) {
-        alert("Access Denied: You do not have permission to view this section (" + requiredPermission + ").");
-        window.location.replace(fallbackUrl);
+        const targetFallback = fallbackUrl || window.getDefaultAuthorizedRoute();
+        const msg = "Access Denied: You do not have permission to view this section (" + requiredPermission + ").";
+        if (typeof showCustomAlert === 'function') {
+            showCustomAlert('Access Denied', msg, 'failed');
+        } else {
+            alert(msg);
+        }
+        setTimeout(() => {
+            window.location.replace(targetFallback);
+        }, 1200);
     }
 };
 
@@ -271,6 +301,8 @@ window.BCSTheme = {
             root.setAttribute('data-theme', mode);
             root.style.setProperty('--win-accent', accent);
             root.style.setProperty('--win-accent-rgb', rgb);
+            root.style.setProperty('--win-selection-bg', `rgba(${rgb}, 0.55)`);
+            root.style.setProperty('--win-selection-color', '#ffffff');
             root.style.setProperty('--bs-primary', accent);
             root.style.setProperty('--bs-primary-rgb', rgb);
             root.style.setProperty('--sidebar-accent', accent);

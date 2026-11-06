@@ -1,11 +1,13 @@
-const { app, BrowserWindow, ipcMain, shell, powerMonitor, nativeTheme, systemPreferences, screen } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, powerMonitor, nativeTheme, systemPreferences, screen, nativeImage } = require('electron');
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
 const { autoUpdater } = require('electron-updater');
 
 const isDev = !app.isPackaged;
-const APP_ID = isDev ? 'com.bcsdeveloper.pos.dev' : 'com.bcsdeveloper.pos';
+
+// Explicit unified App ID so Windows Shell & Taskbar correctly pair windows with their pinned shortcut
+const APP_ID = 'com.bcsdeveloper.pos';
 if (process.platform === 'win32') {
   app.setAppUserModelId(APP_ID);
 }
@@ -154,7 +156,8 @@ function broadcastOsThemeUpdate() {
 }
 
 function createWindow() {
-  const iconPath = path.join(__dirname, 'assets/icon.ico');
+  const iconPath = path.join(__dirname, 'assets', 'icon.ico');
+  const appIcon = fs.existsSync(iconPath) ? nativeImage.createFromPath(iconPath) : null;
   const savedState = loadWindowState();
 
   if (savedState.themeSource && ['system', 'dark', 'light'].includes(savedState.themeSource)) {
@@ -172,13 +175,17 @@ function createWindow() {
     minHeight: 768,
     backgroundColor: initialTheme.isDark ? '#0b0f19' : '#f3f4f6',
     autoHideMenuBar: true,
-    icon: iconPath,
+    icon: appIcon || iconPath,
     show: false,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
     }
   });
+
+  if (appIcon && typeof mainWindow.setIcon === 'function') {
+    mainWindow.setIcon(appIcon);
+  }
 
   // Bind Window State Persistence Events
   mainWindow.on('resize', () => saveWindowState(false));
@@ -336,7 +343,7 @@ if (isDev) {
 // Direct runtime autoUpdater to fetch updates through the serverless backend relay
 autoUpdater.setFeedURL({
   provider: 'generic',
-  url: 'https://backend.bcs.bcsdeveloper.com/api/updater/'
+  url: 'https://backend-bcs.bcsdeveloper.com/api/updater/'
 });
 
 // Quiet background update check every 30 minutes

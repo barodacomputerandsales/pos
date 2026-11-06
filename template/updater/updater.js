@@ -10,7 +10,7 @@
  */
 
 (function() {
-    let currentAppVersion = '2.3.7';
+    let currentAppVersion = '2.3.8';
     let availableRemoteInfo = null;
     let downloadedUpdateInfo = null;
     let isIpcBound = false;
@@ -486,7 +486,7 @@
      * Reinstall App directly with standalone .exe installer
      */
     window.reinstallBcsApp = async function(ver) {
-        const targetUrl = 'https://backend.bcs.bcsdeveloper.com/api/updater/download';
+        const targetUrl = 'https://backend-bcs.bcsdeveloper.com/api/updater/download';
         if (typeof showAlert === 'function') {
             showAlert('Reinstall Initiated', 'Requesting standalone setup installer from Cloudflare serverless edge...', 'info');
         }
@@ -533,7 +533,7 @@
 
                 <h4 class="fw-extrabold text-white mb-2">Update Ready: Version v${targetVer}</h4>
                 <p class="text-muted small mb-3" style="line-height: 1.45;">
-                    A new production build has been published. Updating ensures uninterrupted terminal checkout, peak hardware performance, and Cloudflare D1 central database integrity.
+                    A new production build has been published. Updating ensures uninterrupted terminal checkout, peak hardware performance, and central database integrity.
                 </p>
 
                 <div class="bcs-version-diff mb-4">
@@ -675,7 +675,7 @@
                 <div class="d-flex align-items-start gap-2 mb-1"><span class="text-info fw-bold">•</span><div><strong class="text-white">Windows NSIS Engine Hardening</strong>: Refined 64-bit enterprise installer with seamless background update and instant silent restart handoff.</div></div>
                 <div class="d-flex align-items-start gap-2 mb-1"><span class="text-info fw-bold">•</span><div><strong class="text-white">Streamlined Build Pipeline</strong>: Optimized CI/CD packaging workflow targeting pure Windows environments.</div></div>
                 <div class="d-flex align-items-start gap-2 mb-1"><span class="text-info fw-bold">•</span><div><strong class="text-white">Zero-Flicker Branded Splash</strong>: Universal laser neon loader with smooth hardware-accelerated DWM rendering.</div></div>
-                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-info fw-bold">•</span><div><strong class="text-white">Edge Security Standards</strong>: Strengthened session validation and Cloudflare D1 edge synchronizations.</div></div>
+                <div class="d-flex align-items-start gap-2 mb-1"><span class="text-info fw-bold">•</span><div><strong class="text-white">Edge Security Standards</strong>: Strengthened session validation and native SQLite database synchronizations.</div></div>
             `,
             '2.0.0': `
                 <div class="d-flex align-items-start gap-2 mb-1"><span class="text-success fw-bold">•</span><div><strong class="text-white">Atomic Port Bonding</strong>: Single-shot operator session registration and port trust eliminated edge race conditions.</div></div>
@@ -1031,7 +1031,7 @@
     function triggerSilentDiscoveryCheck() {
         setTimeout(async () => {
             try {
-                const res = await fetch(`https://backend.bcs.bcsdeveloper.com/api/updater/check?current=${currentAppVersion}`).then(r => r.json());
+                const res = await fetch(`https://backend-bcs.bcsdeveloper.com/api/updater/check?current=${currentAppVersion}`).then(r => r.json());
                 if (res && res.updateAvailable) {
                     availableRemoteInfo = res;
                     updateTopbarPill('available', res);

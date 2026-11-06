@@ -18,6 +18,8 @@
         { title: 'Production History', icon: 'bi-gear-wide-connected', url: 'production-history.html', category: 'Page' },
         { title: 'Add Production', icon: 'bi-tools', url: 'add-production.html', category: 'Action' },
         { title: 'Add Production Product', icon: 'bi-box-arrow-in-down', url: 'add-production-product.html', category: 'Action' },
+        { title: 'Account Center', icon: 'bi-person-badge-fill', url: 'account.html', category: 'Page' },
+        { title: 'Employee Management', icon: 'bi-people-fill', url: 'employee.html', category: 'Page' },
         { title: 'Settings & Software Updater', icon: 'bi-gear-fill', url: 'settings.html', category: 'Page' }
     ];
 
@@ -27,7 +29,7 @@
 
     async function loadIndexData() {
         try {
-            const api = 'https://backend.bcs.bcsdeveloper.com/api';
+            const api = 'https://backend-bcs.bcsdeveloper.com/api';
             const headers = {
                 'Content-Type': 'application/json',
                 'x-api-key': 'backend-bcs-pos',
