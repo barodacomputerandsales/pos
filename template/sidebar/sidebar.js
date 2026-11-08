@@ -150,6 +150,12 @@ window._renderSidebarImpl = function(activeMenu, activeSubMenu = null) {
             if (nameEl) nameEl.textContent = userName;
             if (roleEl) roleEl.textContent = String(userRole).charAt(0).toUpperCase() + String(userRole).slice(1);
 
+            const savedAvatar = localStorage.getItem('userAvatarUrl');
+            const avatarEl = document.querySelector('.sidebar-user .user-avatar');
+            if (savedAvatar && avatarEl) {
+                avatarEl.innerHTML = `<img src="${savedAvatar}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">`;
+            }
+
             // Bind submenu toggle logic native to sidebar
             const submenuToggles = document.querySelectorAll('.has-submenu');
             submenuToggles.forEach(toggle => {

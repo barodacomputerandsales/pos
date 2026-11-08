@@ -4,7 +4,7 @@ window._renderTopbarImpl = function() {
         <div class="d-flex align-items-center gap-2 flex-shrink-0">
             <img src="assets/icon.png" onerror="this.src='template/bcs-logo.svg'" alt="BCS" style="width: 36px; height: 36px; border-radius: 9px; object-fit: contain; filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.45));">
             <h4 class="mb-0 fw-bold fs-5 text-nowrap" style="background: linear-gradient(135deg, #00e5ff, var(--win-accent, #6366f1)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">BCS Enterprise</h4>
-            <span id="topbarVersionBadge" class="badge bg-secondary bg-opacity-25 text-muted border border-secondary border-opacity-25 small" style="font-size: 0.72rem;">v2.3.8</span>
+            <span id="topbarVersionBadge" class="badge bg-secondary bg-opacity-25 text-muted border border-secondary border-opacity-25 small" style="font-size: 0.72rem;">v2.4.1</span>
             <div id="topbarUpdateContainer" class="d-inline-flex align-items-center ms-2"></div>
         </div>
 
@@ -72,7 +72,12 @@ window._renderTopbarImpl = function() {
         const initEl = document.getElementById('topbarUserInitial');
         if (nameEl) nameEl.textContent = userName;
         if (roleEl) roleEl.textContent = String(userRole).charAt(0).toUpperCase() + String(userRole).slice(1);
-        if (initEl) initEl.textContent = userName.charAt(0).toUpperCase();
+        const savedAvatar = localStorage.getItem('userAvatarUrl');
+        if (savedAvatar && initEl) {
+            initEl.innerHTML = `<img src="${savedAvatar}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+        } else if (initEl) {
+            initEl.textContent = userName.charAt(0).toUpperCase();
+        }
 
         // Sync Topbar Theme Pill with current BCSTheme state
         if (window.BCSTheme && window.BCSTheme.state) {

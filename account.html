@@ -91,10 +91,17 @@
             pointer-events: none;
         }
 
+        .avatar-circle-wrap {
+            position: relative;
+            width: 86px;
+            height: 86px;
+            flex-shrink: 0;
+        }
+
         .avatar-circle {
-            width: 82px;
-            height: 82px;
-            border-radius: 20px;
+            width: 86px;
+            height: 86px;
+            border-radius: 22px;
             background: linear-gradient(135deg, #00e5ff, #6366f1);
             display: flex;
             align-items: center;
@@ -103,6 +110,109 @@
             font-weight: 800;
             color: #ffffff;
             box-shadow: 0 0 25px rgba(0, 229, 255, 0.45);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid rgba(0, 229, 255, 0.4);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .avatar-circle:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 32px rgba(0, 229, 255, 0.7);
+            border-color: #00e5ff;
+        }
+
+        .avatar-circle img.avatar-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 20px;
+        }
+
+        .avatar-upload-badge {
+            position: absolute;
+            bottom: -4px;
+            right: -4px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #0f172a;
+            border: 2px solid #00e5ff;
+            color: #00e5ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 5;
+            padding: 0;
+        }
+
+        .avatar-upload-badge:hover {
+            background: #00e5ff;
+            color: #07090e;
+            transform: scale(1.12);
+            box-shadow: 0 0 14px rgba(0, 240, 255, 0.8);
+        }
+
+        /* Custom High-Contrast Status Pills (replaces broken solid Bootstrap badges) */
+        .bcs-status-pill {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            padding: 4px 12px !important;
+            border-radius: 9999px !important;
+            font-size: 0.75rem !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.03em !important;
+            line-height: 1.35 !important;
+            text-transform: none !important;
+            white-space: nowrap !important;
+            box-sizing: border-box !important;
+        }
+
+        .bcs-status-pill.pill-active,
+        .bcs-status-pill.pill-verified {
+            background: rgba(16, 185, 129, 0.16) !important;
+            color: #6ee7b7 !important; /* Luminous, ultra-readable mint/emerald */
+            border: 1px solid rgba(52, 211, 153, 0.5) !important;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.2) !important;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .bcs-status-pill.pill-active i,
+        .bcs-status-pill.pill-verified i {
+            color: #34d399 !important;
+            font-size: 0.85rem !important;
+        }
+
+        .bcs-status-pill.pill-unverified {
+            background: rgba(245, 158, 11, 0.16) !important;
+            color: #fcd34d !important; /* Crisp, readable luminous amber */
+            border: 1px solid rgba(245, 158, 11, 0.5) !important;
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.2) !important;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .bcs-status-pill.pill-unverified i {
+            color: #fbbf24 !important;
+            font-size: 0.85rem !important;
+        }
+
+        .bcs-status-pill.pill-unset {
+            background: rgba(148, 163, 184, 0.15) !important;
+            color: #e2e8f0 !important; /* Crisp, readable muted grey/white */
+            border: 1px solid rgba(148, 163, 184, 0.35) !important;
+        }
+
+        .bcs-status-pill.pill-role {
+            background: rgba(239, 68, 68, 0.16) !important;
+            color: #fca5a5 !important;
+            border: 1px solid rgba(239, 68, 68, 0.45) !important;
+            text-transform: uppercase !important;
         }
 
         /* Form Controls */
@@ -326,13 +436,22 @@
         <div class="profile-hero mb-4">
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-4">
                 <div class="d-flex align-items-center gap-3">
-                    <div class="avatar-circle" id="heroUserInitial">A</div>
+                    <div class="avatar-circle-wrap">
+                        <div class="avatar-circle" id="heroUserInitial" title="Click to upload profile photo">
+                            <span id="heroUserInitialChar">A</span>
+                            <img id="heroUserAvatarImg" src="" alt="Avatar" class="avatar-img d-none">
+                        </div>
+                        <button type="button" class="avatar-upload-badge" id="btnUploadAvatar" title="Upload Profile Picture">
+                            <i class="bi bi-camera-fill"></i>
+                        </button>
+                        <input type="file" id="avatarFileInput" accept="image/png, image/jpeg, image/webp, image/gif, image/bmp" style="display: none;">
+                    </div>
                     <div>
                         <div class="d-flex align-items-center gap-2 mb-1">
                             <h4 class="fw-bold text-white mb-0" id="heroUserName">Admin</h4>
-                            <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-25 text-uppercase fw-bold" id="heroUserRole">Administrator</span>
-                            <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-25" id="heroStatusBadge">
-                                <i class="bi bi-shield-check me-1"></i> Active Session
+                            <span class="bcs-status-pill pill-role" id="heroUserRole">Administrator</span>
+                            <span class="bcs-status-pill pill-active" id="heroStatusBadge">
+                                <i class="bi bi-shield-check"></i> Active Session
                             </span>
                         </div>
                         <p class="text-muted small mb-2" id="heroUserSubtext">Baroda Computers &amp; Sales Enterprise Root Administrator</p>
@@ -341,7 +460,10 @@
                             <div><i class="bi bi-laptop text-warning me-1"></i> Bonded Port: <span class="mono text-white" id="heroBondedPort">Not Bonded</span></div>
                             <div><i class="bi bi-envelope text-info me-1"></i> Email: <span class="text-white" id="heroUserEmail">Not Set</span></div>
                             <div><i class="bi bi-clock-history text-success me-1"></i> Last Synced: <span class="text-white" id="heroLastSync">Just now</span></div>
-                            <div><i class="bi bi-shield-lock-fill text-info me-1"></i> Security Code: <a href="javascript:void(0)" onclick="document.getElementById('password-tab-btn').click();" class="text-info fw-bold text-decoration-none"><i class="bi bi-pencil-square"></i> Change Code</a></div>
+                            <div><i class="bi bi-shield-lock-fill text-info me-1"></i> Security Code: <a href="javascript:void(0)" onclick="window.openQuickCodeModal()" class="text-info fw-bold text-decoration-none"><i class="bi bi-pencil-square"></i> Change Code</a></div>
+                            <div id="avatarActionsContainer" class="d-none">
+                                <a href="javascript:void(0)" id="btnRemoveAvatar" class="text-danger fw-semibold text-decoration-none small"><i class="bi bi-trash3-fill me-1"></i>Remove Photo</a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -367,7 +489,7 @@
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="password-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-password" type="button" role="tab">
-                        <i class="bi bi-shield-lock-fill text-warning"></i> Password &amp; Security Code <span class="badge bg-warning bg-opacity-25 text-warning ms-1" style="font-size: 0.68rem;"><i class="bi bi-lock-fill"></i> Protected</span>
+                        <i class="bi bi-shield-lock-fill text-warning"></i> Username, Password &amp; Code <span class="badge bg-warning bg-opacity-25 text-warning ms-1" style="font-size: 0.68rem;"><i class="bi bi-lock-fill"></i> Protected</span>
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
@@ -400,8 +522,13 @@
                                 <div class="row g-3 mb-3">
                                     <div class="col-md-4">
                                         <label class="form-label text-muted small fw-semibold">ACCOUNT USERNAME</label>
-                                        <input type="text" class="form-control mono" id="inputUsername" readonly disabled>
-                                        <small class="text-muted" style="font-size: 0.72rem;">Permanently bonded admin ID.</small>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control mono" id="inputUsername" readonly disabled>
+                                            <button type="button" class="btn btn-outline-info" id="btnQuickChangeUsername" onclick="document.getElementById('password-tab-btn').click(); setTimeout(() => document.getElementById('newUsernameVal')?.focus(), 150);">
+                                                <i class="bi bi-pencil-square me-1"></i> Change
+                                            </button>
+                                        </div>
+                                        <small class="text-muted" style="font-size: 0.72rem;">Primary login username &amp; terminal operator ID.</small>
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label text-muted small fw-semibold">SYSTEM ROLE</label>
@@ -418,7 +545,7 @@
                                         <label class="form-label text-muted small fw-semibold">ACCOUNT PASSWORD</label>
                                         <div class="input-group">
                                             <input type="password" class="form-control" value="••••••••" readonly disabled>
-                                            <button type="button" class="btn btn-outline-warning" onclick="document.getElementById('password-tab-btn').click(); setTimeout(() => document.getElementById('currPassword')?.focus(), 150);">
+                                            <button type="button" class="btn btn-outline-warning" id="btnOpenChangePasswordModal" onclick="window.openQuickPasswordModal()">
                                                 <i class="bi bi-key-fill me-1"></i> Change Password
                                             </button>
                                         </div>
@@ -428,7 +555,7 @@
                                         <label class="form-label text-muted small fw-semibold">SECURITY ACCESS CODE</label>
                                         <div class="input-group">
                                             <input type="password" class="form-control mono" value="••••••••" readonly disabled>
-                                            <button type="button" class="btn btn-outline-info" onclick="document.getElementById('password-tab-btn').click(); setTimeout(() => document.getElementById('newPinCode')?.focus(), 150);">
+                                            <button type="button" class="btn btn-outline-info" id="btnOpenChangePinModal" onclick="window.openQuickCodeModal()">
                                                 <i class="bi bi-shield-lock-fill me-1"></i> Change Code
                                             </button>
                                         </div>
@@ -460,7 +587,7 @@
                                         <div class="d-flex justify-content-between align-items-center mb-1">
                                             <label class="form-label text-muted small fw-semibold mb-0">EMAIL ADDRESS</label>
                                             <span id="emailVerifyStatusBadge">
-                                                <span class="badge bg-secondary bg-opacity-25 text-muted small">Unset</span>
+                                                <span class="bcs-status-pill pill-unset">Email Unset</span>
                                             </span>
                                         </div>
                                         <div class="input-group">
@@ -578,38 +705,75 @@
                 </div>
             </div>
 
-            <!-- ==================== TAB 2: PASSWORD & LOGIN PIN (RE-AUTH GUARDED) ==================== -->
+            <!-- ==================== TAB 2: CREDENTIALS GUARD (USERNAME, PASSWORD & PIN) ==================== -->
             <div class="tab-pane fade" id="tab-password" role="tabpanel">
                 <!-- Re-Authentication Status Banner -->
                 <div id="reauthBannerPasswordTab"></div>
 
                 <div class="row g-4">
-                    <!-- Change Password Card -->
-                    <div class="col-12 col-lg-6">
-                        <div class="solid-panel p-4 h-100 security-locked-wrap" id="panelChangePassword">
-                            <!-- Security Lock Overlay (visible when not reauthenticated) -->
-                            <div class="security-lock-overlay" id="overlayPassword">
-                                <div class="lock-shield-icon"><i class="bi bi-shield-lock-fill"></i></div>
-                                <h5 class="fw-bold text-white mb-1">Credential Guard Locked</h5>
-                                <p class="text-muted small mb-3" style="max-width: 320px;">
-                                    Changing administrator login credentials strictly requires active identity re-authentication.
-                                </p>
-                                <button type="button" class="btn btn-warning text-dark fw-bold px-4 py-2 btn-trigger-reauth">
-                                    <i class="bi bi-key-fill me-1"></i> Authenticate to Unlock
-                                </button>
+                    <!-- 1. Change Username Card -->
+                    <!-- 1. Change Username Card -->
+                    <div class="col-12 col-xl-4 col-md-6">
+                        <div class="solid-panel p-4 h-100" id="panelChangeUsername">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <h5 class="fw-bold text-white mb-0 d-flex align-items-center gap-2">
+                                    <i class="bi bi-person-gear text-info"></i> Change Username
+                                </h5>
+                                <span class="badge bg-info bg-opacity-15 text-info border border-info border-opacity-25 small">
+                                    Operator ID
+                                </span>
                             </div>
+                            <p class="text-muted small mb-3">Set or update your operator username used for login.</p>
 
+                            <form id="changeUsernameForm">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small fw-semibold">CURRENT USERNAME</label>
+                                    <input type="text" class="form-control mono bg-dark bg-opacity-50" id="currentUsernameDisplay" readonly disabled>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small fw-semibold">CURRENT PASSWORD</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="currPasswordForUser" required placeholder="Enter current password">
+                                        <button class="btn btn-outline-secondary" type="button" tabindex="-1" onclick="togglePasswordVisibility('currPasswordForUser')">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label text-muted small fw-semibold">NEW USERNAME</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-dark border-secondary border-opacity-50 text-info"><i class="bi bi-at"></i></span>
+                                        <input type="text" class="form-control mono" id="newUsernameVal" required placeholder="Enter new username">
+                                    </div>
+                                    <small class="text-muted" style="font-size: 0.72rem;">Must be unique across all system accounts.</small>
+                                </div>
+
+                                <button type="submit" class="btn btn-info text-white w-100 py-2 fw-bold d-flex align-items-center justify-content-center gap-2" id="btnSubmitUsername">
+                                    <i class="bi bi-check2-circle"></i> Update Username
+                                </button>
+                                <div class="mt-2 text-center text-muted" style="font-size: 0.72rem;">
+                                    <i class="bi bi-shield-check text-success me-1"></i> Verified with current account password.
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- 2. Change Password Card -->
+                    <div class="col-12 col-xl-4 col-md-6">
+                        <div class="solid-panel p-4 h-100" id="panelChangePassword">
                             <h5 class="fw-bold text-white mb-2 d-flex align-items-center gap-2">
-                                <i class="bi bi-key-fill text-warning"></i> Change Account Password
+                                <i class="bi bi-key-fill text-warning"></i> Change Password
                             </h5>
-                            <p class="text-muted small mb-4">Update your primary login password. Minimum 6 characters required.</p>
+                            <p class="text-muted small mb-3">Update your primary login password.</p>
 
                             <form id="changePasswordForm">
                                 <div class="mb-3">
                                     <label class="form-label text-muted small fw-semibold">CURRENT PASSWORD</label>
                                     <div class="input-group">
                                         <input type="password" class="form-control" id="currPassword" required placeholder="Enter current password">
-                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('currPassword')">
+                                        <button class="btn btn-outline-secondary" type="button" tabindex="-1" onclick="togglePasswordVisibility('currPassword')">
                                             <i class="bi bi-eye"></i>
                                         </button>
                                     </div>
@@ -619,7 +783,7 @@
                                     <label class="form-label text-muted small fw-semibold">NEW PASSWORD</label>
                                     <div class="input-group">
                                         <input type="password" class="form-control" id="newPassword" required placeholder="Enter new password">
-                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('newPassword')">
+                                        <button class="btn btn-outline-secondary" type="button" tabindex="-1" onclick="togglePasswordVisibility('newPassword')">
                                             <i class="bi bi-eye"></i>
                                         </button>
                                     </div>
@@ -629,7 +793,7 @@
                                     <label class="form-label text-muted small fw-semibold">CONFIRM NEW PASSWORD</label>
                                     <div class="input-group">
                                         <input type="password" class="form-control" id="confirmNewPassword" required placeholder="Re-enter new password">
-                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('confirmNewPassword')">
+                                        <button class="btn btn-outline-secondary" type="button" tabindex="-1" onclick="togglePasswordVisibility('confirmNewPassword')">
                                             <i class="bi bi-eye"></i>
                                         </button>
                                     </div>
@@ -638,60 +802,64 @@
                                 <button type="submit" class="btn btn-warning text-dark w-100 py-2 fw-bold d-flex align-items-center justify-content-center gap-2" id="btnSubmitPassword">
                                     <i class="bi bi-shield-lock"></i> Update Password
                                 </button>
+                                <div class="mt-2 text-center text-muted" style="font-size: 0.72rem;">
+                                    <i class="bi bi-shield-check text-success me-1"></i> Verified with current account password.
+                                </div>
                             </form>
                         </div>
                     </div>
 
-                    <!-- Change Security Access Code Card -->
-                    <div class="col-12 col-lg-6">
-                        <div class="solid-panel p-4 h-100 security-locked-wrap" id="panelFastPin">
-                            <!-- Security Lock Overlay -->
-                            <div class="security-lock-overlay" id="overlayFastPin">
-                                <div class="lock-shield-icon"><i class="bi bi-shield-lock-fill"></i></div>
-                                <h5 class="fw-bold text-white mb-1">Security Code Guard Locked</h5>
-                                <p class="text-muted small mb-3" style="max-width: 320px;">
-                                    Setting or updating your security access code strictly requires active identity re-authentication.
-                                </p>
-                                <button type="button" class="btn btn-warning text-dark fw-bold px-4 py-2 btn-trigger-reauth">
-                                    <i class="bi bi-key-fill me-1"></i> Authenticate to Unlock
-                                </button>
-                            </div>
-
+                    <!-- 3. Change Security Access Code Card -->
+                    <div class="col-12 col-xl-4 col-md-12">
+                        <div class="solid-panel p-4 h-100" id="panelFastPin">
                             <div class="d-flex align-items-center justify-content-between mb-2">
                                 <h5 class="fw-bold text-white mb-0 d-flex align-items-center gap-2">
-                                    <i class="bi bi-shield-check text-info"></i> Change Security Access Code
+                                    <i class="bi bi-shield-check text-info"></i> Security Access Code
                                 </h5>
                                 <span class="badge bg-info bg-opacity-15 text-info border border-info border-opacity-25 small">
-                                    <i class="bi bi-asterisk"></i> 3rd Factor &amp; Fast PIN
+                                    3rd Factor &amp; PIN
                                 </span>
                             </div>
-                            <p class="text-muted small mb-4">Set or update the security access code required for login Factor 3 and instant Fast PIN unlock (no character limits).</p>
+                            <p class="text-muted small mb-3">Set or update the security code for 3rd factor &amp; Fast PIN unlock.</p>
 
                             <form id="updatePinForm">
                                 <div class="mb-3">
-                                    <label class="form-label text-muted small fw-semibold">NEW SECURITY ACCESS CODE</label>
+                                    <label class="form-label text-muted small fw-semibold">CURRENT PASSWORD</label>
                                     <div class="input-group">
-                                        <input type="password" class="form-control mono text-center fs-4 fw-bold letter-spacing-2" id="newPinCode" required placeholder="Enter new access code">
-                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('newPinCode')">
+                                        <input type="password" class="form-control" id="currPasswordForPin" required placeholder="Enter current password">
+                                        <button class="btn btn-outline-secondary" type="button" tabindex="-1" onclick="togglePasswordVisibility('currPasswordForPin')">
                                             <i class="bi bi-eye"></i>
                                         </button>
                                     </div>
-                                    <small class="text-muted" style="font-size: 0.75rem;">Can be numbers, letters, or symbols (no character limits).</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small fw-semibold">NEW SECURITY ACCESS CODE</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control mono text-center fs-4 fw-bold letter-spacing-2" id="newPinCode" required placeholder="Enter access code">
+                                        <button class="btn btn-outline-secondary" type="button" tabindex="-1" onclick="togglePasswordVisibility('newPinCode')">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                    <small class="text-muted" style="font-size: 0.75rem;">Can be numbers, letters, or symbols.</small>
                                 </div>
 
                                 <div class="mb-4">
                                     <label class="form-label text-muted small fw-semibold">CONFIRM SECURITY ACCESS CODE</label>
                                     <div class="input-group">
-                                        <input type="password" class="form-control mono text-center fs-4 fw-bold letter-spacing-2" id="confirmPinCode" required placeholder="Re-enter new access code">
-                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('confirmPinCode')">
+                                        <input type="password" class="form-control mono text-center fs-4 fw-bold letter-spacing-2" id="confirmPinCode" required placeholder="Re-enter access code">
+                                        <button class="btn btn-outline-secondary" type="button" tabindex="-1" onclick="togglePasswordVisibility('confirmPinCode')">
                                             <i class="bi bi-eye"></i>
                                         </button>
                                     </div>
                                 </div>
 
                                 <button type="submit" class="btn btn-info text-white w-100 py-2 fw-bold d-flex align-items-center justify-content-center gap-2" id="btnSubmitPin">
-                                    <i class="bi bi-check2-circle"></i> Update Security Access Code
+                                    <i class="bi bi-check2-circle"></i> Update Access Code
                                 </button>
+                                <div class="mt-2 text-center text-muted" style="font-size: 0.72rem;">
+                                    <i class="bi bi-shield-check text-success me-1"></i> Verified with current account password.
+                                </div>
                             </form>
                         </div>
                     </div>
@@ -758,6 +926,110 @@
         </div>
     </main>
 
+    <!-- ==================== MODAL: QUICK CHANGE PASSWORD ==================== -->
+    <div class="modal fade" id="modalQuickChangePassword" tabindex="-1" aria-labelledby="modalQuickChangePasswordLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content solid-panel" style="background: #1e293b !important; border: 1.5px solid #f59e0b !important; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                <div class="modal-header border-bottom border-secondary border-opacity-25 pb-3">
+                    <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2" id="modalQuickChangePasswordLabel">
+                        <i class="bi bi-key-fill text-warning"></i> Change Account Password
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="quickChangePasswordForm">
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-semibold">CURRENT PASSWORD <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="quickCurrPassword" required placeholder="Enter current password" autocomplete="current-password">
+                                <button class="btn btn-outline-secondary" type="button" tabindex="-1" onclick="togglePasswordVisibility('quickCurrPassword')">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-semibold">NEW PASSWORD <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="quickNewPassword" required placeholder="Enter new password" autocomplete="new-password">
+                                <button class="btn btn-outline-secondary" type="button" tabindex="-1" onclick="togglePasswordVisibility('quickNewPassword')">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-semibold">CONFIRM NEW PASSWORD <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="quickConfirmPassword" required placeholder="Re-enter new password" autocomplete="new-password">
+                                <button class="btn btn-outline-secondary" type="button" tabindex="-1" onclick="togglePasswordVisibility('quickConfirmPassword')">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="quickPasswordErrorAlert" class="alert alert-danger py-2 px-3 small d-none mb-3"></div>
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="button" class="btn btn-outline-secondary px-3 py-2" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-warning text-dark fw-bold px-4 py-2 d-flex align-items-center gap-2" id="btnSubmitQuickPassword">
+                                <i class="bi bi-shield-lock-fill"></i> Update Password
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: QUICK CHANGE SECURITY CODE ==================== -->
+    <div class="modal fade" id="modalQuickChangeCode" tabindex="-1" aria-labelledby="modalQuickChangeCodeLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content solid-panel" style="background: #1e293b !important; border: 1.5px solid #00e5ff !important; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                <div class="modal-header border-bottom border-secondary border-opacity-25 pb-3">
+                    <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2" id="modalQuickChangeCodeLabel">
+                        <i class="bi bi-shield-lock-fill text-info"></i> Change Security Access Code
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="quickChangePinForm">
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-semibold">CURRENT ACCOUNT PASSWORD <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="quickPinCurrPassword" required placeholder="Enter current password" autocomplete="current-password">
+                                <button class="btn btn-outline-secondary" type="button" tabindex="-1" onclick="togglePasswordVisibility('quickPinCurrPassword')">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-semibold">NEW SECURITY ACCESS CODE <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="password" class="form-control mono text-center fs-4 fw-bold letter-spacing-2" id="quickNewPinCode" required placeholder="Enter access code" autocomplete="off">
+                                <button class="btn btn-outline-secondary" type="button" tabindex="-1" onclick="togglePasswordVisibility('quickNewPinCode')">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-semibold">CONFIRM SECURITY ACCESS CODE <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="password" class="form-control mono text-center fs-4 fw-bold letter-spacing-2" id="quickConfirmPinCode" required placeholder="Re-enter access code" autocomplete="off">
+                                <button class="btn btn-outline-secondary" type="button" tabindex="-1" onclick="togglePasswordVisibility('quickConfirmPinCode')">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="quickPinErrorAlert" class="alert alert-danger py-2 px-3 small d-none mb-3"></div>
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="button" class="btn btn-outline-secondary px-3 py-2" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-info text-white fw-bold px-4 py-2 d-flex align-items-center gap-2" id="btnSubmitQuickPin">
+                                <i class="bi bi-check2-circle"></i> Update Access Code
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ==================== MODAL: RE-AUTHENTICATION CHALLENGE ==================== -->
     <div class="modal fade" id="reauthModal" tabindex="-1" aria-labelledby="reauthModalLabel" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered">
@@ -778,7 +1050,7 @@
                             <label class="form-label text-white small fw-bold" for="reauthPassword">Account Password <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <input type="password" class="form-control" id="reauthPassword" required placeholder="Enter current password" autocomplete="current-password">
-                                <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('reauthPassword')">
+                                <button class="btn btn-outline-secondary" type="button" tabindex="-1" onclick="togglePasswordVisibility('reauthPassword')">
                                     <i class="bi bi-eye"></i>
                                 </button>
                             </div>
@@ -843,15 +1115,192 @@
         </div>
     </div>
 
+    <!-- ==================== MODAL: CREDENTIAL CHANGE EMAIL OTP AUTHORIZATION ==================== -->
+    <div class="modal fade" id="credentialAuthModal" tabindex="-1" aria-labelledby="credentialAuthModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content solid-panel" style="background: #1e293b !important; border: 1.5px solid #f59e0b !important; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                <div class="modal-header border-bottom border-secondary border-opacity-25 pb-3">
+                    <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2" id="credentialAuthModalLabel">
+                        <i class="bi bi-shield-check text-warning"></i> Authorize Credential Change
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="text-center mb-3">
+                        <div class="rounded-circle d-inline-flex p-3 bg-warning bg-opacity-10 text-warning mb-2 fs-2">
+                            <i class="bi bi-envelope-exclamation-fill"></i>
+                        </div>
+                        <h6 class="fw-bold text-white mb-1" id="credAuthTargetActionText">Authorizing Credential Update</h6>
+                        <p class="text-muted small mb-0">For your security, a 6-digit authorization code was sent to:</p>
+                        <div class="fw-bold text-info mono my-1" id="credAuthTargetEmailDisplay">admin@example.com</div>
+                    </div>
+
+                    <form id="credentialAuthForm">
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold text-center d-block">ENTER 6-DIGIT EMAIL CODE</label>
+                            <input type="text" class="form-control mono text-center fs-3 fw-bold letter-spacing-3" id="credAuthOtpInput" required placeholder="••••••" maxlength="6" autocomplete="one-time-code">
+                        </div>
+
+                        <div id="credAuthErrorAlert" class="alert alert-danger py-2 px-3 small d-none mb-3"></div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-3 small">
+                            <span class="text-muted">Didn't receive the code?</span>
+                            <button type="button" class="btn btn-link text-warning p-0 text-decoration-none small" id="btnResendCredAuthOtp">
+                                <i class="bi bi-arrow-repeat me-1"></i>Resend Code
+                            </button>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-outline-secondary px-3 py-2" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-warning text-dark fw-bold px-4 py-2 d-flex align-items-center gap-2" id="btnConfirmCredAuth">
+                                <i class="bi bi-shield-check"></i> Verify &amp; Apply Change
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
-        import { getCollection, updateDocument, fetchAPI } from './script/api.js';
+        import { getCollection, updateDocument, fetchAPI, compressImageToWebP } from './script/api.js';
 
         let currentAccount = null;
-        let isSecurityReauthenticated = false;
+        let isSecurityReauthenticated = true; // In active admin session, controls are directly accessible
         let activeEmailVerification = null;
+        let pendingCredentialAction = null;
         let reauthModalInstance = null;
         let emailVerifyModalInstance = null;
+        let credentialAuthModalInstance = null;
+        let quickPassModalInstance = null;
+        let quickPinModalInstance = null;
+
+        window.openQuickPasswordModal = function() {
+            const m = document.getElementById('modalQuickChangePassword');
+            const err = document.getElementById('quickPasswordErrorAlert');
+            if (err) err.classList.add('d-none');
+            document.getElementById('quickChangePasswordForm')?.reset();
+            if (!quickPassModalInstance) {
+                quickPassModalInstance = new bootstrap.Modal(m);
+            }
+            quickPassModalInstance.show();
+        };
+
+        window.openQuickCodeModal = function() {
+            const m = document.getElementById('modalQuickChangeCode');
+            const err = document.getElementById('quickPinErrorAlert');
+            if (err) err.classList.add('d-none');
+            document.getElementById('quickChangePinForm')?.reset();
+            if (!quickPinModalInstance) {
+                quickPinModalInstance = new bootstrap.Modal(m);
+            }
+            quickPinModalInstance.show();
+        };
+
+        // Quick Password Form Submit Handler
+        document.getElementById('quickChangePasswordForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const curr = document.getElementById('quickCurrPassword').value;
+            const newP = document.getElementById('quickNewPassword').value;
+            const conf = document.getElementById('quickConfirmPassword').value;
+            const errEl = document.getElementById('quickPasswordErrorAlert');
+            const btn = document.getElementById('btnSubmitQuickPassword');
+
+            if (newP !== conf) {
+                if (errEl) { errEl.textContent = 'New password and confirmation do not match.'; errEl.classList.remove('d-none'); }
+                return;
+            }
+            if (!newP) {
+                if (errEl) { errEl.textContent = 'Please enter a valid new password.'; errEl.classList.remove('d-none'); }
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Updating...';
+            if (errEl) errEl.classList.add('d-none');
+
+            try {
+                const res = await fetchAPI('auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'set_password',
+                        current_password: curr,
+                        new_password: newP,
+                        username: currentAccount?.username || localStorage.getItem('loggedInUserName') || 'admin',
+                        session_id: localStorage.getItem('sessionId')
+                    })
+                });
+
+                if (!res || !res.success) {
+                    throw new Error(res?.error || 'Failed to update password.');
+                }
+
+                if (quickPassModalInstance) quickPassModalInstance.hide();
+                showCustomAlert('Password Changed', 'Your account password has been updated successfully.', 'success');
+                await loadAccountDetails();
+            } catch (err) {
+                if (errEl) {
+                    errEl.textContent = err.message || 'Password update failed.';
+                    errEl.classList.remove('d-none');
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-shield-lock-fill"></i> Update Password';
+            }
+        });
+
+        // Quick Security Access Code (PIN) Form Submit Handler
+        document.getElementById('quickChangePinForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const curr = document.getElementById('quickPinCurrPassword').value;
+            const p1 = document.getElementById('quickNewPinCode').value.trim();
+            const p2 = document.getElementById('quickConfirmPinCode').value.trim();
+            const errEl = document.getElementById('quickPinErrorAlert');
+            const btn = document.getElementById('btnSubmitQuickPin');
+
+            if (p1 !== p2) {
+                if (errEl) { errEl.textContent = 'New security code and confirmation do not match.'; errEl.classList.remove('d-none'); }
+                return;
+            }
+            if (!p1) {
+                if (errEl) { errEl.textContent = 'Please enter a valid security access code.'; errEl.classList.remove('d-none'); }
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Updating...';
+            if (errEl) errEl.classList.add('d-none');
+
+            try {
+                const res = await fetchAPI('auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'set_security_code',
+                        code: p1,
+                        current_password: curr,
+                        username: currentAccount?.username || localStorage.getItem('loggedInUserName') || 'admin',
+                        session_id: localStorage.getItem('sessionId')
+                    })
+                });
+
+                if (!res || !res.success) {
+                    throw new Error(res?.error || 'Failed to update security access code.');
+                }
+
+                if (quickPinModalInstance) quickPinModalInstance.hide();
+                showCustomAlert('Security Code Updated', 'Your Security Access Code (Factor 3 & Fast PIN) has been updated successfully.', 'success');
+                await loadAccountDetails();
+            } catch (err) {
+                if (errEl) {
+                    errEl.textContent = err.message || 'Security code update failed.';
+                    errEl.classList.remove('d-none');
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-check2-circle"></i> Update Access Code';
+            }
+        });
 
         window.showCustomAlert = function(title, message, type = 'success') {
             const container = document.getElementById('custom-alert-container');
@@ -895,6 +1344,7 @@
         // ==================== RE-AUTHENTICATION SYSTEM ====================
         function updateSecurityGateUI() {
             const overlays = [
+                document.getElementById('overlayUsername'),
                 document.getElementById('overlayPassword'),
                 document.getElementById('overlayFastPin'),
                 document.getElementById('overlayWorkstation')
@@ -1083,7 +1533,30 @@
                 document.getElementById('heroUserName').textContent = currentAccount.fullName || currentAccount.name || currentAccount.username || 'Admin';
                 document.getElementById('heroUserId').textContent = currentAccount.id || 'N/A';
                 document.getElementById('heroUserRole').textContent = currentAccount.role || 'Administrator';
-                document.getElementById('heroUserInitial').textContent = (currentAccount.username || 'A').charAt(0).toUpperCase();
+                
+                // Populate Avatar Image or Initial
+                const userAvatar = currentAccount.avatarUrl || currentAccount.photoUrl || currentAccount.profilePicture || localStorage.getItem('userAvatarUrl') || null;
+                const avatarImg = document.getElementById('heroUserAvatarImg');
+                const initialChar = document.getElementById('heroUserInitialChar');
+                const removeAction = document.getElementById('avatarActionsContainer');
+
+                if (userAvatar) {
+                    if (avatarImg) {
+                        avatarImg.src = userAvatar;
+                        avatarImg.classList.remove('d-none');
+                    }
+                    if (initialChar) initialChar.classList.add('d-none');
+                    if (removeAction) removeAction.classList.remove('d-none');
+                    localStorage.setItem('userAvatarUrl', userAvatar);
+                } else {
+                    if (avatarImg) avatarImg.classList.add('d-none');
+                    if (initialChar) {
+                        initialChar.textContent = (currentAccount.username || 'A').charAt(0).toUpperCase();
+                        initialChar.classList.remove('d-none');
+                    }
+                    if (removeAction) removeAction.classList.add('d-none');
+                }
+
                 document.getElementById('heroUserEmail').textContent = currentAccount.email || 'Not Set';
                 
                 const bondedPort = currentAccount.trusted_port || null;
@@ -1092,6 +1565,9 @@
 
                 // Form Fields: Core Identity
                 document.getElementById('inputUsername').value = currentAccount.username || '';
+                if (document.getElementById('currentUsernameDisplay')) {
+                    document.getElementById('currentUsernameDisplay').value = currentAccount.username || '';
+                }
                 document.getElementById('inputRole').value = currentAccount.role || 'admin';
                 document.getElementById('inputFullName').value = currentAccount.fullName || currentAccount.name || '';
 
@@ -1144,14 +1620,14 @@
 
             const email = (document.getElementById('inputEmail')?.value || '').trim();
             if (!email) {
-                container.innerHTML = '<span class="badge bg-secondary bg-opacity-25 text-muted small">Email Unset</span>';
+                container.innerHTML = '<span class="bcs-status-pill pill-unset"><i class="bi bi-dash-circle"></i> Email Unset</span>';
                 return;
             }
 
-            if (currentAccount && currentAccount.email_verified && currentAccount.email === email) {
-                container.innerHTML = '<span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-30 small"><i class="bi bi-patch-check-fill me-1"></i>Verified</span>';
+            if (currentAccount && currentAccount.email_verified && (currentAccount.email || '').trim().toLowerCase() === email.toLowerCase()) {
+                container.innerHTML = '<span class="bcs-status-pill pill-verified"><i class="bi bi-patch-check-fill"></i> Verified</span>';
             } else {
-                container.innerHTML = '<span class="badge bg-warning bg-opacity-20 text-warning border border-warning border-opacity-30 small"><i class="bi bi-exclamation-circle-fill me-1"></i>Unverified</span>';
+                container.innerHTML = '<span class="bcs-status-pill pill-unverified"><i class="bi bi-exclamation-circle-fill"></i> Unverified</span>';
             }
         }
 
@@ -1357,15 +1833,149 @@
             }
         });
 
-        // ==================== CHANGE PASSWORD FORM SUBMIT (RE-AUTH PROTECTED) ====================
-        document.getElementById('changePasswordForm')?.addEventListener('submit', async (e) => {
+        // ==================== CREDENTIAL AUTHORIZATION DISPATCHER (EMAIL OTP) ====================
+        async function sendCredentialOtpAndOpenModal(actionConfig) {
+            const email = (currentAccount?.email || document.getElementById('inputEmail')?.value || '').trim();
+            if (!email || !email.includes('@')) {
+                showCustomAlert('Email Required', 'A verified email address is required to authorize changing your ' + actionConfig.label + '. Please set your email in the Profile tab first.', 'error');
+                document.getElementById('profile-tab-btn')?.click();
+                setTimeout(() => document.getElementById('inputEmail')?.focus(), 250);
+                return false;
+            }
+
+            const otp = Math.floor(100000 + Math.random() * 900000).toString();
+            pendingCredentialAction = {
+                ...actionConfig,
+                otp,
+                email,
+                expiresAt: Date.now() + (10 * 60 * 1000) // 10 minutes
+            };
+
+            if (window.showBcsLoader) window.showBcsLoader("Dispatching Email Authorization...");
+
+            try {
+                await fetchAPI('mail/send', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        to: email,
+                        subject: `🔐 Security Authorization Code: ${otp} - Baroda Computers POS`,
+                        htmlBody: `
+                            <div style="font-family: Arial, sans-serif; background: #0f172a; color: #f8fafc; padding: 32px; border-radius: 12px; max-width: 580px; margin: auto; border: 1px solid #334155;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                                    <h2 style="color: #00e5ff; margin: 0;">Baroda Computers &amp; Sales</h2>
+                                </div>
+                                <div style="display: inline-block; background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; margin-bottom: 12px; text-transform: uppercase;">
+                                    Security Authorization Request
+                                </div>
+                                <h3 style="color: #ffffff; margin-top: 0;">Authorize ${actionConfig.label} Change</h3>
+                                <p style="font-size: 15px; color: #cbd5e1; line-height: 1.5;">
+                                    Hello <strong>${currentAccount.username}</strong>,<br>
+                                    A request has been initiated to update your account <strong>${actionConfig.label}</strong> in the Baroda Computers POS system.
+                                </p>
+                                <div style="background: #1e293b; border: 1.5px dashed #f59e0b; border-radius: 10px; padding: 22px; text-align: center; margin: 26px 0;">
+                                    <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: #94a3b8; margin-bottom: 8px;">6-Digit Security Authorization Code</div>
+                                    <span style="font-size: 34px; font-weight: 800; letter-spacing: 8px; color: #fbbf24; font-family: monospace;">${otp}</span>
+                                </div>
+                                <p style="font-size: 13px; color: #94a3b8; line-height: 1.4;">
+                                    This authorization code is strictly confidential and expires in 10 minutes. If you did not initiate this change, someone may be attempting to access your account. Please review your account security immediately.
+                                </p>
+                                <hr style="border: 0; border-top: 1px solid #334155; margin: 24px 0;">
+                                <div style="font-size: 11px; color: #64748b; text-align: center;">
+                                    Baroda Computers &amp; Sales Enterprise Ecosystem • Verified Mail Subsystem (RFC 2822)
+                                </div>
+                            </div>
+                        `
+                    })
+                });
+
+                if (window.hideBcsLoader) window.hideBcsLoader();
+
+                document.getElementById('credAuthTargetActionText').textContent = `Authorize ${actionConfig.label} Change`;
+                document.getElementById('credAuthTargetEmailDisplay').textContent = email;
+                document.getElementById('credAuthOtpInput').value = '';
+                const errEl = document.getElementById('credAuthErrorAlert');
+                if (errEl) errEl.classList.add('d-none');
+
+                const modalEl = document.getElementById('credentialAuthModal');
+                if (!credentialAuthModalInstance) {
+                    credentialAuthModalInstance = new bootstrap.Modal(modalEl);
+                }
+                credentialAuthModalInstance.show();
+
+                showCustomAlert('Authorization Code Sent', `A 6-digit verification code has been dispatched to ${email}.`, 'info');
+                return true;
+            } catch (err) {
+                if (window.hideBcsLoader) window.hideBcsLoader();
+                console.error('Mail dispatch error:', err);
+                showCustomAlert('Mail Error', 'Failed to dispatch verification email: ' + err.message, 'error');
+                return false;
+            }
+        }
+
+        // ==================== CHANGE USERNAME FORM SUBMIT ====================
+        document.getElementById('changeUsernameForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!isSecurityReauthenticated) {
                 openReauthModal();
                 return;
             }
 
-            if (!currentAccount || !currentAccount.id) return;
+            const curr = document.getElementById('currPasswordForUser')?.value || '';
+            const newUsername = (document.getElementById('newUsernameVal')?.value || '').trim();
+            if (!newUsername) {
+                showCustomAlert('Username Required', 'Please enter a valid new username.', 'error');
+                return;
+            }
+
+            if (newUsername.toLowerCase() === (currentAccount?.username || '').toLowerCase()) {
+                showCustomAlert('Notice', 'New username is identical to the current username.', 'info');
+                return;
+            }
+
+            const btn = document.getElementById('btnSubmitUsername');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Updating Username...';
+
+            try {
+                if (window.showBcsLoader) window.showBcsLoader("Updating Username...");
+                const res = await fetchAPI('auth/login', {
+                    method: 'POST',
+                    headers: { 'x-api-key': 'backend-bcs-pos' },
+                    body: JSON.stringify({
+                        action: 'set_username',
+                        new_username: newUsername,
+                        current_password: curr,
+                        current_username: currentAccount?.username,
+                        session_id: localStorage.getItem('sessionId')
+                    })
+                });
+
+                if (window.hideBcsLoader) window.hideBcsLoader();
+
+                if (!res || !res.success) {
+                    throw new Error(res?.error || 'Failed to update username.');
+                }
+
+                localStorage.setItem('loggedInUserName', newUsername);
+                localStorage.setItem('bcsDeviceUser', newUsername);
+                if (currentAccount) currentAccount.username = newUsername;
+
+                document.getElementById('changeUsernameForm')?.reset();
+                showCustomAlert('Username Updated', `Your username was successfully updated to '${newUsername}'.`, 'success');
+                await loadAccountDetails();
+            } catch (err) {
+                if (window.hideBcsLoader) window.hideBcsLoader();
+                showCustomAlert('Update Failed', err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-check2-circle"></i> Update Username';
+            }
+        });
+
+        // ==================== CHANGE PASSWORD FORM SUBMIT ====================
+        document.getElementById('changePasswordForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentAccount) return;
 
             const curr = document.getElementById('currPassword').value;
             const newP = document.getElementById('newPassword').value;
@@ -1381,52 +1991,48 @@
                 return;
             }
 
-            try {
-                if (window.showBcsLoader) window.showBcsLoader("Updating Password Hash...");
+            const btn = document.getElementById('btnSubmitPassword');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Updating Password...';
 
-                // 1. Verify current password via dedicated reauth endpoint (preserves session and port)
-                const verifyRes = await fetchAPI('auth/reauth', {
+            try {
+                if (window.showBcsLoader) window.showBcsLoader("Updating Account Password...");
+
+                const res = await fetchAPI('auth/login', {
                     method: 'POST',
                     body: JSON.stringify({
-                        username: currentAccount.username,
-                        password: curr
+                        action: 'set_password',
+                        current_password: curr,
+                        new_password: newP,
+                        username: currentAccount.username || localStorage.getItem('loggedInUserName') || 'admin',
+                        session_id: localStorage.getItem('sessionId')
                     })
                 });
 
-                if (!verifyRes || !verifyRes.verified) {
-                    if (window.hideBcsLoader) window.hideBcsLoader();
-                    showCustomAlert('Authentication Error', verifyRes?.error || 'Current password is incorrect.', 'error');
-                    return;
+                if (window.hideBcsLoader) window.hideBcsLoader();
+
+                if (!res || !res.success) {
+                    throw new Error(res?.error || 'Failed to update password.');
                 }
 
-                // 2. Hash and update password in database
-                const newHash = await sha256Hex(newP);
-                currentAccount.password_hash = newHash;
-
-                await updateDocument('users', currentAccount.id, {
-                    password_hash: newHash
-                });
-
-                if (window.hideBcsLoader) window.hideBcsLoader();
-                showCustomAlert('Password Changed', 'Your password has been successfully updated.', 'success');
-                document.getElementById('changePasswordForm').reset();
+                document.getElementById('changePasswordForm')?.reset();
+                showCustomAlert('Password Updated', 'Your account password has been updated successfully.', 'success');
                 await loadAccountDetails();
             } catch (err) {
                 if (window.hideBcsLoader) window.hideBcsLoader();
-                showCustomAlert('Error', 'Failed to update password: ' + err.message, 'error');
+                showCustomAlert('Update Failed', err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-shield-lock"></i> Update Password';
             }
         });
 
-        // ==================== UPDATE SECURITY ACCESS CODE (RE-AUTH PROTECTED) ====================
+        // ==================== UPDATE SECURITY ACCESS CODE ====================
         document.getElementById('updatePinForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!isSecurityReauthenticated) {
-                openReauthModal();
-                return;
-            }
-
             if (!currentAccount) return;
 
+            const curr = document.getElementById('currPasswordForPin')?.value || '';
             const p1 = document.getElementById('newPinCode').value.trim();
             const p2 = document.getElementById('confirmPinCode').value.trim();
 
@@ -1440,31 +2046,190 @@
                 return;
             }
 
-            try {
-                if (window.showBcsLoader) window.showBcsLoader("Updating Security Access Code...");
+            const btn = document.getElementById('btnSubmitPin');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Updating Code...';
 
+            try {
+                if (window.showBcsLoader) window.showBcsLoader("Updating Security Code...");
                 const res = await fetchAPI('auth/login', {
                     method: 'POST',
                     body: JSON.stringify({
                         action: 'set_security_code',
                         code: p1,
-                        username: currentAccount.username,
+                        current_password: curr,
+                        username: currentAccount.username || localStorage.getItem('loggedInUserName') || 'admin',
                         session_id: localStorage.getItem('sessionId')
                     })
                 });
 
                 if (window.hideBcsLoader) window.hideBcsLoader();
 
-                if (res.success) {
-                    showCustomAlert('Security Code Updated', 'Your security access code (Factor 3 & Fast PIN) has been updated successfully.', 'success');
-                    document.getElementById('updatePinForm').reset();
-                    await loadAccountDetails();
-                } else {
-                    showCustomAlert('Update Failed', res.error || 'Failed to update security code.', 'error');
+                if (!res || !res.success) {
+                    throw new Error(res?.error || 'Failed to update security code.');
                 }
+
+                document.getElementById('updatePinForm')?.reset();
+                showCustomAlert('Security Code Updated', 'Your Security Access Code (Factor 3 & Fast PIN) has been updated successfully.', 'success');
+                await loadAccountDetails();
             } catch (err) {
                 if (window.hideBcsLoader) window.hideBcsLoader();
-                showCustomAlert('Error', err.message, 'error');
+                showCustomAlert('Update Failed', err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-check2-circle"></i> Update Access Code';
+            }
+        });
+
+        // ==================== CONFIRM CREDENTIAL AUTHORIZATION CODE ====================
+        document.getElementById('credentialAuthForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const entered = (document.getElementById('credAuthOtpInput')?.value || '').trim();
+            const errEl = document.getElementById('credAuthErrorAlert');
+            const submitBtn = document.getElementById('btnConfirmCredAuth');
+
+            if (!pendingCredentialAction) {
+                errEl.textContent = 'No pending credential update found. Please submit the form again.';
+                errEl.classList.remove('d-none');
+                return;
+            }
+
+            if (Date.now() > pendingCredentialAction.expiresAt) {
+                errEl.textContent = 'Authorization code has expired. Please request a new code.';
+                errEl.classList.remove('d-none');
+                return;
+            }
+
+            if (entered !== pendingCredentialAction.otp) {
+                errEl.textContent = 'Invalid 6-digit authorization code. Please verify the code sent to your email.';
+                errEl.classList.remove('d-none');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Applying Change...';
+
+            try {
+                if (window.showBcsLoader) window.showBcsLoader("Applying Verified " + pendingCredentialAction.label + "...");
+
+                if (pendingCredentialAction.type === 'username') {
+                    const newUsername = pendingCredentialAction.data.newUsername;
+                    const res = await fetchAPI('auth/login', {
+                        method: 'POST',
+                        headers: { 'x-api-key': 'backend-bcs-pos' },
+                        body: JSON.stringify({
+                            action: 'set_username',
+                            new_username: newUsername,
+                            current_username: currentAccount?.username,
+                            session_id: localStorage.getItem('sessionId')
+                        })
+                    });
+
+                    if (!res || !res.success) {
+                        throw new Error(res?.error || 'Failed to update username.');
+                    }
+
+                    localStorage.setItem('loggedInUserName', newUsername);
+                    localStorage.setItem('bcsDeviceUser', newUsername);
+                    if (currentAccount) currentAccount.username = newUsername;
+
+                    document.getElementById('changeUsernameForm')?.reset();
+                    showCustomAlert('Username Updated', `Your username was verified via email and updated to '${newUsername}'.`, 'success');
+                } else if (pendingCredentialAction.type === 'password') {
+                    const newP = pendingCredentialAction.data.newPassword;
+                    const newHash = await sha256Hex(newP);
+                    currentAccount.password_hash = newHash;
+
+                    await updateDocument('users', currentAccount.id, {
+                        password_hash: newHash
+                    });
+
+                    document.getElementById('changePasswordForm')?.reset();
+                    showCustomAlert('Password Changed', 'Your password was verified via email and updated successfully.', 'success');
+                } else if (pendingCredentialAction.type === 'pin') {
+                    const p1 = pendingCredentialAction.data.newPinCode;
+                    const res = await fetchAPI('auth/login', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            action: 'set_security_code',
+                            code: p1,
+                            username: currentAccount.username,
+                            session_id: localStorage.getItem('sessionId')
+                        })
+                    });
+
+                    if (!res || !res.success) {
+                        throw new Error(res?.error || 'Failed to update security access code.');
+                    }
+
+                    document.getElementById('updatePinForm')?.reset();
+                    showCustomAlert('Security Code Updated', 'Your Security Access Code (Factor 3 & Fast PIN) was verified via email and updated successfully.', 'success');
+                }
+
+                if (window.hideBcsLoader) window.hideBcsLoader();
+                if (credentialAuthModalInstance) credentialAuthModalInstance.hide();
+                pendingCredentialAction = null;
+                await loadAccountDetails();
+            } catch (err) {
+                if (window.hideBcsLoader) window.hideBcsLoader();
+                errEl.textContent = 'Update failed: ' + err.message;
+                errEl.classList.remove('d-none');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="bi bi-shield-check"></i> Verify &amp; Apply Change';
+            }
+        });
+
+        // Resend Credential Authorization OTP
+        document.getElementById('btnResendCredAuthOtp')?.addEventListener('click', async () => {
+            if (!pendingCredentialAction) {
+                showCustomAlert('Notice', 'No active credential update in progress.', 'info');
+                return;
+            }
+
+            const resendBtn = document.getElementById('btnResendCredAuthOtp');
+            resendBtn.disabled = true;
+            resendBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Resending...';
+
+            try {
+                const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+                pendingCredentialAction.otp = newOtp;
+                pendingCredentialAction.expiresAt = Date.now() + (10 * 60 * 1000);
+
+                await fetchAPI('mail/send', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        to: pendingCredentialAction.email,
+                        subject: `🔐 Resent Security Authorization Code: ${newOtp} - Baroda Computers POS`,
+                        htmlBody: `
+                            <div style="font-family: Arial, sans-serif; background: #0f172a; color: #f8fafc; padding: 32px; border-radius: 12px; max-width: 580px; margin: auto; border: 1px solid #334155;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                                    <h2 style="color: #00e5ff; margin: 0;">Baroda Computers &amp; Sales</h2>
+                                </div>
+                                <div style="display: inline-block; background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; margin-bottom: 12px; text-transform: uppercase;">
+                                    Resent Security Authorization
+                                </div>
+                                <h3 style="color: #ffffff; margin-top: 0;">Authorize ${pendingCredentialAction.label} Change</h3>
+                                <div style="background: #1e293b; border: 1.5px dashed #f59e0b; border-radius: 10px; padding: 22px; text-align: center; margin: 26px 0;">
+                                    <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: #94a3b8; margin-bottom: 8px;">Your New Authorization Code</div>
+                                    <span style="font-size: 34px; font-weight: 800; letter-spacing: 8px; color: #fbbf24; font-family: monospace;">${newOtp}</span>
+                                </div>
+                                <p style="font-size: 13px; color: #94a3b8; line-height: 1.4;">
+                                    Valid for 10 minutes.
+                                </p>
+                            </div>
+                        `
+                    })
+                });
+
+                showCustomAlert('Code Resent', `A fresh 6-digit authorization code was sent to ${pendingCredentialAction.email}.`, 'info');
+                const errEl = document.getElementById('credAuthErrorAlert');
+                if (errEl) errEl.classList.add('d-none');
+            } catch (err) {
+                showCustomAlert('Error', 'Failed to resend code: ' + err.message, 'error');
+            } finally {
+                resendBtn.disabled = false;
+                resendBtn.innerHTML = '<i class="bi bi-arrow-repeat me-1"></i>Resend Code';
             }
         });
 
@@ -1529,6 +2294,129 @@
             } catch (err) {
                 if (window.hideBcsLoader) window.hideBcsLoader();
                 showCustomAlert('Error', err.message, 'error');
+            }
+        });
+
+        // ==================== USER PROFILE PICTURE UPLOAD HANDLER ====================
+        const avatarInput = document.getElementById('avatarFileInput');
+        const btnUpload = document.getElementById('btnUploadAvatar');
+        const heroAvatarWrap = document.getElementById('heroUserInitial');
+
+        btnUpload?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            avatarInput?.click();
+        });
+
+        heroAvatarWrap?.addEventListener('click', () => {
+            avatarInput?.click();
+        });
+
+        avatarInput?.addEventListener('change', async (e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                showCustomAlert('Invalid File', 'Please select an image file (PNG, JPG, WebP, GIF, BMP).', 'error');
+                return;
+            }
+
+            try {
+                if (window.showBcsLoader) window.showBcsLoader("Optimizing Profile Photo...");
+
+                // Compress image to lightweight WebP (max 400x400)
+                const result = await compressImageToWebP(file, 400, 0.85);
+
+                if (!currentAccount || !currentAccount.id) {
+                    throw new Error('No user account active.');
+                }
+
+                // Save to SQLite users table
+                await updateDocument('users', currentAccount.id, {
+                    avatarUrl: result.base64,
+                    photoUrl: result.base64,
+                    profilePicture: result.base64
+                });
+
+                // Update local memory and cache
+                currentAccount.avatarUrl = result.base64;
+                currentAccount.photoUrl = result.base64;
+                localStorage.setItem('userAvatarUrl', result.base64);
+
+                // Update UI
+                const avatarImg = document.getElementById('heroUserAvatarImg');
+                const initialChar = document.getElementById('heroUserInitialChar');
+                if (avatarImg) {
+                    avatarImg.src = result.base64;
+                    avatarImg.classList.remove('d-none');
+                }
+                if (initialChar) initialChar.classList.add('d-none');
+                document.getElementById('avatarActionsContainer')?.classList.remove('d-none');
+
+                // Sync with live Topbar and Sidebar
+                const topbarInit = document.getElementById('topbarUserInitial');
+                if (topbarInit) {
+                    topbarInit.innerHTML = `<img src="${result.base64}" alt="Avatar" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                }
+                const sidebarAvatar = document.querySelector('.sidebar-user .user-avatar');
+                if (sidebarAvatar) {
+                    sidebarAvatar.innerHTML = `<img src="${result.base64}" alt="Avatar" style="width:100%; height:100%; object-fit:cover; border-radius:10px;">`;
+                }
+
+                if (window.hideBcsLoader) window.hideBcsLoader();
+                showCustomAlert('Profile Picture Updated', `New photo optimized (${result.sizeKB} KB) and saved successfully!`, 'success');
+            } catch (err) {
+                if (window.hideBcsLoader) window.hideBcsLoader();
+                console.error('Failed to update avatar:', err);
+                showCustomAlert('Upload Error', 'Failed to update profile photo: ' + err.message, 'error');
+            } finally {
+                avatarInput.value = '';
+            }
+        });
+
+        // Remove Profile Photo
+        document.getElementById('btnRemoveAvatar')?.addEventListener('click', async (e) => {
+            e.preventDefault();
+            if (!currentAccount || !currentAccount.id) return;
+
+            if (!confirm('Are you sure you want to remove your profile picture?')) return;
+
+            try {
+                if (window.showBcsLoader) window.showBcsLoader("Removing Profile Photo...");
+
+                await updateDocument('users', currentAccount.id, {
+                    avatarUrl: null,
+                    photoUrl: null,
+                    profilePicture: null
+                });
+
+                currentAccount.avatarUrl = null;
+                currentAccount.photoUrl = null;
+                localStorage.removeItem('userAvatarUrl');
+
+                const avatarImg = document.getElementById('heroUserAvatarImg');
+                const initialChar = document.getElementById('heroUserInitialChar');
+                if (avatarImg) avatarImg.classList.add('d-none');
+                if (initialChar) {
+                    initialChar.textContent = (currentAccount.username || 'A').charAt(0).toUpperCase();
+                    initialChar.classList.remove('d-none');
+                }
+                document.getElementById('avatarActionsContainer')?.classList.add('d-none');
+
+                // Reset Topbar and Sidebar
+                const topbarInit = document.getElementById('topbarUserInitial');
+                if (topbarInit) {
+                    topbarInit.textContent = (currentAccount.username || 'A').charAt(0).toUpperCase();
+                }
+                const sidebarAvatar = document.querySelector('.sidebar-user .user-avatar');
+                if (sidebarAvatar) {
+                    sidebarAvatar.innerHTML = `<i class="bi bi-person-fill"></i>`;
+                }
+
+                if (window.hideBcsLoader) window.hideBcsLoader();
+                showCustomAlert('Photo Removed', 'Profile photo removed. Showing default initial.', 'info');
+            } catch (err) {
+                if (window.hideBcsLoader) window.hideBcsLoader();
+                showCustomAlert('Error', 'Failed to remove photo: ' + err.message, 'error');
             }
         });
 

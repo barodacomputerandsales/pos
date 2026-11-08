@@ -3,128 +3,349 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | BCS Enterprise POS</title>
+    <title>Dashboard | Baroda Computers & Sales</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
     <link rel="apple-touch-icon" href="assets/icon.png">
-    <!-- Portable Enterprise Neon Laser Loader (Auto-pushes immediately on load) -->
+    <!-- Portable Enterprise Neon Laser Loader -->
     <script src="template/loader/loader-1.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Chart.js Engine for Local Offline Graphs -->
     <script src="script/chart.umd.js"></script>
     
     <style>
         :root {
             --bs-primary: #6366f1;
-            --glass-bg: rgba(30, 30, 30, 0.55);
-            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
-            --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            --page-bg: #111827;
+            --bs-primary-rgb: 99, 102, 241;
+            --page-bg: #0b0f19;
+            --card-bg: rgba(19, 27, 46, 0.72);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --card-hover-border: rgba(99, 102, 241, 0.35);
+            --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
+            --card-hover-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.6);
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--page-bg) !important;
+            background-image: 
+                radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.05), transparent 35%),
+                radial-gradient(circle at 90% 20%, rgba(14, 165, 233, 0.04), transparent 35%),
+                radial-gradient(circle at 50% 85%, rgba(16, 185, 129, 0.03), transparent 45%) !important;
+            background-attachment: fixed !important;
             min-height: 100vh;
+            color: #f1f5f9;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
         }
 
         .main-content {
             margin-left: 240px;
-            padding-top: 92px;
+            padding-top: 86px;
             padding-left: 2rem;
             padding-right: 2rem;
-            padding-bottom: 2rem;
+            padding-bottom: 3rem;
+            max-width: 1750px;
         }
 
-        .stat-card {
-            background: #1e293b;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 16px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            transition: transform 0.2s, border-color 0.2s;
-            height: 100%;
-            -webkit-font-smoothing: subpixel-antialiased !important;
-            text-rendering: geometricPrecision !important;
-        }
-
-        /* Auto-fill flex grid containers for dynamic RBAC space filling */
+        /* Symmetric 4-Column Card Grid System */
         .stat-cards-grid {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
             gap: 1.25rem;
+            margin-bottom: 1.25rem;
         }
 
-        .stat-cards-grid > .stat-card-col {
-            flex: 1 1 200px;
-            min-width: 190px;
+        @media (max-width: 1399.98px) {
+            .stat-cards-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
 
-        .dashboard-content-grid {
+        @media (max-width: 767.98px) {
+            .stat-cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Card Link Wrapper */
+        .stat-card-link {
+            text-decoration: none;
+            color: inherit;
             display: flex;
-            flex-wrap: wrap;
-            gap: 1.5rem;
+            flex-direction: column;
+            height: 100%;
         }
 
-        .dashboard-content-grid > .main-table-col {
-            flex: 2 1 600px;
-            min-width: 320px;
-        }
-
-        .dashboard-content-grid > .side-actions-col {
-            flex: 1 1 320px;
-            min-width: 280px;
-        }
-
-        .charts-grid {
+        /* Modern Executive Glassmorphic Stat Card */
+        .stat-card {
+            position: relative;
+            background: var(--card-bg);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.25rem 1.35rem;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), var(--card-shadow);
+            transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.22s ease, box-shadow 0.22s ease;
             display: flex;
-            flex-wrap: wrap;
-            gap: 1.5rem;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            overflow: hidden;
+            cursor: pointer;
         }
 
-        .charts-grid > .chart-col-half {
-            flex: 1 1 450px;
-            min-width: 320px;
+        /* Subtle Corner Ambient Glow for Cards */
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 65px;
+            height: 65px;
+            background: radial-gradient(circle, var(--accent-glow, rgba(99, 102, 241, 0.15)), transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
         }
 
         .stat-card:hover {
             transform: translateY(-3px);
-            border-color: rgba(0, 229, 255, 0.35);
+            border-color: var(--card-hover-border);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), var(--card-hover-shadow);
         }
 
+        .stat-card:hover::after {
+            opacity: 1;
+            transform: scale(1.15);
+        }
+
+        .stat-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin-bottom: 0.65rem;
+        }
+
+        .stat-card-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #94a3b8;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .stat-card-value {
+            font-family: 'Inter', system-ui, sans-serif;
+            font-size: 1.65rem;
+            font-weight: 700;
+            line-height: 1.2;
+            color: #ffffff;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: baseline;
+            gap: 0.35rem;
+            word-break: break-word;
+        }
+
+        .stat-card-subtext {
+            font-size: 0.74rem;
+            font-weight: 500;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        /* Modern Gradient Squircles */
         .stat-icon {
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-            color: white;
+            font-size: 1.25rem;
+            color: #ffffff;
+            flex-shrink: 0;
+            box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.4);
+            transition: transform 0.2s ease;
         }
 
-        /* Loading Skeleton */
+        .stat-card:hover .stat-icon {
+            transform: scale(1.06);
+        }
+
+        /* Color-Themed Gradients */
+        .icon-emerald  { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 6px 16px -2px rgba(16, 185, 129, 0.3); }
+        .icon-indigo   { background: linear-gradient(135deg, #6366f1, #4f46e5); box-shadow: 0 6px 16px -2px rgba(99, 102, 241, 0.3); }
+        .icon-cyan     { background: linear-gradient(135deg, #06b6d4, #0284c7); box-shadow: 0 6px 16px -2px rgba(6, 182, 212, 0.3); }
+        .icon-amber    { background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 6px 16px -2px rgba(245, 158, 11, 0.3); }
+        .icon-rose     { background: linear-gradient(135deg, #ef4444, #dc2626); box-shadow: 0 6px 16px -2px rgba(239, 68, 68, 0.3); }
+        .icon-violet   { background: linear-gradient(135deg, #8b5cf6, #7c3aed); box-shadow: 0 6px 16px -2px rgba(139, 92, 246, 0.3); }
+        .icon-teal     { background: linear-gradient(135deg, #14b8a6, #0d9488); box-shadow: 0 6px 16px -2px rgba(20, 184, 166, 0.3); }
+
+        /* Themed Border Glow Highlights on Active Hover */
+        .stat-card.theme-emerald { --accent-glow: rgba(16, 185, 129, 0.2); }
+        .stat-card.theme-emerald:hover { border-color: rgba(16, 185, 129, 0.4); }
+
+        .stat-card.theme-indigo { --accent-glow: rgba(99, 102, 241, 0.2); }
+        .stat-card.theme-indigo:hover { border-color: rgba(99, 102, 241, 0.4); }
+
+        .stat-card.theme-cyan { --accent-glow: rgba(6, 182, 212, 0.2); }
+        .stat-card.theme-cyan:hover { border-color: rgba(6, 182, 212, 0.4); }
+
+        .stat-card.theme-amber { --accent-glow: rgba(245, 158, 11, 0.2); }
+        .stat-card.theme-amber:hover { border-color: rgba(245, 158, 11, 0.4); }
+
+        .stat-card.theme-rose { --accent-glow: rgba(239, 68, 68, 0.2); }
+        .stat-card.theme-rose:hover { border-color: rgba(239, 68, 68, 0.4); }
+
+        .stat-card.theme-violet { --accent-glow: rgba(139, 92, 246, 0.2); }
+        .stat-card.theme-violet:hover { border-color: rgba(139, 92, 246, 0.4); }
+
+        .stat-card.theme-teal { --accent-glow: rgba(20, 184, 166, 0.2); }
+        .stat-card.theme-teal:hover { border-color: rgba(20, 184, 166, 0.4); }
+
+        /* Charts Layout */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .dashboard-content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1199.98px) {
+            .dashboard-content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 991.98px) {
+            .main-content {
+                margin-left: 0;
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Skeleton Loading Placeholder */
         .skeleton {
-            background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+            background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0.04) 75%);
             background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-            border-radius: 4px;
+            animation: skeletonLoading 1.4s infinite;
+            border-radius: 6px;
+            display: inline-block;
         }
 
         .skeleton-text {
-            height: 2rem;
-            width: 50%;
+            height: 1.6rem;
+            width: 70%;
         }
 
-        @keyframes loading {
+        @keyframes skeletonLoading {
             0% { background-position: 200% 0; }
             100% { background-position: -200% 0; }
         }
+
+        /* Top Header Live Pill */
+        .live-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.35rem 0.85rem;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #34d399;
+        }
+
+        .live-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #10b981;
+            box-shadow: 0 0 10px #10b981;
+            animation: pulseDot 2s infinite;
+        }
+
+        @keyframes pulseDot {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .spin-animation {
+            animation: spinBtn 0.75s linear infinite;
+        }
+
+        @keyframes spinBtn {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Modern Table Customization */
+        .dashboard-table {
+            color: #e2e8f0;
+            margin-bottom: 0;
+        }
+
+        .dashboard-table thead th {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #94a3b8;
+            background: rgba(15, 23, 42, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 0.85rem 1rem;
+        }
+
+        .dashboard-table tbody td {
+            padding: 0.85rem 1rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            vertical-align: middle;
+        }
+
+        .dashboard-table tbody tr:hover td {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        .table-responsive::-webkit-scrollbar {
+            height: 6px;
+        }
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+        }
     </style>
 </head>
-<body style="background-color: #212529;">
+<body>
     <script>
         if (localStorage.getItem('isAuthenticated') !== 'true' || !localStorage.getItem('sessionId') || !localStorage.getItem('sessionPort')) {
             window.location.href = 'index.html';
@@ -138,328 +359,488 @@
     </script>
 
     <main class="main-content">
-        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <!-- Top Executive Header Bar -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
             <div>
-                <h3 class="fw-bold mb-1">Overview Dashboard</h3>
-                <p class="text-muted small mb-0">Live inventory, production, sales analytics & performance metrics</p>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <h2 class="fw-bold mb-0 text-white" style="letter-spacing: -0.02em;">Dashboard</h2>
+                    <span class="live-status-pill">
+                        <span class="live-status-dot"></span> Live Sync
+                    </span>
+                </div>
+                <p class="text-muted small mb-0">Overview of sales revenue, inventory valuation & store operations</p>
             </div>
+            
             <div class="d-flex align-items-center gap-2">
-                <button type="button" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-2" onclick="window.loadDashboardData && window.loadDashboardData()">
-                    <i class="bi bi-arrow-clockwise"></i> Refresh Data
+                <button type="button" id="refreshDashboardBtn" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-2 py-2 px-3 rounded-3" onclick="window.loadDashboardData && window.loadDashboardData(true)">
+                    <i class="bi bi-arrow-clockwise" id="refreshBtnIcon"></i> 
+                    <span class="fw-semibold">Refresh</span>
                 </button>
             </div>
         </div>
-        
-        <!-- Product & Inventory Analytics Cards (Auto-fills on RBAC hiding) -->
-        <div class="stat-cards-grid mb-4">
-            <!-- Total Products -->
-            <div class="stat-card-col" data-permission="view_products">
-                <div class="stat-card">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="card-header-label">Total Products</p>
-                            <h2 class="fw-bold mb-0 stat-val-white" id="totalProducts">
-                                <div class="skeleton skeleton-text"></div>
-                            </h2>
+
+        <!-- ROW 1: PRIMARY FINANCIAL & EXPENSE METRICS (4 Symmetrical Cards) -->
+        <div class="stat-cards-grid">
+            <!-- 1. Total Sale (BDT) -->
+            <div class="stat-card-col" id="perm-dashboard_total_sale_bdt" data-permission="view_sales">
+                <a href="account.html" class="stat-card-link">
+                    <div class="stat-card theme-emerald">
+                        <div class="stat-card-header">
+                            <div>
+                                <div class="stat-card-label">Total Sale (BDT)</div>
+                                <div class="stat-card-value text-emerald-bright" id="totalRevenue">
+                                    <span class="skeleton skeleton-text"></span>
+                                </div>
+                            </div>
+                            <div class="stat-icon icon-emerald">
+                                <i class="bi bi-cash-coin"></i>
+                            </div>
                         </div>
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #6366f1, #a855f7);">
-                            <i class="bi bi-box-seam"></i>
+                        <div class="stat-card-subtext">
+                            <i class="bi bi-arrow-up-right text-success"></i> Gross completed sales revenue
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
 
-            <!-- Production Products -->
-            <div class="stat-card-col" data-permission="view_production">
-                <div class="stat-card">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="card-header-label">Production Items</p>
-                            <h2 class="fw-bold mb-0 stat-val-cyan" id="totalProductionProducts">
-                                <div class="skeleton skeleton-text"></div>
-                            </h2>
+            <!-- 2. Total Purchase (BDT) -->
+            <div class="stat-card-col" id="perm-dashboard_total_purchase" data-permission="view_purchases">
+                <a href="purchase-history.html" class="stat-card-link">
+                    <div class="stat-card theme-indigo">
+                        <div class="stat-card-header">
+                            <div>
+                                <div class="stat-card-label">Total Purchase</div>
+                                <div class="stat-card-value" id="totalPurchase">
+                                    <span class="skeleton skeleton-text"></span>
+                                </div>
+                            </div>
+                            <div class="stat-icon icon-indigo">
+                                <i class="bi bi-bag-check-fill"></i>
+                            </div>
                         </div>
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #0ea5e9, #0284c7);">
-                            <i class="bi bi-gear-wide-connected"></i>
+                        <div class="stat-card-subtext">
+                            <i class="bi bi-cart text-info"></i> Inventory acquisition cost
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
 
-            <!-- With Images -->
-            <div class="stat-card-col" data-permission="view_products">
-                <div class="stat-card">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="card-header-label">With Image</p>
-                            <h2 class="fw-bold mb-0 stat-val-emerald" id="totalWithImages">
-                                <div class="skeleton skeleton-text"></div>
-                            </h2>
+            <!-- 3. Total Purchase Due -->
+            <div class="stat-card-col" id="perm-dashboard_total_purchase_due" data-permission="view_purchases">
+                <a href="purchase-history.html" class="stat-card-link">
+                    <div class="stat-card theme-rose">
+                        <div class="stat-card-header">
+                            <div>
+                                <div class="stat-card-label">Purchase Due</div>
+                                <div class="stat-card-value text-danger" id="totalPurchaseDue">
+                                    <span class="skeleton skeleton-text"></span>
+                                </div>
+                            </div>
+                            <div class="stat-icon icon-rose">
+                                <i class="bi bi-credit-card-2-front"></i>
+                            </div>
                         </div>
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
-                            <i class="bi bi-image-fill"></i>
+                        <div class="stat-card-subtext">
+                            <i class="bi bi-truck text-danger"></i> Outstanding vendor payables
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
 
-            <!-- Non-Image Added Products -->
-            <div class="stat-card-col" data-permission="view_products">
-                <div class="stat-card">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="card-header-label">No Image Added</p>
-                            <h2 class="fw-bold mb-0 stat-val-slate" id="totalNoImages">
-                                <div class="skeleton skeleton-text"></div>
-                            </h2>
+            <!-- 4. Net Profit (BDT) -->
+            <div class="stat-card-col" id="perm-dashboard_net_profit" data-permission="view_sales">
+                <a href="account.html" class="stat-card-link">
+                    <div class="stat-card theme-cyan">
+                        <div class="stat-card-header">
+                            <div>
+                                <div class="stat-card-label">Net Profit</div>
+                                <div class="stat-card-value" id="netProfit">
+                                    <span class="skeleton skeleton-text"></span>
+                                </div>
+                            </div>
+                            <div class="stat-icon icon-cyan">
+                                <i class="bi bi-graph-up-arrow"></i>
+                            </div>
                         </div>
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #64748b, #475569);">
-                            <i class="bi bi-card-image"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Low Stock / Alert Stock Products -->
-            <div class="stat-card-col" data-permission="view_products">
-                <div class="stat-card">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="card-header-label">Alert Stock</p>
-                            <h2 class="fw-bold mb-0 stat-val-amber" id="totalAlertStock">
-                                <div class="skeleton skeleton-text"></div>
-                            </h2>
-                        </div>
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
-                            <i class="bi bi-exclamation-triangle-fill"></i>
+                        <div class="stat-card-subtext">
+                            <i class="bi bi-shield-check text-cyan"></i> Realized gross sales margin
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Out of Stock Products -->
-            <div class="stat-card-col" data-permission="view_products">
-                <div class="stat-card">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="card-header-label">Out of Stock</p>
-                            <h2 class="fw-bold mb-0 stat-val-rose" id="totalOutOfStock">
-                                <div class="skeleton skeleton-text"></div>
-                            </h2>
-                        </div>
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
-                            <i class="bi bi-slash-circle-fill"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Total Purchases -->
-            <div class="stat-card-col" data-permission="view_purchases">
-                <div class="stat-card">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="card-header-label">Total Purchases</p>
-                            <h2 class="fw-bold mb-0 stat-val-indigo" id="totalPurchases">
-                                <div class="skeleton skeleton-text"></div>
-                            </h2>
-                        </div>
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #14b8a6, #0d9488);">
-                            <i class="bi bi-bag-check"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Total Sales -->
-            <div class="stat-card-col" data-permission="view_sales">
-                <div class="stat-card">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="card-header-label">Total Sales</p>
-                            <h2 class="fw-bold mb-0 stat-val-pink" id="totalSales">
-                                <div class="skeleton skeleton-text"></div>
-                            </h2>
-                        </div>
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #ec4899, #be185d);">
-                            <i class="bi bi-cart-check"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- System Users -->
-            <div class="stat-card-col" data-permission="manage_users">
-                <div class="stat-card">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="card-header-label">System Users</p>
-                            <h2 class="fw-bold mb-0 stat-val-purple" id="totalUsers">
-                                <div class="skeleton skeleton-text"></div>
-                            </h2>
-                        </div>
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
-                            <i class="bi bi-person-badge"></i>
-                        </div>
-                    </div>
-                </div>
+                </a>
             </div>
         </div>
 
-        <!-- Inventory Valuation & Financial Calculations Row (RBAC Protected) -->
-        <div class="stat-cards-grid mb-4">
-            <!-- Total Stock Units -->
-            <div class="stat-card-col" data-permission="view_products">
-                <div class="stat-card border-info border-opacity-25" style="background: linear-gradient(135deg, #1e293b, rgba(14, 165, 233, 0.08));">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="card-header-label">Total Stock Units</p>
-                            <h2 class="fw-bold mb-0 stat-val-cyan" id="calcTotalStockUnits">
-                                <div class="skeleton skeleton-text"></div>
-                            </h2>
-                            <span class="card-subtext">Available across all products</span>
-                        </div>
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #0284c7, #0369a1);">
-                            <i class="bi bi-stack"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Total Inventory Cost Value (Purchase Valuation) -->
+        <!-- ROW 2: INVENTORY VALUATION & MARGIN ANALYTICS (4 Symmetrical Cards) -->
+        <div class="stat-cards-grid">
+            <!-- 5. Total Cost Valuation -->
             <div class="stat-card-col" data-permission="view_purchases">
-                <div class="stat-card border-primary border-opacity-25" style="background: linear-gradient(135deg, #1e293b, rgba(99, 102, 241, 0.08));">
-                    <div class="d-flex justify-content-between align-items-center">
+                <div class="stat-card theme-indigo">
+                    <div class="stat-card-header">
                         <div>
-                            <p class="card-header-label">Total Cost Valuation</p>
-                            <h2 class="fw-bold mb-0 stat-val-indigo" id="calcTotalCostValue">
-                                <div class="skeleton skeleton-text"></div>
-                            </h2>
-                            <span class="card-subtext">∑ (Stock × Buy Price)</span>
+                            <div class="stat-card-label">Total Cost Valuation</div>
+                            <div class="stat-card-value text-indigo" id="calcTotalCostValue">
+                                <span class="skeleton skeleton-text"></span>
+                            </div>
                         </div>
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #4f46e5, #4338ca);">
+                        <div class="stat-icon icon-indigo">
                             <i class="bi bi-wallet2"></i>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Total Inventory Retail Value (Selling Valuation) -->
-            <div class="stat-card-col" data-permission="view_sales">
-                <div class="stat-card border-success border-opacity-25" style="background: linear-gradient(135deg, #1e293b, rgba(16, 185, 129, 0.08));">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="card-header-label">Total Retail Valuation</p>
-                            <h2 class="fw-bold mb-0 stat-val-emerald" id="calcTotalRetailValue">
-                                <div class="skeleton skeleton-text"></div>
-                            </h2>
-                            <span class="card-subtext">∑ (Stock × Sell Price)</span>
-                        </div>
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #059669, #047857);">
-                            <i class="bi bi-cash-stack"></i>
-                        </div>
+                    <div class="stat-card-subtext">
+                        <i class="bi bi-calculator"></i> ∑ (Current Stock × Buy Price)
                     </div>
                 </div>
             </div>
 
-            <!-- Potential Gross Profit -->
+            <!-- 6. Total Retail Valuation -->
             <div class="stat-card-col" data-permission="view_sales">
-                <div class="stat-card border-warning border-opacity-25" style="background: linear-gradient(135deg, #1e293b, rgba(245, 158, 11, 0.08));">
-                    <div class="d-flex justify-content-between align-items-center">
+                <div class="stat-card theme-emerald">
+                    <div class="stat-card-header">
                         <div>
-                            <p class="card-header-label">Est. Stock Margin</p>
-                            <h2 class="fw-bold mb-0 stat-val-amber" id="calcPotentialProfit">
-                                <div class="skeleton skeleton-text"></div>
-                            </h2>
-                            <span class="card-subtext" id="calcMarginPercentage">Est. Margin: 0.0%</span>
+                            <div class="stat-card-label">Total Retail Valuation</div>
+                            <div class="stat-card-value text-emerald" id="calcTotalRetailValue">
+                                <span class="skeleton skeleton-text"></span>
+                            </div>
                         </div>
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #d97706, #b45309);">
-                            <i class="bi bi-graph-up-arrow"></i>
+                        <div class="stat-icon icon-emerald">
+                            <i class="bi bi-cash-stack"></i>
                         </div>
+                    </div>
+                    <div class="stat-card-subtext">
+                        <i class="bi bi-tags"></i> ∑ (Current Stock × Sell Price)
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. Potential Stock Margin -->
+            <div class="stat-card-col" data-permission="view_sales">
+                <div class="stat-card theme-amber">
+                    <div class="stat-card-header">
+                        <div>
+                            <div class="stat-card-label">Est. Stock Margin</div>
+                            <div class="stat-card-value text-warning" id="calcPotentialProfit">
+                                <span class="skeleton skeleton-text"></span>
+                            </div>
+                        </div>
+                        <div class="stat-icon icon-amber">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card-subtext" id="calcMarginPercentage">
+                        <i class="bi bi-percent"></i> Est. Margin: 0.0%
+                    </div>
+                </div>
+            </div>
+
+            <!-- 8. Total Physical Stock Units -->
+            <div class="stat-card-col" data-permission="view_products">
+                <div class="stat-card theme-teal">
+                    <div class="stat-card-header">
+                        <div>
+                            <div class="stat-card-label">Total Stock Units</div>
+                            <div class="stat-card-value text-teal" id="calcTotalStockUnits">
+                                <span class="skeleton skeleton-text"></span>
+                            </div>
+                        </div>
+                        <div class="stat-icon icon-teal">
+                            <i class="bi bi-stack"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card-subtext">
+                        <i class="bi bi-check-circle"></i> Physical units across all products
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Interactive Visual Analytics & Charts Row -->
+        <!-- ROW 3: PRODUCT CATALOG & STOCK HEALTH (4 Symmetrical Cards) -->
+        <div class="stat-cards-grid">
+            <!-- 9. Total Products -->
+            <div class="stat-card-col" id="perm-dashboard_total_products" data-permission="view_products">
+                <a href="all-product.html" class="stat-card-link">
+                    <div class="stat-card theme-indigo">
+                        <div class="stat-card-header">
+                            <div>
+                                <div class="stat-card-label">Total Products</div>
+                                <div class="stat-card-value" id="totalProducts">
+                                    <span class="skeleton skeleton-text"></span>
+                                </div>
+                            </div>
+                            <div class="stat-icon icon-indigo">
+                                <i class="bi bi-boxes"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card-subtext">
+                            <i class="bi bi-grid-3x3"></i> Catalog SKUs registered
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- 10. Items In Stock -->
+            <div class="stat-card-col" id="perm-dashboard_in_stock" data-permission="view_products">
+                <a href="all-product.html" class="stat-card-link">
+                    <div class="stat-card theme-emerald">
+                        <div class="stat-card-header">
+                            <div>
+                                <div class="stat-card-label">In Stock</div>
+                                <div class="stat-card-value text-success" id="inStockCount">
+                                    <span class="skeleton skeleton-text"></span>
+                                </div>
+                            </div>
+                            <div class="stat-icon icon-emerald">
+                                <i class="bi bi-check2-circle"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card-subtext">
+                            <i class="bi bi-shield-check text-success"></i> Ready for checkout
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- 11. Out of Stock -->
+            <div class="stat-card-col" id="perm-dashboard_out_of_stock" data-permission="view_products">
+                <a href="all-product.html" class="stat-card-link">
+                    <div class="stat-card theme-rose">
+                        <div class="stat-card-header">
+                            <div>
+                                <div class="stat-card-label">Out of Stock</div>
+                                <div class="stat-card-value text-danger" id="outOfStockCount">
+                                    <span class="skeleton skeleton-text"></span>
+                                </div>
+                            </div>
+                            <div class="stat-icon icon-rose">
+                                <i class="bi bi-slash-circle-fill"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card-subtext">
+                            <i class="bi bi-x-circle text-danger"></i> Needs replenishment
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- 12. Stock Alert -->
+            <div class="stat-card-col" id="perm-dashboard_stock_alert" data-permission="view_products">
+                <a href="all-product.html" class="stat-card-link">
+                    <div class="stat-card theme-amber">
+                        <div class="stat-card-header">
+                            <div>
+                                <div class="stat-card-label">Stock Alert</div>
+                                <div class="stat-card-value text-warning" id="stockAlertCount">
+                                    <span class="skeleton skeleton-text"></span>
+                                </div>
+                            </div>
+                            <div class="stat-icon icon-amber">
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card-subtext">
+                            <i class="bi bi-bell text-warning"></i> At reorder threshold
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- ROW 4: PRODUCTION, CATEGORIES, SUPPLIERS & TEAM (4 Symmetrical Cards) -->
+        <div class="stat-cards-grid">
+            <!-- 13. Production Items -->
+            <div class="stat-card-col" id="perm-dashboard_production" data-permission="view_production">
+                <a href="production-history.html" class="stat-card-link">
+                    <div class="stat-card theme-violet">
+                        <div class="stat-card-header">
+                            <div>
+                                <div class="stat-card-label">Production Items</div>
+                                <div class="stat-card-value" id="totalProductionProducts">
+                                    <span class="skeleton skeleton-text"></span>
+                                </div>
+                            </div>
+                            <div class="stat-icon icon-violet">
+                                <i class="bi bi-gear-wide-connected"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card-subtext">
+                            <i class="bi bi-tools text-violet"></i> In-house manufactured
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- 14. Categories -->
+            <div class="stat-card-col" id="perm-dashboard_categories" data-permission="view_products">
+                <a href="all-product.html" class="stat-card-link">
+                    <div class="stat-card theme-cyan">
+                        <div class="stat-card-header">
+                            <div>
+                                <div class="stat-card-label">Categories</div>
+                                <div class="stat-card-value" id="categoryCount">
+                                    <span class="skeleton skeleton-text"></span>
+                                </div>
+                            </div>
+                            <div class="stat-icon icon-cyan">
+                                <i class="bi bi-tags-fill"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card-subtext">
+                            <i class="bi bi-diagram-3"></i> Merchandise lines
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- 15. Total Suppliers -->
+            <div class="stat-card-col" id="perm-dashboard_total_suppliers" data-permission="view_purchases">
+                <a href="all-suppliers.html" class="stat-card-link">
+                    <div class="stat-card theme-violet">
+                        <div class="stat-card-header">
+                            <div>
+                                <div class="stat-card-label">Total Suppliers</div>
+                                <div class="stat-card-value" id="totalSuppliers">
+                                    <span class="skeleton skeleton-text"></span>
+                                </div>
+                            </div>
+                            <div class="stat-icon icon-violet">
+                                <i class="bi bi-truck"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card-subtext">
+                            <i class="bi bi-buildings text-violet"></i> Sourcing partners & vendors
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- 16. Total Employees / Staff Users -->
+            <div class="stat-card-col" id="perm-dashboard_total_employees" data-permission="manage_users">
+                <a href="employee.html" class="stat-card-link">
+                    <div class="stat-card theme-indigo">
+                        <div class="stat-card-header">
+                            <div>
+                                <div class="stat-card-label">Total Employees</div>
+                                <div class="stat-card-value" id="totalEmployees">
+                                    <span class="skeleton skeleton-text"></span>
+                                </div>
+                            </div>
+                            <div class="stat-icon icon-indigo">
+                                <i class="bi bi-person-badge-fill"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card-subtext">
+                            <i class="bi bi-shield-lock text-indigo"></i> POS operators & system users
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- CHARTS ROW: CATEGORY DISTRIBUTION & STOCK HEALTH -->
         <div class="charts-grid mb-4" data-permission="view_products">
             <!-- Product Category Distribution Chart -->
-            <div class="chart-col-half">
-                <div class="stat-card d-flex flex-column h-100">
+            <div>
+                <div class="stat-card d-flex flex-column h-100" style="min-height: 380px;">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
                             <h5 class="fw-bold mb-0 d-flex align-items-center gap-2">
                                 <i class="bi bi-pie-chart-fill text-info"></i> Inventory Category Breakdown
                             </h5>
-                            <span class="text-muted small" style="font-size: 0.75rem;">Interactive share of store inventory</span>
+                            <span class="text-muted small" style="font-size: 0.75rem;">Interactive share of merchandise categories</span>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-secondary bg-opacity-25 text-light" id="categoryCountBadge">0 Categories</span>
-                        </div>
+                        <span class="badge bg-secondary bg-opacity-25 text-light px-2 py-1" id="categoryCountBadge">0 Categories</span>
                     </div>
-                    <div style="position: relative; height: 290px; width: 100%;" class="d-flex align-items-center justify-content-center">
+                    <div style="position: relative; height: 300px; width: 100%;" class="d-flex align-items-center justify-content-center">
                         <canvas id="categoryChart"></canvas>
                     </div>
                 </div>
             </div>
 
             <!-- Stock Status & Production Health Chart -->
-            <div class="chart-col-half">
-                <div class="stat-card d-flex flex-column">
+            <div>
+                <div class="stat-card d-flex flex-column h-100" style="min-height: 380px;">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="fw-bold mb-0 d-flex align-items-center gap-2">
-                            <i class="bi bi-bar-chart-fill text-warning"></i> Stock Health & Media Distribution
-                        </h5>
-                        <span class="badge bg-warning bg-opacity-25 text-warning" id="stockAlertRatioBadge">Live Metrics</span>
+                        <div>
+                            <h5 class="fw-bold mb-0 d-flex align-items-center gap-2">
+                                <i class="bi bi-bar-chart-fill text-warning"></i> Stock Health & Distribution
+                            </h5>
+                            <span class="text-muted small" style="font-size: 0.75rem;">Healthy vs Low-Stock & In-House ratios</span>
+                        </div>
+                        <span class="badge bg-warning bg-opacity-25 text-warning px-2 py-1" id="stockAlertRatioBadge">Live Metrics</span>
                     </div>
-                    <div style="position: relative; height: 260px; width: 100%;">
+                    <div style="position: relative; height: 300px; width: 100%;">
                         <canvas id="stockHealthChart"></canvas>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- RECENT PRODUCTS & QUICK OPERATIONS -->
         <div class="dashboard-content-grid">
-            <div class="main-table-col" data-permission="view_products">
-                <div class="stat-card">
-                    <h5 class="fw-bold mb-3">Recent Products</h5>
+            <div data-permission="view_products">
+                <div class="stat-card h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0 d-flex align-items-center gap-2">
+                            <i class="bi bi-clock-history text-secondary"></i> Recently Added Products
+                        </h5>
+                        <a href="all-product.html" class="btn btn-sm btn-outline-secondary py-1 px-2" style="font-size: 0.75rem;">
+                            View All <i class="bi bi-chevron-right ms-1"></i>
+                        </a>
+                    </div>
                     <div class="table-responsive">
-                        <table class="table table-dark table-hover mb-0" style="background: transparent;">
+                        <table class="table dashboard-table table-dark table-hover mb-0" style="background: transparent;">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
+                                    <th>Product</th>
                                     <th>Category</th>
-                                    <th>Price</th>
-                                    <th>Stock</th>
+                                    <th>Selling Price</th>
+                                    <th>Current Stock</th>
                                 </tr>
                             </thead>
                             <tbody id="recentProductsTable">
-                                <tr><td colspan="4">Loading data...</td></tr>
+                                <tr><td colspan="4" class="text-center py-4 text-muted">Loading inventory data...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-            <div class="side-actions-col">
-                <div class="stat-card">
-                    <h5 class="fw-bold mb-3">Quick Actions</h5>
-                    <div class="d-flex flex-column gap-2 mb-4">
-                        <a href="add-product.html" class="btn btn-primary text-start" data-permission="add_product"><i class="bi bi-plus-circle me-2"></i> Add New Product</a>
-                        <a href="add-purchase.html" class="btn btn-info text-start text-white" data-permission="add_purchase"><i class="bi bi-bag-check me-2"></i> Record Purchase</a>
-                        <a href="add-production.html" class="btn btn-secondary text-start" data-permission="add_production"><i class="bi bi-gear-wide-connected me-2"></i> Record Production</a>
+
+            <div>
+                <div class="stat-card h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                            <i class="bi bi-lightning-charge-fill text-warning"></i> Quick Operations
+                        </h5>
+                        <div class="d-flex flex-column gap-2 mb-4">
+                            <a href="add-product.html" class="btn btn-primary text-start d-flex align-items-center justify-content-between py-2 px-3 rounded-3" data-permission="add_product">
+                                <span><i class="bi bi-plus-circle me-2"></i> Add New Product</span>
+                                <i class="bi bi-chevron-right opacity-50"></i>
+                            </a>
+                            <a href="add-purchase.html" class="btn btn-info text-start text-white d-flex align-items-center justify-content-between py-2 px-3 rounded-3" data-permission="add_purchase">
+                                <span><i class="bi bi-bag-check me-2"></i> Record Purchase</span>
+                                <i class="bi bi-chevron-right opacity-50"></i>
+                            </a>
+                            <a href="add-production.html" class="btn btn-secondary text-start d-flex align-items-center justify-content-between py-2 px-3 rounded-3" data-permission="add_production">
+                                <span><i class="bi bi-gear-wide-connected me-2"></i> Record Production</span>
+                                <i class="bi bi-chevron-right opacity-50"></i>
+                            </a>
+                        </div>
                     </div>
 
                     <div class="p-3 rounded-4 border" data-permission="use_ai_studio" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.14), rgba(0, 229, 255, 0.08)); border-color: rgba(0, 229, 255, 0.3) !important;">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="fw-bold d-flex align-items-center gap-2"><i class="bi bi-stars text-info"></i> BCS AI Business Insights</span>
-                            <span class="badge bg-info bg-opacity-25 text-info border border-info border-opacity-25" style="font-size: 0.68rem;">Ruleare Engine</span>
+                            <span class="fw-bold d-flex align-items-center gap-2" style="font-size: 0.88rem;">
+                                <i class="bi bi-stars text-info"></i> BCS AI Business Insights
+                            </span>
+                            <span class="badge bg-info bg-opacity-25 text-info border border-info border-opacity-25" style="font-size: 0.65rem;">Ruleare Engine</span>
                         </div>
-                        <p class="small text-muted mb-3" id="aiDashboardInsightOutput">Analyze live store inventory, low-stock items, and pricing opportunities with Ruleare Native AI.</p>
+                        <p class="small text-muted mb-3" id="aiDashboardInsightOutput" style="font-size: 0.8rem; line-height: 1.45;">
+                            Analyze real-time stock levels, restock alerts, and revenue opportunities with local Ruleare AI.
+                        </p>
                         <div class="d-flex gap-2">
-                            <button type="button" id="generateAiInsightsBtn" class="btn btn-sm btn-info text-white fw-semibold flex-grow-1">
-                                <i class="bi bi-lightning-charge-fill me-1"></i> Generate Live Insights
+                            <button type="button" id="generateAiInsightsBtn" class="btn btn-sm btn-info text-white fw-semibold flex-grow-1 py-1 px-3">
+                                <i class="bi bi-lightning-charge-fill me-1"></i> Generate Insights
                             </button>
-                            <button type="button" class="btn btn-sm btn-outline-light" onclick="if(window.BCSAICopilot) window.BCSAICopilot.open();" title="Open Full AI Copilot">
+                            <button type="button" class="btn btn-sm btn-outline-light py-1 px-2" onclick="if(window.BCSAICopilot) window.BCSAICopilot.open();" title="Open Full AI Copilot">
                                 <i class="bi bi-chat-dots-fill"></i>
                             </button>
                         </div>
@@ -469,6 +850,7 @@
         </div>
     </main>
 
+    <!-- Main Module Script -->
     <script type="module">
         import { getCollection } from './script/api.js';
         import { logoutUser } from './script/auth.js';
@@ -477,61 +859,123 @@
         let categoryChartInstance = null;
         let stockHealthChartInstance = null;
 
-        window.loadDashboardData = async function() {
-            if (window.showBcsLoader) window.showBcsLoader("Loading Dashboard Analytics...");
-            try {
-                const canSeeProducts = window.hasPermission('view_products');
-                const canSeePurchases = window.hasPermission('view_purchases');
-                const canSeeSales = window.hasPermission('view_sales');
-                const canSeeUsers = window.hasPermission('manage_users');
-                const canSeeProduction = window.hasPermission('view_production');
+        function formatBDT(amount) {
+            const num = Number(amount || 0);
+            return num.toLocaleString('en-IN', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }) + ' BDT';
+        }
 
-                // Fetch data conditionally based on permissions to save bandwidth & enforce privacy
-                const [productsRes, purchasesRes, salesRes, usersRes] = await Promise.all([
-                    canSeeProducts ? getCollection('products').catch(() => ({ docs: [] })) : Promise.resolve({ docs: [] }),
-                    canSeePurchases ? getCollection('purchases').catch(() => ({ docs: [] })) : Promise.resolve({ docs: [] }),
-                    canSeeSales ? getCollection('sales').catch(() => ({ docs: [] })) : Promise.resolve({ docs: [] }),
-                    canSeeUsers ? getCollection('users').catch(() => ({ docs: [] })) : Promise.resolve({ docs: [] })
+        function formatCurrencySymbol(amount) {
+            const num = Number(amount || 0);
+            return '৳' + num.toLocaleString('en-IN', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        window.loadDashboardData = async function(forceRefresh = false) {
+            const refreshIcon = document.getElementById('refreshBtnIcon');
+            if (refreshIcon) refreshIcon.classList.add('spin-animation');
+            if (window.showBcsLoader && !forceRefresh) window.showBcsLoader("Loading Dashboard Analytics...");
+
+            try {
+                const canSeeProducts = window.hasPermission ? window.hasPermission('view_products') : true;
+                const canSeePurchases = window.hasPermission ? window.hasPermission('view_purchases') : true;
+                const canSeeSales = window.hasPermission ? window.hasPermission('view_sales') : true;
+                const canSeeUsers = window.hasPermission ? window.hasPermission('manage_users') : true;
+                const canSeeProduction = window.hasPermission ? window.hasPermission('view_production') : true;
+
+                // Concurrent fetch across only real, existing database tables
+                const [
+                    productsRes,
+                    purchasesRes,
+                    salesRes,
+                    usersRes,
+                    suppliersRes
+                ] = await Promise.all([
+                    canSeeProducts ? getCollection('products', forceRefresh).catch(() => ({ docs: [] })) : Promise.resolve({ docs: [] }),
+                    canSeePurchases ? getCollection('purchases', forceRefresh).catch(() => ({ docs: [] })) : Promise.resolve({ docs: [] }),
+                    canSeeSales ? getCollection('sales', forceRefresh).catch(() => ({ docs: [] })) : Promise.resolve({ docs: [] }),
+                    canSeeUsers ? getCollection('users', forceRefresh).catch(() => ({ docs: [] })) : Promise.resolve({ docs: [] }),
+                    canSeePurchases ? getCollection('suppliers', forceRefresh).catch(() => ({ docs: [] })) : Promise.resolve({ docs: [] })
                 ]);
 
-                const products = productsRes.docs.map(d => {
-                    const data = d.data();
-                    return {
-                        ...data,
-                        buyPrice: data.buyPrice || data.buy_price || 0,
-                        sellPrice: data.sellPrice || data.sell_price || 0,
-                        wholesalePrice: data.wholesalePrice || data.wholesale_price || 0,
-                        quantity: Number(data.quantity || 0),
-                        alertQuantity: Number(data.alertQuantity || data.alert_quantity || 5),
-                        imageUrl: data.imageUrl || data.image_url || data.image || '',
-                        isProduction: Boolean(data.isProduction || data.is_production || data.productType === 'production')
-                    };
-                }).filter(p => !p.deleteScheduledAt);
-                const purchases = purchasesRes.docs.map(d => d.data());
-                const sales = salesRes.docs.map(d => d.data());
-                const users = usersRes.docs.map(d => d.data());
+                // Normalize Products
+                const rawProducts = (productsRes.docs || productsRes || []).map(d => typeof d.data === 'function' ? d.data() : d);
+                const products = rawProducts.map(data => ({
+                    ...data,
+                    buyPrice: Number(data.buyPrice || data.buy_price || 0),
+                    sellPrice: Number(data.sellPrice || data.sell_price || 0),
+                    wholesalePrice: Number(data.wholesalePrice || data.wholesale_price || 0),
+                    quantity: Number(data.quantity || 0),
+                    alertQuantity: Number(data.alertQuantity || data.alert_quantity || 5),
+                    imageUrl: data.imageUrl || data.image_url || data.image || '',
+                    isProduction: Boolean(data.isProduction || data.is_production || data.productType === 'production'),
+                    category: (data.category || 'General').trim()
+                })).filter(p => !p.deleteScheduledAt);
 
-                // Calculate Detailed Product Breakdown Metrics
-                const productionProducts = products.filter(p => p.isProduction);
-                const withImages = products.filter(p => p.imageUrl && String(p.imageUrl).trim().length > 0);
-                const withoutImages = products.filter(p => !p.imageUrl || String(p.imageUrl).trim().length === 0);
-                const outOfStock = products.filter(p => p.quantity <= 0);
-                const alertStock = products.filter(p => p.quantity > 0 && p.quantity <= p.alertQuantity);
-                const inGoodStock = products.filter(p => p.quantity > p.alertQuantity);
+                // Normalize Purchases
+                const purchases = (purchasesRes.docs || purchasesRes || []).map(d => typeof d.data === 'function' ? d.data() : d);
 
-                // Financial & Inventory Valuation Calculations
+                // Normalize Sales
+                const sales = (salesRes.docs || salesRes || []).map(d => typeof d.data === 'function' ? d.data() : d);
+
+                // Normalize Users & Suppliers
+                const users = (usersRes.docs || usersRes || []).map(d => typeof d.data === 'function' ? d.data() : d);
+                const suppliers = (suppliersRes.docs || suppliersRes || []).map(d => typeof d.data === 'function' ? d.data() : d);
+
+                // -------------------------------------------------------------
+                // 1. FINANCIAL REVENUE & PURCHASE TOTALS
+                // -------------------------------------------------------------
+                let totalSaleRevenue = 0;
+                sales.forEach(sale => {
+                    const grand = Number(sale.grandTotal ?? sale.total ?? sale.finalTotal ?? sale.payableAmount ?? sale.netTotal ?? 0);
+                    totalSaleRevenue += grand;
+                });
+
+                let totalPurchaseExpense = 0;
+                let totalPurchaseDue = 0;
+                purchases.forEach(p => {
+                    const grand = Number(p.grandTotal ?? p.total ?? p.totalAmount ?? p.payableAmount ?? 0);
+                    const due = Number(p.dueAmount ?? p.due ?? p.balanceDue ?? 0);
+                    totalPurchaseExpense += grand;
+                    totalPurchaseDue += due;
+                });
+
+                const netProfitValue = totalSaleRevenue - totalPurchaseExpense;
+
+                // -------------------------------------------------------------
+                // 2. INVENTORY ASSET VALUATION
+                // -------------------------------------------------------------
                 let totalStockUnits = 0;
                 let totalCostValuation = 0;
                 let totalRetailValuation = 0;
+                const categoriesSet = new Set();
+
+                const inStock = [];
+                const outOfStock = [];
+                const alertStock = [];
+                const productionItems = [];
 
                 products.forEach(p => {
                     const qty = Math.max(0, p.quantity);
-                    const buy = Number(p.buyPrice || 0);
-                    const sell = Number(p.sellPrice || 0);
-
                     totalStockUnits += qty;
-                    totalCostValuation += (qty * buy);
-                    totalRetailValuation += (qty * sell);
+                    totalCostValuation += (qty * p.buyPrice);
+                    totalRetailValuation += (qty * p.sellPrice);
+
+                    if (p.category) categoriesSet.add(p.category);
+                    if (p.isProduction) productionItems.push(p);
+
+                    if (qty <= 0) {
+                        outOfStock.push(p);
+                    } else {
+                        inStock.push(p);
+                        if (qty <= p.alertQuantity) {
+                            alertStock.push(p);
+                        }
+                    }
                 });
 
                 const potentialProfit = Math.max(0, totalRetailValuation - totalCostValuation);
@@ -539,165 +983,153 @@
                     ? ((potentialProfit / totalRetailValuation) * 100).toFixed(1) 
                     : '0.0';
 
-                const formatCurrency = (amt) => '৳' + Number(amt || 0).toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                });
+                // -------------------------------------------------------------
+                // 3. POPULATE DOM ELEMENTS
+                // -------------------------------------------------------------
+                const setEl = (id, val) => {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = val;
+                };
 
-                // Update Overview & Product Specific Cards
-                if (document.getElementById('totalProducts')) document.getElementById('totalProducts').textContent = products.length;
-                if (document.getElementById('totalProductionProducts')) document.getElementById('totalProductionProducts').textContent = productionProducts.length;
-                if (document.getElementById('totalWithImages')) document.getElementById('totalWithImages').textContent = withImages.length;
-                if (document.getElementById('totalNoImages')) document.getElementById('totalNoImages').textContent = withoutImages.length;
-                if (document.getElementById('totalAlertStock')) document.getElementById('totalAlertStock').textContent = alertStock.length;
-                if (document.getElementById('totalOutOfStock')) document.getElementById('totalOutOfStock').textContent = outOfStock.length;
+                // Row 1: Financials
+                setEl('totalRevenue', formatBDT(totalSaleRevenue));
+                setEl('totalPurchase', formatBDT(totalPurchaseExpense));
+                setEl('totalPurchaseDue', formatBDT(totalPurchaseDue));
+                setEl('netProfit', formatBDT(netProfitValue));
 
-                // Update Financial Valuation Calculation Cards
-                if (document.getElementById('calcTotalStockUnits')) {
-                    document.getElementById('calcTotalStockUnits').textContent = totalStockUnits.toLocaleString('en-IN');
-                }
-                if (document.getElementById('calcTotalCostValue')) {
-                    document.getElementById('calcTotalCostValue').textContent = formatCurrency(totalCostValuation);
-                }
-                if (document.getElementById('calcTotalRetailValue')) {
-                    document.getElementById('calcTotalRetailValue').textContent = formatCurrency(totalRetailValuation);
-                }
-                if (document.getElementById('calcPotentialProfit')) {
-                    document.getElementById('calcPotentialProfit').textContent = formatCurrency(potentialProfit);
-                }
-                if (document.getElementById('calcMarginPercentage')) {
-                    document.getElementById('calcMarginPercentage').textContent = `Est. Margin: ${marginPercentage}%`;
-                }
-                
-                if (document.getElementById('totalPurchases')) document.getElementById('totalPurchases').textContent = purchases.length;
-                if (document.getElementById('totalSales')) document.getElementById('totalSales').textContent = sales.length;
-                if (document.getElementById('totalUsers')) document.getElementById('totalUsers').textContent = users.length;
+                // Row 2: Valuation
+                setEl('calcTotalCostValue', formatCurrencySymbol(totalCostValuation));
+                setEl('calcTotalRetailValue', formatCurrencySymbol(totalRetailValuation));
+                setEl('calcPotentialProfit', formatCurrencySymbol(potentialProfit));
+                setEl('calcMarginPercentage', `Est. Margin: ${marginPercentage}%`);
+                setEl('calcTotalStockUnits', totalStockUnits.toLocaleString('en-IN') + ' Units');
 
-                // Render or update Interactive Charts
+                // Row 3: Stock Health
+                setEl('totalProducts', products.length.toLocaleString('en-IN'));
+                setEl('inStockCount', inStock.length.toLocaleString('en-IN'));
+                setEl('outOfStockCount', outOfStock.length.toLocaleString('en-IN'));
+                setEl('totalOutOfStock', outOfStock.length.toLocaleString('en-IN'));
+                setEl('stockAlertCount', alertStock.length.toLocaleString('en-IN'));
+                setEl('totalAlertStock', alertStock.length.toLocaleString('en-IN'));
+
+                // Row 4: Production, Categories, Suppliers & Employees
+                setEl('totalProductionProducts', productionItems.length.toLocaleString('en-IN'));
+                setEl('categoryCount', categoriesSet.size.toLocaleString('en-IN'));
+                setEl('totalSuppliers', suppliers.length.toLocaleString('en-IN'));
+                setEl('totalEmployees', users.length.toLocaleString('en-IN'));
+                setEl('totalUsers', users.length.toLocaleString('en-IN'));
+
+                // -------------------------------------------------------------
+                // 4. RENDER CHARTS
+                // -------------------------------------------------------------
                 if (canSeeProducts && window.Chart) {
-                    renderCategoryChart(products);
+                    renderCategoryChart(products, categoriesSet.size);
                     renderStockHealthChart({
-                        inGoodStock: inGoodStock.length,
+                        inGoodStock: inStock.length - alertStock.length,
                         alertStock: alertStock.length,
                         outOfStock: outOfStock.length,
-                        withImages: withImages.length,
-                        withoutImages: withoutImages.length,
-                        productionItems: productionProducts.length
+                        productionItems: productionItems.length
                     });
                 }
 
-                // Expose live context for BCS AI Copilot & Business Insights
-                const lowStockItems = [...outOfStock, ...alertStock].slice(0, 15).map(p => ({
-                    name: p.name,
-                    category: p.category,
-                    stock: p.quantity,
-                    sellPrice: p.sellPrice
-                }));
-
-                window.BCS_LIVE_DASHBOARD_CONTEXT = {
-                    totalProducts: products.length,
-                    totalPurchases: purchases.length,
-                    totalSales: sales.length,
-                    productionItems: productionProducts.length,
-                    withImagesCount: withImages.length,
-                    noImagesCount: withoutImages.length,
-                    lowStockCount: lowStockItems.length,
-                    totalStockUnits,
-                    totalCostValuation,
-                    totalRetailValuation,
-                    potentialProfit,
-                    marginPercentage,
-                    lowStockSample: lowStockItems,
-                    recentProductsSample: products.slice(-8).map(p => ({
-                        name: p.name,
-                        category: p.category,
-                        buyPrice: p.buyPrice,
-                        sellPrice: p.sellPrice,
-                        stock: p.quantity
-                    }))
-                };
-
-                // Update Recent Products Table
+                // -------------------------------------------------------------
+                // 5. UPDATE RECENT PRODUCTS TABLE
+                // -------------------------------------------------------------
                 const tbody = document.getElementById('recentProductsTable');
                 if (tbody) {
                     if (products.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No products found in database.</td></tr>';
+                        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-muted">No products found in database.</td></tr>';
                     } else {
                         const recentProducts = products.slice(-6).reverse();
                         tbody.innerHTML = recentProducts.map(p => `
                             <tr>
                                 <td>
                                     <div class="d-flex align-items-center gap-2">
-                                        ${p.imageUrl ? `<img src="${p.imageUrl}" style="width: 28px; height: 28px; border-radius: 6px; object-fit: cover;">` : `<i class="bi bi-box-seam text-secondary"></i>`}
-                                        <span class="fw-semibold text-light">${p.name || 'N/A'}</span>
+                                        ${p.imageUrl ? `<img src="${p.imageUrl}" style="width: 32px; height: 32px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(255,255,255,0.1);">` : `<div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center;"><i class="bi bi-box-seam text-secondary"></i></div>`}
+                                        <div>
+                                            <div class="fw-semibold text-light text-truncate" style="max-width: 220px;">${p.name || 'Unnamed Item'}</div>
+                                            <span class="text-muted" style="font-size: 0.7rem;">Barcode: ${p.barcode || 'N/A'}</span>
+                                        </div>
                                     </div>
                                 </td>
-                                <td><span class="badge bg-secondary bg-opacity-50 text-light">${p.category || 'General'}</span></td>
-                                <td>৳${p.sellPrice || p.priceTiers?.pcs?.sell || 0}</td>
+                                <td><span class="badge bg-secondary bg-opacity-25 text-light border border-secondary border-opacity-25">${p.category || 'General'}</span></td>
+                                <td class="fw-semibold text-emerald-bright">৳${Number(p.sellPrice || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
                                 <td>
-                                    <span class="badge ${p.quantity <= 0 ? 'bg-danger' : (p.quantity <= p.alertQuantity ? 'bg-warning text-dark' : 'bg-success')}">
-                                        ${p.quantity <= 0 ? 'Out of Stock' : `${p.quantity} In Stock`}
+                                    <span class="badge ${p.quantity <= 0 ? 'bg-danger bg-opacity-25 text-danger border border-danger border-opacity-25' : (p.quantity <= p.alertQuantity ? 'bg-warning bg-opacity-25 text-warning border border-warning border-opacity-25' : 'bg-success bg-opacity-25 text-success border border-success border-opacity-25')}">
+                                        ${p.quantity <= 0 ? 'Out of Stock' : `${p.quantity} in stock`}
                                     </span>
                                 </td>
                             </tr>
                         `).join('');
                     }
                 }
+
+                // Expose context for AI Business Insights
+                window.BCS_LIVE_DASHBOARD_CONTEXT = {
+                    totalRevenue: totalSaleRevenue,
+                    totalPurchase: totalPurchaseExpense,
+                    totalPurchaseDue,
+                    netProfit: netProfitValue,
+                    totalProducts: products.length,
+                    totalStockUnits,
+                    totalCostValuation,
+                    totalRetailValuation,
+                    potentialProfit,
+                    marginPercentage,
+                    outOfStockCount: outOfStock.length,
+                    alertStockCount: alertStock.length,
+                    lowStockSample: [...outOfStock, ...alertStock].slice(0, 10).map(p => ({
+                        name: p.name,
+                        category: p.category,
+                        stock: p.quantity,
+                        sellPrice: p.sellPrice
+                    }))
+                };
+
+                // Apply RBAC hide rules
+                if (window.applyUIPermissions) {
+                    window.applyUIPermissions(document);
+                }
+
             } catch (error) {
-                console.error("Failed to load dashboard data", error);
-                const tbody = document.getElementById('recentProductsTable');
-                if (tbody) tbody.innerHTML = `<tr><td colspan="4" class="text-danger">Error loading data: ${error.message}</td></tr>`;
+                console.error("Dashboard data load failed:", error);
             } finally {
+                if (refreshIcon) refreshIcon.classList.remove('spin-animation');
                 if (window.hideBcsLoader) window.hideBcsLoader();
             }
         };
 
-        function renderCategoryChart(products) {
+        // Render Category Breakdown Doughnut Chart
+        function renderCategoryChart(products, categoryCount) {
             const canvas = document.getElementById('categoryChart');
             if (!canvas) return;
 
-            // Group products by category and calculate total items
             const categoryMap = {};
-            let totalProductCount = 0;
+            let totalItems = 0;
             products.forEach(p => {
                 const cat = (p.category || 'General').trim();
                 categoryMap[cat] = (categoryMap[cat] || 0) + 1;
-                totalProductCount++;
+                totalItems++;
             });
 
-            // Sort categories descending by volume for visually appealing flow
             const sortedEntries = Object.entries(categoryMap).sort((a, b) => b[1] - a[1]);
             const labels = sortedEntries.map(e => e[0]);
             const dataCounts = sortedEntries.map(e => e[1]);
 
             const badge = document.getElementById('categoryCountBadge');
-            if (badge) badge.textContent = `${labels.length} Categories`;
+            if (badge) badge.textContent = `${categoryCount || labels.length} Categories`;
 
             if (categoryChartInstance) {
                 categoryChartInstance.destroy();
             }
 
-            const ctx = canvas.getContext('2d');
-            
-            // Vibrant modern neon gradient palette
             const modernPalette = [
-                '#6366f1', // Indigo
-                '#00e5ff', // Cyan Neon
-                '#10b981', // Emerald
-                '#f59e0b', // Amber
-                '#ec4899', // Pink
-                '#8b5cf6', // Violet
-                '#14b8a6', // Teal
-                '#f97316', // Orange
-                '#3b82f6', // Blue
-                '#a855f7', // Purple
-                '#06b6d4', // Sky
-                '#84cc16'  // Lime
+                '#6366f1', '#06b6d4', '#10b981', '#f59e0b', '#ec4899', 
+                '#8b5cf6', '#14b8a6', '#f97316', '#3b82f6', '#a855f7'
             ];
 
-            // Custom center text plugin for total products in doughnut
-            const centerTextPlugin = {
-                id: 'centerTextPlugin',
+            const centerPlugin = {
+                id: 'centerDoughnutText',
                 beforeDraw: function(chart) {
                     if (chart.config.type !== 'doughnut') return;
                     const { ctx: c, chartArea } = chart;
@@ -705,24 +1137,19 @@
                     c.save();
                     const centerX = (chartArea.left + chartArea.right) / 2;
                     const centerY = (chartArea.top + chartArea.bottom) / 2;
-
                     c.textAlign = 'center';
                     c.textBaseline = 'middle';
-
-                    // Number of items
-                    c.font = '800 24px "Plus Jakarta Sans", sans-serif';
+                    c.font = '700 22px "Plus Jakarta Sans", sans-serif';
                     c.fillStyle = '#ffffff';
-                    c.fillText(totalProductCount.toLocaleString('en-IN'), centerX, centerY - 8);
-
-                    // Subtitle
+                    c.fillText(totalItems.toLocaleString('en-IN'), centerX, centerY - 8);
                     c.font = '600 11px "Plus Jakarta Sans", sans-serif';
                     c.fillStyle = '#94a3b8';
                     c.fillText('PRODUCTS', centerX, centerY + 14);
-
                     c.restore();
                 }
             };
 
+            const ctx = canvas.getContext('2d');
             categoryChartInstance = new window.Chart(ctx, {
                 type: 'doughnut',
                 data: {
@@ -731,60 +1158,28 @@
                         data: dataCounts.length > 0 ? dataCounts : [1],
                         backgroundColor: labels.length > 0 ? modernPalette.slice(0, labels.length) : ['#334155'],
                         borderWidth: 0,
-                        hoverBorderWidth: 0,
-                        hoverOffset: 8,
+                        hoverOffset: 6,
                         borderRadius: 6,
                         spacing: 2
                     }]
                 },
-                plugins: [centerTextPlugin],
+                plugins: [centerPlugin],
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: {
-                        animateScale: true,
-                        animateRotate: true,
-                        duration: 900,
-                        easing: 'easeOutQuart'
-                    },
-                    layout: {
-                        padding: 10
-                    },
                     plugins: {
                         legend: {
                             position: 'right',
-                            align: 'center',
                             labels: {
                                 color: '#cbd5e1',
                                 usePointStyle: true,
                                 pointStyle: 'circle',
                                 boxWidth: 8,
-                                boxHeight: 8,
                                 padding: 12,
                                 font: {
-                                    family: "'Plus Jakarta Sans', system-ui, sans-serif",
+                                    family: "'Plus Jakarta Sans', sans-serif",
                                     size: 11,
                                     weight: '600'
-                                },
-                                generateLabels: function(chart) {
-                                    const data = chart.data;
-                                    if (data.labels.length && data.datasets.length) {
-                                        const dataset = data.datasets[0];
-                                        const total = dataset.data.reduce((a, b) => a + b, 0);
-                                        return data.labels.map((label, i) => {
-                                            const val = dataset.data[i];
-                                            const pct = total > 0 ? ((val / total) * 100).toFixed(0) : 0;
-                                            return {
-                                                text: `${label} (${pct}%)`,
-                                                fillStyle: dataset.backgroundColor[i] || '#6366f1',
-                                                strokeStyle: dataset.backgroundColor[i] || '#6366f1',
-                                                lineWidth: 0,
-                                                hidden: isNaN(dataset.data[i]) || chart.getDatasetMeta(0).data[i]?.hidden,
-                                                index: i
-                                            };
-                                        });
-                                    }
-                                    return [];
                                 }
                             }
                         },
@@ -792,23 +1187,10 @@
                             backgroundColor: 'rgba(15, 23, 42, 0.95)',
                             titleColor: '#ffffff',
                             bodyColor: '#e2e8f0',
-                            borderColor: 'rgba(255, 255, 255, 0.15)',
+                            borderColor: 'rgba(255, 255, 255, 0.12)',
                             borderWidth: 1,
-                            padding: 12,
-                            cornerRadius: 10,
-                            boxPadding: 6,
-                            usePointStyle: true,
-                            callbacks: {
-                                labelPointStyle: function() {
-                                    return { pointStyle: 'circle', rotation: 0 };
-                                },
-                                label: function(context) {
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const value = context.parsed;
-                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                                    return `  ${context.label}: ${value.toLocaleString()} items (${percentage}%)`;
-                                }
-                            }
+                            padding: 10,
+                            cornerRadius: 8
                         }
                     },
                     cutout: '72%'
@@ -816,14 +1198,15 @@
             });
         }
 
-        function renderStockHealthChart({ inGoodStock, alertStock, outOfStock, withImages, withoutImages, productionItems }) {
+        // Render Stock Health Bar Chart
+        function renderStockHealthChart({ inGoodStock, alertStock, outOfStock, productionItems }) {
             const canvas = document.getElementById('stockHealthChart');
             if (!canvas) return;
 
             const badge = document.getElementById('stockAlertRatioBadge');
             if (badge) {
                 badge.textContent = outOfStock > 0 ? `${outOfStock} Out of Stock` : 'Healthy Inventory';
-                badge.className = `badge ${outOfStock > 0 ? 'bg-danger bg-opacity-25 text-danger' : 'bg-success bg-opacity-25 text-success'}`;
+                badge.className = `badge ${outOfStock > 0 ? 'bg-danger bg-opacity-25 text-danger' : 'bg-success bg-opacity-25 text-success'} px-2 py-1`;
             }
 
             if (stockHealthChartInstance) {
@@ -834,25 +1217,18 @@
             stockHealthChartInstance = new window.Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['Good Stock', 'Alert Stock', 'Out of Stock', 'With Image', 'No Image', 'Production'],
+                    labels: ['Good Stock', 'Stock Alert', 'Out of Stock', 'Production Items'],
                     datasets: [{
-                        label: 'Product Count',
-                        data: [inGoodStock, alertStock, outOfStock, withImages, withoutImages, productionItems],
+                        label: 'Item Count',
+                        data: [inGoodStock, alertStock, outOfStock, productionItems],
                         backgroundColor: [
                             'rgba(16, 185, 129, 0.75)',
                             'rgba(245, 158, 11, 0.75)',
                             'rgba(239, 68, 68, 0.75)',
-                            'rgba(99, 102, 241, 0.75)',
-                            'rgba(100, 116, 139, 0.75)',
-                            'rgba(14, 165, 233, 0.75)'
+                            'rgba(139, 92, 246, 0.75)'
                         ],
                         borderColor: [
-                            '#10b981',
-                            '#f59e0b',
-                            '#ef4444',
-                            '#6366f1',
-                            '#64748b',
-                            '#0ea5e9'
+                            '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'
                         ],
                         borderWidth: 1.5,
                         borderRadius: 6
@@ -872,25 +1248,26 @@
                     scales: {
                         x: {
                             grid: { display: false },
-                            ticks: { color: '#94a3b8', font: { family: 'Inter', size: 11 } }
+                            ticks: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans', size: 11 } }
                         },
                         y: {
                             beginAtZero: true,
                             grid: { color: 'rgba(255, 255, 255, 0.06)' },
-                            ticks: { color: '#94a3b8', font: { family: 'Inter', size: 11 }, precision: 0 }
+                            ticks: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans', size: 11 }, precision: 0 }
                         }
                     }
                 }
             });
         }
 
-        // Initialize
+        // Initialize on load
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', window.loadDashboardData);
+            document.addEventListener('DOMContentLoaded', () => window.loadDashboardData());
         } else {
             window.loadDashboardData();
         }
 
+        // Ruleare AI Insights Generation
         document.getElementById('generateAiInsightsBtn')?.addEventListener('click', async function() {
             const btn = this;
             const outEl = document.getElementById('aiDashboardInsightOutput');
@@ -899,11 +1276,11 @@
             btn.disabled = true;
             const origHtml = btn.innerHTML;
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Analyzing...';
-            outEl.innerHTML = '<span class="text-info"><i class="bi bi-cpu me-1"></i>Running Ruleare AI analysis on live inventory & sales...</span>';
+            outEl.innerHTML = '<span class="text-info"><i class="bi bi-cpu me-1"></i>Running Ruleare Native AI inference...</span>';
 
             try {
                 const res = await window.BCSAICopilot.ask({
-                    prompt: 'Generate an executive business insight summary, restock alert list, and pricing recommendations based on our live store metrics.',
+                    prompt: 'Generate an executive business insight summary, restock alerts, and profitability recommendations based on our live store metrics.',
                     task: 'business_insights',
                     contextData: window.BCS_LIVE_DASHBOARD_CONTEXT || {}
                 });
@@ -913,7 +1290,7 @@
                     .replace(/>/g, '&gt;')
                     .replace(/\*\*(.*?)\*\*/g, '<strong class="text-light">$1</strong>')
                     .replace(/\n/g, '<br>');
-                outEl.innerHTML = `<div class="text-light" style="max-height: 220px; overflow-y: auto; font-size: 0.82rem; line-height: 1.5;">${formatted}</div><div class="mt-2 small text-muted">Completed via Ruleare AI Engine</div>`;
+                outEl.innerHTML = `<div class="text-light" style="max-height: 220px; overflow-y: auto; font-size: 0.82rem; line-height: 1.5;">${formatted}</div><div class="mt-2 small text-muted" style="font-size: 0.7rem;">Completed via Ruleare AI Engine</div>`;
             } catch (err) {
                 outEl.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>${err.message}</span>`;
             } finally {
@@ -924,7 +1301,3 @@
     </script>
 </body>
 </html>
-
-
-
-

@@ -1,6 +1,6 @@
 {
     "name": "bcs-enterprise-pos",
-    "version": "2.3.8",
+    "version": "2.4.7",
     "description": "BCS Enterprise POS PRO Max",
     "author": "BCS Developer",
     "main": "main.js",
@@ -53,16 +53,17 @@
             "verifyUpdateCodeSignature": false
         },
         "nsis": {
-            "oneClick": true,
+            "oneClick": false,
             "perMachine": false,
-            "allowToChangeInstallationDirectory": false,
+            "allowToChangeInstallationDirectory": true,
             "createDesktopShortcut": true,
             "createStartMenuShortcut": true,
             "shortcutName": "BCS Enterprise POS",
             "uninstallDisplayName": "BCS Enterprise POS",
             "runAfterFinish": true,
             "differentialPackage": false,
-            "deleteAppDataOnUninstall": false
+            "deleteAppDataOnUninstall": false,
+            "include": "installer.nsh"
         },
         "publish": [
             {

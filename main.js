@@ -514,18 +514,41 @@ ipcMain.handle('get_system_info', () => {
   };
 });
 
+// --- RESILIENT PROCESS EXCEPTION SAFETY ---
+process.on('uncaughtException', (err) => {
+  console.error('[MainProcess] Uncaught Exception caught safely:', err && err.message ? err.message : err);
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    try {
+      mainWindow.webContents.send('update_error', err && err.message ? err.message : 'System notification');
+    } catch (e) {}
+  }
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.warn('[MainProcess] Unhandled Promise Rejection safely handled:', reason);
+});
+
 // Explicit download update trigger
 ipcMain.on('download_update', () => {
   if (downloadedUpdateInfo) {
-    if (mainWindow) mainWindow.webContents.send('update_downloaded', downloadedUpdateInfo);
+    if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('update_downloaded', downloadedUpdateInfo);
     return;
   }
-  autoUpdater.downloadUpdate().catch(err => {
-    const msg = err && err.message ? err.message : String(err);
-    if (!msg.toLowerCase().includes('already')) {
-      if (mainWindow) mainWindow.webContents.send('update_error', msg);
+  try {
+    const downloadPromise = autoUpdater.downloadUpdate();
+    if (downloadPromise && typeof downloadPromise.catch === 'function') {
+      downloadPromise.catch(err => {
+        const msg = err && err.message ? err.message : String(err);
+        if (!msg.toLowerCase().includes('already')) {
+          if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('update_error', msg);
+        }
+      });
     }
-  });
+  } catch (err) {
+    const msg = err && err.message ? err.message : String(err);
+    console.warn('[AutoUpdater] downloadUpdate call safe catch:', msg);
+    if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('update_error', msg);
+  }
 });
 
 // Open external download links in system default browser

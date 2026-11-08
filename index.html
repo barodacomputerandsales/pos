@@ -27,7 +27,7 @@
     <!-- Bootstrap 5 CSS & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="template/animations.css">
 
     <style>
@@ -36,20 +36,21 @@
             --win-accent-rgb: 124, 58, 237;
             --win-selection-bg: rgba(124, 58, 237, 0.55);
             --win-selection-color: #ffffff;
-            --page-bg: #0b0f19;
-            --card-dark: #121624;
-            --card-dark-glass: rgba(18, 22, 36, 0.94);
-            --gradient-hero: linear-gradient(135deg, #4f46e5 0%, #7c3aed 45%, #9333ea 75%, #6366f1 100%);
+            --page-bg: #07090e;
+            --card-glass-bg: rgba(13, 16, 28, 0.88);
+            --gradient-hero: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #6366f1 100%);
             --btn-purple: #7c3aed;
             --btn-purple-hover: #6d28d9;
-            --btn-purple-glow: rgba(124, 58, 237, 0.55);
-            --input-bg: #161a29;
-            --input-border: #23293d;
+            --btn-purple-glow: rgba(124, 58, 237, 0.45);
+            --input-bg: rgba(255, 255, 255, 0.035);
+            --input-border: rgba(255, 255, 255, 0.1);
             --input-focus: #8b5cf6;
-            --text-primary: #ffffff;
+            --text-primary: #f8fafc;
             --text-secondary: #94a3b8;
-            --badge-label: #c4b5fd;
-            --accent-cyan: #00e5ff;
+            --text-muted: #64748b;
+            --accent-cyan: #00f0ff;
+            --accent-emerald: #10b981;
+            --brand-purple: #a78bfa;
         }
 
         * {
@@ -85,100 +86,32 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            color: #f8fafc;
-            padding: 20px;
-            perspective: 1200px;
+            color: var(--text-primary);
+            padding: 24px;
         }
 
-        /* Animated Ambient Cyber Dot Grid */
-        .ambient-grid-canvas {
+        /* Luxury Minimalist Studio Canvas */
+        .ambient-bg {
             position: fixed;
             inset: 0;
-            background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-            background-size: 28px 28px;
             pointer-events: none;
-            z-index: 1;
-            opacity: 0.6;
-        }
-
-        /* Animated Floating Glowing Plasma Orbs */
-        .plasma-orb {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(100px);
-            pointer-events: none;
+            overflow: hidden;
             z-index: 0;
-            opacity: 0.55;
-            mix-blend-mode: screen;
+            background: 
+                radial-gradient(circle at 50% 0%, rgba(var(--win-accent-rgb, 124, 58, 237), 0.12) 0%, transparent 65%),
+                radial-gradient(circle at 50% 100%, rgba(var(--win-accent-rgb, 124, 58, 237), 0.05) 0%, transparent 65%),
+                #07090e;
         }
 
-        .orb-1 {
-            width: 580px;
-            height: 580px;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, rgba(124, 58, 237, 0.15) 60%, transparent 80%);
-            top: -100px;
-            left: -80px;
-            animation: floatOrb1 22s ease-in-out infinite alternate;
-        }
-
-        .orb-2 {
-            width: 520px;
-            height: 520px;
-            background: radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, rgba(217, 70, 239, 0.12) 60%, transparent 80%);
-            bottom: -120px;
-            right: -80px;
-            animation: floatOrb2 26s ease-in-out infinite alternate;
-        }
-
-        .orb-3 {
-            width: 440px;
-            height: 440px;
-            background: radial-gradient(circle, rgba(6, 182, 212, 0.22) 0%, rgba(99, 102, 241, 0.1) 60%, transparent 80%);
-            top: 50%;
-            left: 55%;
-            transform: translate(-50%, -50%);
-            animation: floatOrb3 18s ease-in-out infinite alternate;
-        }
-
-        @keyframes floatOrb1 {
-            0% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(120px, 80px) scale(1.12); }
-            100% { transform: translate(40px, 140px) scale(0.95); }
-        }
-
-        @keyframes floatOrb2 {
-            0% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(-100px, -60px) scale(1.1); }
-            100% { transform: translate(-50px, -120px) scale(0.92); }
-        }
-
-        @keyframes floatOrb3 {
-            0% { transform: translate(-50%, -50%) scale(0.95); }
-            50% { transform: translate(-42%, -58%) scale(1.15); }
-            100% { transform: translate(-58%, -45%) scale(1); }
-        }
-
-        /* Centered Dual-Pane Container */
+        /* ========================================================
+           MAIN CARD WRAPPER
+           ======================================================== */
         .auth-wrapper {
             position: relative;
             z-index: 10;
             width: 100%;
-            max-width: 900px;
-            transition: transform 0.2s cubic-bezier(0.2, 0, 0.2, 1);
-        }
-
-        .auth-split-card {
-            background: var(--card-dark-glass);
-            border: 1px solid rgba(255, 255, 255, 0.09);
-            border-radius: 26px;
-            box-shadow: 0 25px 70px -15px rgba(0, 0, 0, 0.85), 0 0 50px rgba(124, 58, 237, 0.2);
-            display: flex;
-            overflow: hidden;
-            animation: cardEntrance 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards, borderGlowPulse 8s ease-in-out infinite;
-            min-height: 520px;
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            position: relative;
+            max-width: 960px;
+            animation: cardEntrance 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         @keyframes cardEntrance {
@@ -192,316 +125,507 @@
             }
         }
 
-        @keyframes borderGlowPulse {
-            0%, 100% {
-                box-shadow: 0 25px 70px -15px rgba(0, 0, 0, 0.85), 0 0 45px rgba(124, 58, 237, 0.18);
-                border-color: rgba(255, 255, 255, 0.09);
+        /* ========================================================
+           RICH MINIMALIST STUDIO CARD BACKLIGHT
+           Monolithic, Pure, Velvety Diffused Radiance Behind Card
+           ======================================================== */
+        .auth-card-backdrop-aura {
+            position: absolute;
+            inset: -35px;
+            pointer-events: none;
+            z-index: 0;
+            overflow: visible;
+            transition: all 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Monolithic Velvet Ambient Halo */
+        .card-ambient-glow {
+            position: absolute;
+            inset: -25px;
+            border-radius: 54px;
+            background: radial-gradient(
+                ellipse 75% 65% at 50% 50%,
+                rgba(var(--win-accent-rgb, 124, 58, 237), 0.32) 0%,
+                rgba(var(--win-accent-rgb, 124, 58, 237), 0.1) 48%,
+                transparent 74%
+            );
+            filter: blur(55px);
+            opacity: 0.85;
+            transition: all 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: luxuryBreathe 10s ease-in-out infinite alternate;
+        }
+
+        /* Subtle Architectural Specular Rim Behind Card Edge */
+        .card-silhouette-rim {
+            position: absolute;
+            inset: 0px;
+            border-radius: 28px;
+            box-shadow: 0 0 50px -5px rgba(var(--win-accent-rgb, 124, 58, 237), 0.28);
+            opacity: 0.7;
+            transition: all 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes luxuryBreathe {
+            0% {
+                opacity: 0.75;
+                transform: scale(0.985);
             }
-            50% {
-                box-shadow: 0 25px 75px -10px rgba(0, 0, 0, 0.9), 0 0 60px rgba(0, 229, 255, 0.22);
-                border-color: rgba(0, 229, 255, 0.25);
+            100% {
+                opacity: 0.95;
+                transform: scale(1.02);
             }
         }
 
-        /* Left Hero Banner Pane */
+        /* ========================================================
+           MAIN LUXURY GLASS CARD (WITH SMOOTH SIZE MORPH ANIMATION)
+           ======================================================== */
+        .auth-split-card {
+            background: rgba(13, 16, 28, 0.88);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 28px;
+            box-shadow: 
+                0 32px 85px -15px rgba(0, 0, 0, 0.95),
+                0 0 50px -15px rgba(var(--win-accent-rgb, 124, 58, 237), 0.2),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+            display: flex;
+            overflow: hidden;
+            min-height: 520px;
+            backdrop-filter: blur(40px) saturate(160%);
+            -webkit-backdrop-filter: blur(40px) saturate(160%);
+            position: relative;
+            z-index: 2;
+            will-change: height;
+            transition: height 0.42s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .auth-split-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 
+                0 36px 95px -15px rgba(0, 0, 0, 0.98),
+                0 0 55px -10px rgba(var(--win-accent-rgb, 124, 58, 237), 0.28),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.26);
+        }
+
+        /* Left Hero & Enterprise System Pane */
         .hero-banner-pane {
-            flex: 1.05;
-            background: var(--gradient-hero);
-            padding: 3rem 2.8rem;
+            flex: 1;
+            background: linear-gradient(165deg, rgba(17, 21, 35, 0.96) 0%, rgba(10, 13, 22, 0.98) 100%);
+            padding: 3.2rem 2.8rem;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             position: relative;
             overflow: hidden;
-            color: #ffffff;
+            border-right: 1px solid rgba(255, 255, 255, 0.07);
         }
 
         .hero-banner-pane::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.22) 0%, transparent 60%);
+            background: radial-gradient(circle at 15% 20%, rgba(var(--win-accent-rgb, 124, 58, 237), 0.12) 0%, transparent 60%);
             pointer-events: none;
         }
 
-        .hero-banner-pane::after {
-            content: '';
-            position: absolute;
-            bottom: -80px;
-            right: -80px;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(0, 229, 255, 0.28) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
+        /* Terminal Status Ribbon */
+        .terminal-status-ribbon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            gap: 12px;
+            margin-bottom: 2rem;
         }
 
-        /* Top Enterprise Status Pill */
-        .hero-chip-badge {
+        .terminal-status-pill {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: rgba(0, 0, 0, 0.32);
-            border: 1px solid rgba(255, 255, 255, 0.22);
-            padding: 5px 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 6px 14px;
             border-radius: 999px;
-            font-size: 0.72rem;
-            font-weight: 800;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: #ffffff;
-            margin-bottom: 2rem;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            position: relative;
+            font-size: 0.74rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
-        .pulse-dot {
+        .status-dot-pulse {
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background-color: #10b981;
-            box-shadow: 0 0 10px #10b981;
+            background-color: var(--accent-emerald);
+            box-shadow: 0 0 10px var(--accent-emerald);
             position: relative;
         }
-
-        .pulse-dot::after {
+        .status-dot-pulse::after {
             content: '';
             position: absolute;
             inset: -4px;
             border-radius: 50%;
-            border: 1.5px solid #10b981;
-            animation: pulseRadar 1.8s infinite;
+            border: 1.5px solid var(--accent-emerald);
+            animation: pulseWave 2s infinite ease-out;
         }
-
-        @keyframes pulseRadar {
+        @keyframes pulseWave {
             0% { transform: scale(0.6); opacity: 1; }
-            100% { transform: scale(2.2); opacity: 0; }
+            100% { transform: scale(2.4); opacity: 0; }
         }
 
-        /* App Squircle Logo Badge with Holographic 3D Floating Animation */
-        .hero-app-logo {
-            width: 76px;
-            height: 76px;
-            background: rgba(255, 255, 255, 0.16);
-            border: 1.5px solid rgba(255, 255, 255, 0.35);
+        /* 12-Hour Live Clock Badge */
+        .terminal-clock {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.74rem;
+            font-weight: 600;
+            color: #94a3b8;
+            background: rgba(0, 0, 0, 0.35);
+            padding: 5px 11px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Logo Brand Badge */
+        .hero-logo-card {
+            width: 74px;
+            height: 74px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 1.5rem;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35), inset 0 0 20px rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(12px);
+            box-shadow: 
+                0 16px 36px rgba(0, 0, 0, 0.45),
+                inset 0 1.5px 0 rgba(255, 255, 255, 0.3),
+                inset 0 0 20px rgba(var(--win-accent-rgb, 124, 58, 237), 0.25);
+            backdrop-filter: blur(16px);
             position: relative;
             overflow: hidden;
-            animation: floatLogo 5s ease-in-out infinite alternate;
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: floatBadge 5s ease-in-out infinite alternate;
         }
 
-        @keyframes floatLogo {
+        @keyframes floatBadge {
             0% { transform: translateY(0px) rotate(0deg); }
             100% { transform: translateY(-7px) rotate(-1.5deg); }
         }
 
-        .hero-app-logo::after {
+        .hero-logo-card::after {
             content: '';
             position: absolute;
             top: 0;
             left: -100%;
             width: 70%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
             transform: skewX(-25deg);
-            animation: logoShine 4.5s infinite;
+            animation: badgeShine 5s infinite;
         }
-
-        @keyframes logoShine {
-            0%, 70% { left: -100%; }
+        @keyframes badgeShine {
+            0%, 65% { left: -100%; }
             100% { left: 200%; }
         }
 
-        .hero-app-logo img {
+        .hero-logo-card img {
             width: 48px;
             height: 48px;
             object-fit: contain;
-            filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35));
+            filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
         }
 
         .hero-headline {
-            font-size: 2.15rem;
+            font-size: 2.25rem;
             font-weight: 800;
-            line-height: 1.15;
-            letter-spacing: -0.03em;
-            margin-bottom: 0.85rem;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            line-height: 1.12;
+            letter-spacing: -0.035em;
+            margin-bottom: 0.65rem;
+            color: #ffffff;
+        }
+
+        .hero-accent-text {
+            background: linear-gradient(135deg, #ffffff 0%, var(--win-accent, #c4b5fd) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .hero-subtext {
             font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.85);
-            line-height: 1.5;
-            max-width: 320px;
+            color: rgba(226, 232, 240, 0.75);
+            line-height: 1.55;
+            margin-bottom: 1.8rem;
+        }
+
+        /* Enterprise Badges Grid */
+        .system-badges-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
             margin-bottom: 1.6rem;
         }
 
-        /* Feature Highlight Badges */
-        .hero-feature-tags {
+        .system-badge-item {
             display: flex;
-            flex-wrap: wrap;
-            gap: 7px;
-            margin-bottom: 1rem;
-        }
-
-        .feature-tag-chip {
-            display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 5px 11px;
-            background: rgba(0, 0, 0, 0.28);
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            gap: 7px;
+            padding: 7px 11px;
+            background: rgba(255, 255, 255, 0.035);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 10px;
-            font-size: 0.72rem;
-            font-weight: 700;
-            color: #ffffff;
-            letter-spacing: 0.02em;
-            backdrop-filter: blur(8px);
-            transition: all 0.25s ease;
+            font-size: 0.74rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s ease;
+        }
+        .system-badge-item:hover {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(255, 255, 255, 0.18);
+            transform: translateY(-1px);
         }
 
-        .feature-tag-chip:hover {
-            background: rgba(255, 255, 255, 0.22);
-            transform: translateY(-2px);
-        }
-
-        .hero-signature {
+        .hero-bottom-info {
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             font-size: 0.76rem;
-            color: rgba(255, 255, 255, 0.75);
-            font-weight: 500;
-            letter-spacing: 0.02em;
+            color: #64748b;
+        }
+        .hero-bottom-info a {
+            color: #a5b4fc;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.15s ease;
+        }
+        .hero-bottom-info a:hover {
+            color: #ffffff;
+            text-decoration: underline;
         }
 
         /* Right Authentication Form Pane */
         .auth-form-pane {
-            flex: 1.1;
-            padding: 2.8rem 2.8rem;
+            flex: 1.18;
+            padding: 3.2rem 2.8rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            background: var(--card-dark-glass);
+            background: rgba(13, 17, 29, 0.9);
             position: relative;
             z-index: 2;
         }
 
-        .form-heading {
+        .form-header-wrap {
+            margin-bottom: 1.35rem;
+        }
+
+        .form-title {
             font-size: 1.65rem;
             font-weight: 800;
             letter-spacing: -0.025em;
             color: #ffffff;
-            margin-bottom: 3px;
+            margin-bottom: 4px;
         }
 
-        .form-subheading {
-            color: #94a3b8;
-            font-size: 0.86rem;
-            margin-bottom: 1.3rem;
+        .form-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
         }
 
-        /* Security Level Badge Strip */
-        .auth-security-badge-strip {
+        /* ========================================================
+           INTERACTIVE SLIDER: DRAGGABLE BY MOUSE & DIRECTLY CLICKABLE
+           ======================================================== */
+        .auth-tab-slider {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            border-radius: 10px;
-            padding: 6px 12px;
-            margin-bottom: 1.3rem;
-            font-size: 0.73rem;
+            position: relative;
+            background: rgba(18, 23, 38, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 999px;
+            padding: 4px;
+            margin-bottom: 1.35rem;
+            box-shadow: 
+                inset 0 2px 6px rgba(0, 0, 0, 0.45),
+                0 4px 16px rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(14px);
+            overflow: hidden;
+            cursor: pointer;
+            touch-action: pan-y;
         }
 
-        .security-level-pill {
+        .auth-tab-slider.is-dragging {
+            cursor: grabbing !important;
+        }
+
+        /* The Physical Sliding Glider with Drag Support */
+        .auth-slider-glider {
+            position: absolute;
+            top: 4px;
+            bottom: 4px;
+            left: 4px;
+            width: calc(50% - 4px);
+            background: linear-gradient(135deg, rgba(var(--win-accent-rgb, 124, 58, 237), 0.9) 0%, rgba(79, 70, 229, 0.9) 100%);
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            box-shadow: 
+                0 4px 18px rgba(0, 0, 0, 0.4),
+                0 0 14px rgba(var(--win-accent-rgb, 124, 58, 237), 0.25),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transition: transform 0.35s cubic-bezier(0.34, 1.42, 0.64, 1);
+            z-index: 1;
+            cursor: grab;
+            will-change: transform;
+        }
+
+        .auth-slider-glider:active {
+            cursor: grabbing;
+        }
+
+        .auth-tab-btn {
+            flex: 1;
+            padding: 9.5px 14px;
+            border-radius: 999px;
+            border: none;
+            background: transparent !important;
+            color: #94a3b8;
+            font-size: 0.83rem;
             font-weight: 700;
-            color: #fbbf24;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            justify-content: center;
+            gap: 7px;
+            cursor: pointer;
+            transition: color 0.25s ease;
+            position: relative;
+            z-index: 2;
+            user-select: none;
         }
 
-        .security-req-pill {
-            color: #38bdf8;
-            font-weight: 600;
-            letter-spacing: 0.03em;
-            text-transform: uppercase;
+        .auth-tab-btn.active {
+            color: #ffffff;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
         }
 
-        /* Modern Input Fields with Glowing Badges */
-        .field-group {
+        .auth-tab-btn:hover:not(.active) {
+            color: #e2e8f0;
+        }
+
+        /* Animated Tab Pane Cross-Fade Transitions */
+        .form-pane-content {
+            transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1), transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+
+        .form-pane-content.slide-left-enter {
+            animation: slideInFromLeft 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .form-pane-content.slide-right-enter {
+            animation: slideInFromRight 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideInFromLeft {
+            0% {
+                opacity: 0;
+                transform: translateX(-18px) scale(0.98);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        @keyframes slideInFromRight {
+            0% {
+                opacity: 0;
+                transform: translateX(18px) scale(0.98);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        /* Input Field Groups */
+        .input-group-custom {
             margin-bottom: 1.05rem;
             position: relative;
             text-align: left;
         }
 
-        .field-badge-label {
-            display: block;
-            font-size: 0.74rem;
-            font-weight: 700;
-            color: var(--badge-label);
-            letter-spacing: 0.03em;
-            text-transform: uppercase;
+        .input-label-custom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.76rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            margin-bottom: 6px;
+            letter-spacing: 0.02em;
         }
 
-        .badge-required-pill {
-            font-size: 0.62rem;
-            font-weight: 800;
-            letter-spacing: 0.06em;
-            color: #f87171;
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            padding: 2px 7px;
-            border-radius: 999px;
-            text-transform: uppercase;
-        }
-
-        .field-input-box {
+        .input-box-frame {
             position: relative;
             display: flex;
             align-items: center;
             background: var(--input-bg);
-            border: 1.5px solid var(--input-border);
-            border-radius: 12px;
+            border: 1px solid var(--input-border);
+            border-radius: 13px;
             transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.35);
         }
 
-        .field-input-box:hover {
-            border-color: rgba(168, 85, 247, 0.4);
+        .input-box-frame:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
         }
 
-        .field-input-box:focus-within {
-            border-color: var(--input-focus);
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25), 0 8px 24px -6px rgba(124, 58, 237, 0.25);
-            background: #191e30;
+        .input-box-frame:focus-within {
+            border-color: var(--win-accent, #8b5cf6);
+            box-shadow: 
+                0 0 0 3px rgba(var(--win-accent-rgb, 124, 58, 237), 0.26),
+                0 8px 24px -6px rgba(0, 0, 0, 0.5),
+                inset 0 1px 2px rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.07);
             transform: translateY(-1px);
         }
 
-        .field-input {
+        .input-lead-icon {
+            padding-left: 14px;
+            color: #64748b;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s ease;
+        }
+
+        .input-box-frame:focus-within .input-lead-icon {
+            color: var(--win-accent, #a78bfa);
+        }
+
+        .input-clean-field {
             width: 100%;
             background: transparent !important;
             border: none !important;
-            padding: 11px 14px;
-            font-size: 0.92rem;
+            padding: 11px 12px;
+            font-size: 0.93rem;
             color: #ffffff !important;
             outline: none !important;
             box-shadow: none !important;
             font-family: inherit;
-            user-select: text;
         }
 
-        .field-input::placeholder {
-            color: rgba(148, 163, 184, 0.45);
+        .input-clean-field::placeholder {
+            color: rgba(148, 163, 184, 0.4);
             font-size: 0.85rem;
         }
 
-        .field-toggle-btn {
+        .input-action-icon-btn {
             background: none;
             border: none;
             color: #64748b;
@@ -511,39 +635,34 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 0.95rem;
         }
-
-        .field-toggle-btn:hover {
-            color: #c4b5fd;
-            transform: scale(1.15);
-        }
-
-        .form-field-helper {
-            font-size: 0.72rem;
-            color: #64748b;
-            margin-top: 4px;
-            margin-left: 2px;
+        .input-action-icon-btn:hover {
+            color: #cbd5e1;
+            transform: scale(1.08);
         }
 
         .mono {
             font-family: 'JetBrains Mono', monospace;
         }
 
-        /* Solid Purple Master Sign In Button with Sweeping Shine Reflection */
-        .btn-purple-signin {
+        /* Solid Purple Primary Submit Button with Sweeping Sheen */
+        .btn-auth-submit {
             width: 100%;
-            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            background: linear-gradient(135deg, var(--win-accent, #7c3aed) 0%, #6d28d9 100%);
             color: #ffffff;
-            border: none;
-            border-radius: 12px;
-            padding: 13.5px;
-            font-size: 0.98rem;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 13px;
+            padding: 12.5px;
+            font-size: 0.95rem;
             font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.45);
+            box-shadow: 
+                0 8px 25px rgba(var(--win-accent-rgb, 124, 58, 237), 0.4),
+                inset 0 1.5px 0 rgba(255, 255, 255, 0.35);
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            margin-top: 0.8rem;
-            display: flex;
+            margin-top: 0.85rem;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
@@ -551,205 +670,208 @@
             overflow: hidden;
         }
 
-        .btn-purple-signin::after {
+        .btn-auth-submit:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 12px 32px rgba(var(--win-accent-rgb, 124, 58, 237), 0.58),
+                0 0 24px rgba(var(--win-accent-rgb, 124, 58, 237), 0.38),
+                inset 0 1.5px 0 rgba(255, 255, 255, 0.45);
+            filter: brightness(1.08);
+        }
+
+        .btn-auth-submit:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn-auth-submit::after {
             content: '';
             position: absolute;
             top: 0;
             left: -100%;
             width: 60%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
             transform: skewX(-20deg);
-            transition: none;
         }
 
-        .btn-purple-signin:hover::after {
-            animation: btnShineSweep 1.1s ease-in-out;
+        .btn-auth-submit:hover::after {
+            animation: btnSweep 1.2s ease-in-out;
         }
 
-        @keyframes btnShineSweep {
+        @keyframes btnSweep {
             0% { left: -100%; }
             100% { left: 200%; }
         }
 
-        .btn-purple-signin:hover {
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 14px 32px rgba(124, 58, 237, 0.65), 0 0 20px rgba(168, 85, 247, 0.35);
-            color: #ffffff;
-        }
-
-        .btn-purple-signin:active {
-            transform: translateY(1px) scale(0.99);
-        }
-
-        .btn-purple-signin:disabled {
-            background: #334155 !important;
-            color: #94a3b8 !important;
+        .btn-auth-submit:disabled {
+            background: #252d43 !important;
+            color: #64748b !important;
             cursor: not-allowed;
             transform: none !important;
             box-shadow: none !important;
+            border-color: rgba(255, 255, 255, 0.05);
         }
 
-        /* Error Shake Banner */
+        /* Error Alert Box */
         .form-error-banner {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.35);
-            border-radius: 10px;
-            padding: 9px 12px;
-            font-size: 0.84rem;
+            background: rgba(239, 68, 68, 0.14);
+            border: 1px solid rgba(239, 68, 68, 0.38);
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-size: 0.85rem;
             color: #fca5a5;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 9px;
             margin-bottom: 1.15rem;
             text-align: left;
-            animation: shakeAlert 0.35s ease-in-out;
+            animation: alertShake 0.35s ease-in-out;
+            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.2);
         }
 
-        @keyframes shakeAlert {
+        @keyframes alertShake {
             0%, 100% { transform: translateX(0); }
             20%, 60% { transform: translateX(-5px); }
             40%, 80% { transform: translateX(5px); }
         }
 
-        /* Customer Login Sublink */
-        .customer-link-row {
-            margin-top: 1.15rem;
-            font-size: 0.82rem;
-            color: #94a3b8;
-            text-align: center;
-        }
-
-        .customer-link-row a {
-            color: #a78bfa;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.15s;
-        }
-
-        .customer-link-row a:hover {
-            color: #c4b5fd;
-            text-decoration: underline;
-        }
-
-        /* Fast Code Slider / Tabs on Login */
-        .auth-mode-slider-wrap {
-            display: flex;
-            position: relative;
-            background: rgba(15, 23, 42, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 999px;
-            padding: 4px;
-            margin-bottom: 1.25rem;
-        }
-
-        .auth-mode-tab {
-            flex: 1;
-            padding: 8px 12px;
-            border-radius: 999px;
-            border: none;
-            background: transparent;
-            color: #94a3b8;
-            font-size: 0.8rem;
-            font-weight: 700;
+        /* Fast PIN Indicator & Crystal Dots */
+        .pin-indicator-strip {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            position: relative;
-            z-index: 2;
-        }
-
-        .auth-mode-tab.active {
-            color: #ffffff;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-        }
-
-        /* Fast Code PIN Numpad & Display */
-        .pin-digit-display {
-            letter-spacing: 12px;
-            font-size: 1.6rem;
-            font-weight: 800;
-            text-align: center;
-            font-family: 'JetBrains Mono', monospace;
+            gap: 14px;
+            padding: 14px 18px;
             background: rgba(15, 23, 42, 0.8);
-            border: 2px solid rgba(99, 102, 241, 0.4);
+            border: 2px solid rgba(99, 102, 241, 0.35);
             border-radius: 16px;
-            color: #00e5ff;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1rem;
-            transition: border-color 0.25s, color 0.25s;
+            margin-bottom: 1.1rem;
+            height: 60px;
+            transition: all 0.25s ease;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.45);
         }
 
-        .pin-numpad {
+        .pin-indicator-strip.locked {
+            border-color: #ef4444 !important;
+            background: rgba(239, 68, 68, 0.14) !important;
+        }
+
+        .pin-dot {
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.04);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .pin-dot.filled {
+            background: #ffffff;
+            border-color: #ffffff;
+            box-shadow: 
+                0 0 14px rgba(255, 255, 255, 0.6),
+                0 0 24px rgba(var(--win-accent-rgb, 124, 58, 237), 0.45);
+            transform: scale(1.15);
+        }
+
+        .pin-locked-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #ef4444;
+            letter-spacing: 1px;
+        }
+
+        /* Fast PIN 3x4 Tactile Frosted Glass Numpad Grid */
+        .pin-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 8px;
             margin-bottom: 1rem;
         }
 
-        .pin-btn {
-            background: rgba(22, 26, 41, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+        .pin-key-btn {
+            background: rgba(22, 28, 48, 0.72);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             color: #ffffff;
-            font-size: 1.25rem;
+            font-size: 1.3rem;
             font-weight: 700;
-            border-radius: 12px;
-            padding: 10px 0;
+            border-radius: 14px;
+            padding: 11px 0;
             cursor: pointer;
-            transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+            transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
         }
 
-        .pin-btn:hover {
-            background: rgba(139, 92, 246, 0.2);
-            border-color: rgba(139, 92, 246, 0.4);
-            transform: translateY(-2px);
+        .pin-key-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.18);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+        }
+
+        .pin-key-btn:active {
+            transform: translateY(1px) scale(0.94);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        .customer-link-footer {
+            margin-top: 1.25rem;
+            font-size: 0.82rem;
+            color: #94a3b8;
+            text-align: center;
+        }
+        .customer-link-footer a {
+            color: #a78bfa;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.15s;
+        }
+        .customer-link-footer a:hover {
             color: #c4b5fd;
+            text-decoration: underline;
         }
 
-        .pin-btn:active {
-            transform: scale(0.92);
-        }
-
-        /* Bottom Fixed Brand Credits Footer */
+        /* Fixed Brand Footer */
         .fixed-page-footer {
             position: fixed;
-            bottom: 16px;
+            bottom: 14px;
             left: 0;
             width: 100%;
             text-align: center;
-            font-size: 0.75rem;
+            font-size: 0.74rem;
             color: #64748b;
             z-index: 10;
         }
-
         .fixed-page-footer strong {
             color: #94a3b8;
         }
-
         .fixed-page-footer .highlight-purple {
             color: #a78bfa;
             font-weight: 600;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
+        /* Responsive Breakpoints */
+        @media (max-width: 820px) {
             .auth-split-card {
                 flex-direction: column;
                 min-height: auto;
             }
             .hero-banner-pane {
                 padding: 2.2rem 1.8rem;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             }
             .hero-headline {
-                font-size: 1.6rem;
+                font-size: 1.75rem;
             }
             .auth-form-pane {
                 padding: 2.2rem 1.8rem;
@@ -759,22 +881,23 @@
                 height: auto;
                 padding-bottom: 60px;
             }
+            .auth-card-backdrop-aura {
+                inset: -20px;
+            }
         }
 
-        /* ========================================================
-           AUTHENTICATION SUCCESS POPUP (Tick Under/Inside Circle)
-           Modern Native <dialog> with @starting-style & Smooth Transitions
-           ======================================================== */
+        /* Authentication Success Modal with Animated Circle & Tick */
         dialog#authSuccessModal {
             border: 1px solid rgba(16, 185, 129, 0.45);
             border-radius: 26px;
-            background: rgba(15, 23, 42, 0.94);
+            background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(28px);
             -webkit-backdrop-filter: blur(28px);
-            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.85), 
-                        0 0 60px rgba(16, 185, 129, 0.28),
-                        inset 0 1px 1px rgba(255, 255, 255, 0.2);
-            padding: 2.3rem 2.5rem;
+            box-shadow: 
+                0 28px 80px rgba(0, 0, 0, 0.88), 
+                0 0 60px rgba(16, 185, 129, 0.3),
+                inset 0 1px 1px rgba(255, 255, 255, 0.2);
+            padding: 2.4rem 2.5rem;
             max-width: 440px;
             width: 90vw;
             color: #ffffff;
@@ -785,57 +908,32 @@
             inset: 0;
             margin: auto;
             z-index: 99999;
-            
-            /* Modern Discrete Top-Layer Transition */
             opacity: 0;
             transform: scale(0.86) translateY(22px);
-            transition-property: opacity, transform, display, overlay;
-            transition-duration: 0.38s;
-            transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-            transition-behavior: allow-discrete;
+            transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         dialog#authSuccessModal[open] {
             opacity: 1;
             transform: scale(1) translateY(0);
-
-            @starting-style {
-                opacity: 0;
-                transform: scale(0.86) translateY(22px);
-            }
         }
 
         dialog#authSuccessModal::backdrop {
-            background: rgba(6, 9, 18, 0.8);
+            background: rgba(6, 9, 18, 0.82);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
-            opacity: 0;
-            transition-property: opacity, display, overlay;
-            transition-duration: 0.38s;
-            transition-timing-function: ease-out;
-            transition-behavior: allow-discrete;
         }
 
-        dialog#authSuccessModal[open]::backdrop {
-            opacity: 1;
-
-            @starting-style {
-                opacity: 0;
-            }
-        }
-
-        /* Tick Under a Circle Animation Container */
         .success-tick-wrapper {
             position: relative;
-            width: 110px;
-            height: 110px;
+            width: 104px;
+            height: 104px;
             margin: 0 auto 1.35rem auto;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        /* Glowing Radial Sonar Shockwave */
         .success-sonar-ring {
             position: absolute;
             inset: -14px;
@@ -843,27 +941,19 @@
             background: radial-gradient(circle, rgba(16, 185, 129, 0.35) 0%, rgba(0, 229, 255, 0.18) 45%, transparent 70%);
             animation: sonarShockwave 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
             pointer-events: none;
-            z-index: 0;
         }
 
         @keyframes sonarShockwave {
-            0% {
-                transform: scale(0.85);
-                opacity: 0.95;
-            }
-            100% {
-                transform: scale(1.65);
-                opacity: 0;
-            }
+            0% { transform: scale(0.85); opacity: 0.95; }
+            100% { transform: scale(1.65); opacity: 0; }
         }
 
         .success-circle-svg {
-            width: 104px;
-            height: 104px;
+            width: 100px;
+            height: 100px;
             position: relative;
             z-index: 1;
-            transform-origin: center center;
-            filter: drop-shadow(0 0 18px rgba(16, 185, 129, 0.65));
+            filter: drop-shadow(0 0 16px rgba(16, 185, 129, 0.65));
         }
 
         dialog#authSuccessModal[open] .success-circle-svg {
@@ -876,7 +966,6 @@
             100% { transform: scale(1); }
         }
 
-        /* Circular Track and Drawn Stroke */
         .circle-bg {
             fill: rgba(16, 185, 129, 0.12);
             stroke: rgba(255, 255, 255, 0.1);
@@ -897,12 +986,9 @@
         }
 
         @keyframes drawCircleStroke {
-            100% {
-                stroke-dashoffset: 0;
-            }
+            100% { stroke-dashoffset: 0; }
         }
 
-        /* Tick / Checkmark Path */
         .tick-path {
             fill: none;
             stroke: #10b981;
@@ -918,14 +1004,11 @@
         }
 
         @keyframes drawTickStroke {
-            100% {
-                stroke-dashoffset: 0;
-            }
+            100% { stroke-dashoffset: 0; }
         }
 
-        /* Popup Content Styles */
         .auth-success-title {
-            font-size: 1.55rem;
+            font-size: 1.6rem;
             font-weight: 800;
             letter-spacing: -0.025em;
             color: #ffffff;
@@ -945,9 +1028,9 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 4px 11px;
+            padding: 4px 12px;
             border-radius: 999px;
-            font-size: 0.73rem;
+            font-size: 0.74rem;
             font-weight: 700;
             letter-spacing: 0.04em;
             text-transform: uppercase;
@@ -972,7 +1055,6 @@
             line-height: 1.45;
         }
 
-        /* Redirect Progress Track */
         .auth-success-progress-wrap {
             background: rgba(255, 255, 255, 0.08);
             border-radius: 999px;
@@ -1005,161 +1087,160 @@
             color: #64748b;
             font-family: 'JetBrains Mono', monospace;
         }
-
-        @media (prefers-reduced-motion: reduce) {
-            dialog#authSuccessModal {
-                transform: none !important;
-                transition-duration: 0.1s !important;
-            }
-            .success-circle-svg,
-            .circle-progress,
-            .tick-path,
-            .success-sonar-ring,
-            .auth-success-progress-bar {
-                animation: none !important;
-                stroke-dashoffset: 0 !important;
-                width: 100% !important;
-            }
-        }
     </style>
 </head>
 <body>
-    <!-- Ambient Cyber Dot Grid Background -->
-    <div class="ambient-grid-canvas"></div>
+    <!-- Luxury Minimalist Studio Canvas -->
+    <div class="ambient-bg" aria-hidden="true"></div>
 
-    <!-- Animated Floating Plasma Glow Orbs -->
-    <div class="plasma-orb orb-1"></div>
-    <div class="plasma-orb orb-2"></div>
-    <div class="plasma-orb orb-3"></div>
-
-    <!-- Centered Dual-Pane Card Layout -->
+    <!-- Main Card Wrapper -->
     <div class="auth-wrapper" id="authCardWrapper">
+        
+        <!-- Rich Minimalist Studio Backlight Behind Card -->
+        <div class="auth-card-backdrop-aura" aria-hidden="true">
+            <div class="card-ambient-glow"></div>
+            <div class="card-silhouette-rim"></div>
+        </div>
+
         <div class="auth-split-card" id="authSplitCard">
             
-            <!-- Left Hero Banner Pane -->
+            <!-- Left Hero & Enterprise System Pane -->
             <div class="hero-banner-pane">
                 <div>
-                    <!-- Top Enterprise Live Pill -->
-                    <div class="hero-chip-badge">
-                        <span class="pulse-dot"></span>
-                        <span>SERVER ONLINE • PORT 3001</span>
+                    <!-- Terminal Status Ribbon & 12-Hour Live Clock -->
+                    <div class="terminal-status-ribbon">
+                        <div class="terminal-status-pill">
+                            <span class="status-dot-pulse"></span>
+                            <span>Register Node • BCR-01</span>
+                        </div>
+                        <div class="terminal-clock" id="liveTerminalClock">
+                            <i class="bi bi-clock-history"></i> <span id="clockDigits">--:--:-- --</span>
+                        </div>
                     </div>
 
-                    <!-- App Squircle Logo Badge with Holographic 3D Floating Animation -->
-                    <div class="hero-app-logo" id="heroAppLogo">
+                    <!-- Holographic Floating Logo -->
+                    <div class="hero-logo-card" id="heroLogoCard">
                         <img src="assets/icon.png" onerror="this.src='template/bcs-logo.svg'" alt="BCS">
                     </div>
 
-                    <!-- Bold Brand Title -->
+                    <!-- Brand Headline -->
                     <h1 class="hero-headline">
                         Baroda<br>
-                        Computer<br>
-                        &amp; Sales
+                        Computers<br>
+                        <span class="hero-accent-text">&amp; Sales</span>
                     </h1>
 
                     <!-- Hero Subtext -->
                     <p class="hero-subtext">
-                        Enterprise Point of Sale &amp; Operations Management. Protected by 3-factor authentication and workstation port bonding.
+                        Enterprise Point of Sale &amp; Retail Terminal Platform. High-speed register bonding with Zero-Bypass security.
                     </p>
 
-                    <!-- Feature Highlight Chips & Badges -->
-                    <div class="hero-feature-tags">
-                        <span class="feature-tag-chip"><i class="bi bi-shield-lock-fill text-info"></i> 3-Factor Strict Auth</span>
-                        <span class="feature-tag-chip"><i class="bi bi-database-check text-cyan" style="color: #00e5ff;"></i> SQLite WAL NVMe</span>
-                        <span class="feature-tag-chip"><i class="bi bi-hdd-network-fill text-success"></i> Workstation Guard</span>
-                        <span class="feature-tag-chip"><i class="bi bi-lightning-charge-fill text-warning"></i> Fast PIN Keypad</span>
+                    <!-- System Specifications Grid -->
+                    <div class="system-badges-grid">
+                        <div class="system-badge-item">
+                            <i class="bi bi-shield-check text-info"></i> Zero Bypass
+                        </div>
+                        <div class="system-badge-item">
+                            <i class="bi bi-lightning-charge-fill text-warning"></i> Fast PIN Ready
+                        </div>
+                        <div class="system-badge-item">
+                            <i class="bi bi-lock-fill text-purple"></i> Argon2id Secured
+                        </div>
+                        <div class="system-badge-item">
+                            <i class="bi bi-hdd-network-fill text-success"></i> Port-Bonded 3001
+                        </div>
                     </div>
                 </div>
 
                 <!-- Footer Signature -->
-                <div class="hero-signature">
-                    Manufactured &amp; Developed by <a href="https://www.bcsdeveloper.com" target="_blank" rel="noopener" style="color: #00f0ff; text-decoration: underline; text-decoration-color: rgba(0, 240, 255, 0.4); font-weight: 700;">BCS Developer</a>
+                <div class="hero-bottom-info">
+                    <span>Publisher: <a href="https://www.bcsdeveloper.com" target="_blank" rel="noopener">BCS Developer</a></span>
+                    <span><i class="bi bi-hdd-rack-fill me-1 text-info"></i>Dell PowerEdge Host</span>
                 </div>
             </div>
 
             <!-- Right Authentication Form Pane -->
             <div class="auth-form-pane">
-                <h2 class="form-heading">Shop Terminal Sign In</h2>
-                <p class="form-subheading">Enter all 3 operator credentials to unlock your register</p>
-
-                <!-- Security Level Badge Strip -->
-                <div class="auth-security-badge-strip">
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="security-level-pill"><i class="bi bi-shield-fill-check text-warning"></i> Level 3 Auth</span>
-                        <span class="security-req-pill">All 3 Fields Required</span>
-                    </div>
-                    <span class="text-muted" style="font-size: 0.7rem;"><i class="bi bi-lock-fill text-danger me-1"></i>Zero Bypass</span>
+                <div class="form-header-wrap">
+                    <h2 class="form-title">Terminal Sign In</h2>
+                    <p class="form-subtitle" id="formSubheading">Authenticate operator credentials to unlock register</p>
                 </div>
 
                 <!-- Error Alert Box -->
-                <div id="errorAlertBox" class="form-error-banner d-none">
+                <div id="errorAlertBox" class="form-error-banner d-none" role="alert" aria-live="assertive">
                     <i class="bi bi-exclamation-triangle-fill text-danger fs-5"></i>
                     <span id="errorAlertMessage">Invalid credentials. All 3 fields are required.</span>
                 </div>
 
-                <!-- Sign-in Mode Slider: Standard 3-Input vs Fast Device Code -->
-                <div class="auth-mode-slider-wrap">
-                    <button type="button" class="auth-mode-tab active" id="tabStandardLogin">
-                        <i class="bi bi-shield-lock-fill"></i> 3-Input Login
+                <!-- Interactive Auth Slider: Draggable with Mouse or Directly Clickable -->
+                <div class="auth-tab-slider" id="authTabSlider" data-active="standard" title="Drag to slide or click to switch modes">
+                    <!-- Physical Gliding Pill Indicator -->
+                    <div class="auth-slider-glider" id="sliderGlider" title="Drag me to switch mode"></div>
+                    <button type="button" class="auth-tab-btn active" id="tabStandardLogin">
+                        <i class="bi bi-shield-lock-fill"></i> Standard Sign In
                     </button>
-                    <button type="button" class="auth-mode-tab" id="tabFastCodeLogin">
+                    <button type="button" class="auth-tab-btn" id="tabFastCodeLogin">
                         <i class="bi bi-lightning-charge-fill text-warning"></i> Fast PIN Unlock
                     </button>
                 </div>
 
-                <!-- FAST DEVICE CODE PANE (Instant Station Unlock) -->
-                <div id="fastCodePane" class="d-none">
-                    <div class="text-center mb-3">
-                        <div class="badge bg-info bg-opacity-15 text-info border border-info border-opacity-25 px-3 py-1 rounded-pill small mb-2">
-                            <i class="bi bi-shield-check"></i> Workstation Fast Unlock
-                        </div>
-                        <p class="text-muted small mb-0">Enter the security access code configured in Account Center</p>
+                <!-- 1. FAST DEVICE PIN PANE (Instant Station Unlock) -->
+                <div id="fastCodePane" class="form-pane-content d-none">
+                    <div class="text-center mb-2">
+                        <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 px-3 py-1 rounded-pill small">
+                            <i class="bi bi-shield-check me-1"></i> Bonded Workstation Quick Pass
+                        </span>
                     </div>
 
-                    <div class="pin-digit-display" id="pinDisplayVisual">••••••</div>
-
-                    <div class="pin-numpad">
-                        <button type="button" class="pin-btn" data-key="1">1</button>
-                        <button type="button" class="pin-btn" data-key="2">2</button>
-                        <button type="button" class="pin-btn" data-key="3">3</button>
-                        <button type="button" class="pin-btn" data-key="4">4</button>
-                        <button type="button" class="pin-btn" data-key="5">5</button>
-                        <button type="button" class="pin-btn" data-key="6">6</button>
-                        <button type="button" class="pin-btn" data-key="7">7</button>
-                        <button type="button" class="pin-btn" data-key="8">8</button>
-                        <button type="button" class="pin-btn" data-key="9">9</button>
-                        <button type="button" class="pin-btn text-danger" id="btnPinClear"><i class="bi bi-x-lg"></i></button>
-                        <button type="button" class="pin-btn" data-key="0">0</button>
-                        <button type="button" class="pin-btn text-warning" id="btnPinBackspace"><i class="bi bi-backspace"></i></button>
+                    <!-- 6 Neon Glow Crystal Indicator Dots -->
+                    <div class="pin-indicator-strip" id="pinIndicatorStrip">
+                        <div class="pin-dot" id="pindot-0"></div>
+                        <div class="pin-dot" id="pindot-1"></div>
+                        <div class="pin-dot" id="pindot-2"></div>
+                        <div class="pin-dot" id="pindot-3"></div>
+                        <div class="pin-dot" id="pindot-4"></div>
+                        <div class="pin-dot" id="pindot-5"></div>
                     </div>
 
-                    <button type="button" class="btn-purple-signin" id="btnSubmitFastPin">
-                        <i class="bi bi-lightning-charge-fill me-1"></i> Unlock Register
+                    <!-- 3x4 Tactile Frosted Numpad Grid -->
+                    <div class="pin-grid">
+                        <button type="button" class="pin-key-btn" data-key="1">1</button>
+                        <button type="button" class="pin-key-btn" data-key="2">2</button>
+                        <button type="button" class="pin-key-btn" data-key="3">3</button>
+                        <button type="button" class="pin-key-btn" data-key="4">4</button>
+                        <button type="button" class="pin-key-btn" data-key="5">5</button>
+                        <button type="button" class="pin-key-btn" data-key="6">6</button>
+                        <button type="button" class="pin-key-btn" data-key="7">7</button>
+                        <button type="button" class="pin-key-btn" data-key="8">8</button>
+                        <button type="button" class="pin-key-btn" data-key="9">9</button>
+                        <button type="button" class="pin-key-btn text-danger" id="btnPinClear" title="Clear entered digits"><i class="bi bi-x-lg"></i></button>
+                        <button type="button" class="pin-key-btn" data-key="0">0</button>
+                        <button type="button" class="pin-key-btn text-warning" id="btnPinBackspace" title="Backspace"><i class="bi bi-backspace"></i></button>
+                    </div>
+
+                    <button type="button" class="btn-auth-submit" id="btnSubmitFastPin">
+                        <i class="bi bi-lightning-charge-fill me-1"></i> Unlock Register Station
                     </button>
                 </div>
 
-                <!-- STANDARD 3-INPUT LOGIN FORM -->
-                <form id="shopLoginForm" autocomplete="on">
-                    <!-- 1. Username or Name (REQUIRED) -->
-                    <div class="field-group">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <label class="field-badge-label mb-0" for="loginUser">1. Operator Username</label>
-                            <span class="badge-required-pill"><i class="bi bi-asterisk"></i> Required</span>
-                        </div>
-                        <div class="field-input-box">
-                            <input type="text" class="field-input mono" id="loginUser" placeholder="Enter username (e.g. admin)" required autocomplete="username" autofocus>
+                <!-- 2. STANDARD 3-INPUT LOGIN FORM -->
+                <form id="shopLoginForm" class="form-pane-content" autocomplete="on">
+                    <!-- 1. Username / Operator ID -->
+                    <div class="input-group-custom">
+                        <label class="input-label-custom" for="loginUser">Operator Username</label>
+                        <div class="input-box-frame">
+                            <span class="input-lead-icon"><i class="bi bi-person-fill"></i></span>
+                            <input type="text" class="input-clean-field mono" id="loginUser" name="username" placeholder="Enter username (e.g. admin)" required autocomplete="username" spellcheck="false" autofocus>
                         </div>
                     </div>
 
-                    <!-- 2. Password (REQUIRED) -->
-                    <div class="field-group">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <label class="field-badge-label mb-0" for="loginPass">2. Account Password</label>
-                            <span class="badge-required-pill"><i class="bi bi-asterisk"></i> Required</span>
-                        </div>
-                        <div class="field-input-box">
-                            <input type="password" class="field-input" id="loginPass" placeholder="••••••••" required autocomplete="current-password">
-                            <button type="button" class="field-toggle-btn" id="togglePasswordBtn" title="Toggle password visibility">
+                    <!-- 2. Account Password -->
+                    <div class="input-group-custom">
+                        <label class="input-label-custom" for="loginPass">Account Password</label>
+                        <div class="input-box-frame">
+                            <span class="input-lead-icon"><i class="bi bi-key-fill"></i></span>
+                            <input type="password" class="input-clean-field" id="loginPass" name="password" placeholder="••••••••" required autocomplete="current-password">
+                            <button type="button" class="input-action-icon-btn" id="togglePasswordBtn" title="Toggle password visibility" tabindex="-1">
                                 <i class="bi bi-eye" id="passwordEyeIcon"></i>
                             </button>
                         </div>
@@ -1168,32 +1249,27 @@
                         </div>
                     </div>
 
-                    <!-- 3. Security Access Code / PIN (REQUIRED) -->
-                    <div class="field-group">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <label class="field-badge-label mb-0" for="loginPin">3. Security Access Code</label>
-                            <span class="badge-required-pill"><i class="bi bi-asterisk"></i> Required</span>
-                        </div>
-                        <div class="field-input-box">
-                            <input type="password" class="field-input mono" id="loginPin" placeholder="Enter security access code" required autocomplete="off">
-                            <button type="button" class="field-toggle-btn" id="togglePinBtn" title="Toggle access code visibility">
+                    <!-- 3. Security Access Code / PIN -->
+                    <div class="input-group-custom">
+                        <label class="input-label-custom" for="loginPin">Security Access Code</label>
+                        <div class="input-box-frame">
+                            <span class="input-lead-icon"><i class="bi bi-shield-lock-fill"></i></span>
+                            <input type="password" class="input-clean-field mono" id="loginPin" name="securityCode" placeholder="Enter security access code" autocomplete="off" required>
+                            <button type="button" class="input-action-icon-btn" id="togglePinBtn" title="Toggle access code visibility" tabindex="-1">
                                 <i class="bi bi-eye" id="pinEyeIcon"></i>
                             </button>
-                        </div>
-                        <div class="form-field-helper">
-                            <i class="bi bi-shield-check text-info me-1"></i> Mandatory 3-factor validation enforced by server.
                         </div>
                     </div>
 
                     <!-- Solid Purple Sign In Button with Sweeping Glow Effect -->
-                    <button type="submit" class="btn-purple-signin" id="btnSignIn">
-                        <span id="btnSignInText"><i class="bi bi-shield-lock-fill me-1"></i> Authenticate &amp; Sign In</span>
+                    <button type="submit" class="btn-auth-submit" id="btnSignIn">
+                        <span id="btnSignInText"><i class="bi bi-shield-lock-fill me-1"></i> Sign In to Terminal</span>
                     </button>
                 </form>
 
-                <!-- Customer Portal Sublink -->
-                <div class="customer-link-row">
-                    Are you a customer? If yes, then please <a href="https://bcs.bcsdeveloper.com" target="_blank" rel="noopener">Login Here</a>
+                <!-- Customer Portal Quicklink -->
+                <div class="customer-link-footer">
+                    Customer account? <a href="https://bcs.bcsdeveloper.com" target="_blank" rel="noopener">Storefront Portal</a>
                 </div>
             </div>
         </div>
@@ -1201,7 +1277,6 @@
 
     <!-- Dedicated Authentication Success Modal with Animated Circle & Tick -->
     <dialog id="authSuccessModal" aria-labelledby="successModalTitle" aria-describedby="successModalDesc">
-        <!-- Circular Animated Tick Graphic -->
         <div class="success-tick-wrapper">
             <div class="success-sonar-ring"></div>
             <svg class="success-circle-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -1212,11 +1287,8 @@
                         <stop offset="100%" stop-color="#8b5cf6" />
                     </linearGradient>
                 </defs>
-                <!-- Base Circle Background -->
                 <circle class="circle-bg" cx="50" cy="50" r="42" />
-                <!-- Animated Perimeter Progress Circle -->
                 <circle class="circle-progress" cx="50" cy="50" r="42" transform="rotate(-90 50 50)" />
-                <!-- Animated Checkmark Tick -->
                 <path class="tick-path" d="M30 52 L45 67 L72 38" />
             </svg>
         </div>
@@ -1236,7 +1308,6 @@
             Welcome back, <strong id="successOperatorName" class="text-white">Operator</strong>! Workstation bonded and permissions unlocked.
         </p>
 
-        <!-- Redirect Progress Bar -->
         <div class="auth-success-progress-wrap" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
             <div class="auth-success-progress-bar"></div>
         </div>
@@ -1247,43 +1318,581 @@
 
     <!-- Bottom Page Credit Footer -->
     <footer class="fixed-page-footer">
-        Made with care in <strong>Bangladesh 🇧🇩</strong> | Manufacturer: <a href="https://www.bcsdeveloper.com" target="_blank" rel="noopener" class="highlight-purple" style="text-decoration: none; border-bottom: 1px dotted var(--brand-purple);"><strong>BCS Developer</strong></a> | Version: <strong id="loginVersionDisplay">2.4.3</strong> | Host: <strong>Dell PowerEdge</strong>.
+        Made with care in <strong>Bangladesh 🇧🇩</strong> | Publisher: <a href="https://www.bcsdeveloper.com" target="_blank" rel="noopener" class="highlight-purple" style="text-decoration: none; border-bottom: 1px dotted var(--brand-purple);"><strong>BCS Developer</strong></a> | Version: <strong id="loginVersionDisplay">2.4.7</strong> | Host: <strong>Dell PowerEdge</strong>.
     </footer>
 
-    <!-- Login Authentication Handler & Splash Sequence -->
+    <!-- Dedicated Web Audio UI Sound FX Engine (Slide, Pop-Up, Mechanical Keyboard & Haptics) -->
+    <script>
+        window.BCSSoundFX = (() => {
+            let audioCtx = null;
+            let masterCompressor = null;
+            let masterGain = null;
+
+            function getAudioContext() {
+                try {
+                    if (!audioCtx) {
+                        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                        if (AudioContextClass) {
+                            audioCtx = new AudioContextClass();
+
+                            // Studio Dynamics Compressor & Limiter to boost perceived loudness without digital clipping
+                            masterCompressor = audioCtx.createDynamicsCompressor();
+                            masterCompressor.threshold.setValueAtTime(-10, audioCtx.currentTime);
+                            masterCompressor.knee.setValueAtTime(8, audioCtx.currentTime);
+                            masterCompressor.ratio.setValueAtTime(5, audioCtx.currentTime);
+                            masterCompressor.attack.setValueAtTime(0.002, audioCtx.currentTime);
+                            masterCompressor.release.setValueAtTime(0.07, audioCtx.currentTime);
+
+                            // Master Boost Gain Node (+3.5 dB boost)
+                            masterGain = audioCtx.createGain();
+                            masterGain.gain.setValueAtTime(1.4, audioCtx.currentTime);
+
+                            masterCompressor.connect(masterGain);
+                            masterGain.connect(audioCtx.destination);
+                        }
+                    }
+                    if (audioCtx && audioCtx.state === 'suspended') {
+                        audioCtx.resume().catch(() => {});
+                    }
+                } catch (e) {}
+                return audioCtx;
+            }
+
+            function getMasterOut() {
+                return masterCompressor || (audioCtx ? audioCtx.destination : null);
+            }
+
+            // Unlock audio context on initial interaction
+            ['click', 'touchstart', 'keydown'].forEach(evt => {
+                window.addEventListener(evt, () => getAudioContext(), { once: true, passive: true });
+            });
+
+            // 1. Crisp Tactile Switch Click Sound (Numpad, Buttons, Toggles)
+            function playClick(freq = 820, type = 'sine') {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                try {
+                    const now = ctx.currentTime;
+                    const out = getMasterOut();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, now);
+                    osc.frequency.exponentialRampToValueAtTime(freq * 0.35, now + 0.038);
+
+                    gain.gain.setValueAtTime(0.35, now);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.042);
+
+                    osc.connect(gain);
+                    gain.connect(out);
+
+                    osc.start(now);
+                    osc.stop(now + 0.045);
+                } catch (e) {}
+            }
+
+            // 2. Silky Fluid Slider Whoosh / Glide Sound (Tab switcher / Glider)
+            function playSlide(direction = 'forward') {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                try {
+                    const now = ctx.currentTime;
+                    const out = getMasterOut();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    const filter = ctx.createBiquadFilter();
+
+                    osc.type = 'triangle';
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(1600, now);
+
+                    if (direction === 'forward') {
+                        // Ascending glide (Standard -> Fast PIN)
+                        osc.frequency.setValueAtTime(260, now);
+                        osc.frequency.exponentialRampToValueAtTime(620, now + 0.18);
+                    } else {
+                        // Descending glide (Fast PIN -> Standard)
+                        osc.frequency.setValueAtTime(620, now);
+                        osc.frequency.exponentialRampToValueAtTime(260, now + 0.18);
+                    }
+
+                    gain.gain.setValueAtTime(0.005, now);
+                    gain.gain.linearRampToValueAtTime(0.30, now + 0.045);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+
+                    osc.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(out);
+
+                    osc.start(now);
+                    osc.stop(now + 0.23);
+                } catch (e) {}
+            }
+
+            // 3. Glider Real-Time Drag Ratchet Tick
+            function playSliderTick() {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                try {
+                    const now = ctx.currentTime;
+                    const out = getMasterOut();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(980, now);
+                    osc.frequency.exponentialRampToValueAtTime(320, now + 0.018);
+
+                    gain.gain.setValueAtTime(0.22, now);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.02);
+
+                    osc.connect(gain);
+                    gain.connect(out);
+
+                    osc.start(now);
+                    osc.stop(now + 0.022);
+                } catch (e) {}
+            }
+
+            // 4. Input Focus Chime (Clean Executive Blip on Focus)
+            function playFocus() {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                try {
+                    const now = ctx.currentTime;
+                    const out = getMasterOut();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(520, now);
+                    osc.frequency.exponentialRampToValueAtTime(780, now + 0.06);
+
+                    gain.gain.setValueAtTime(0.24, now);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
+
+                    osc.connect(gain);
+                    gain.connect(out);
+
+                    osc.start(now);
+                    osc.stop(now + 0.095);
+                } catch (e) {}
+            }
+
+            // 5. Crystal Ascending PIN Dot Chime (520Hz to 870Hz ascending)
+            function playPinDot(index = 0) {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                try {
+                    const now = ctx.currentTime;
+                    const out = getMasterOut();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+
+                    const freq = 520 + (index * 70); // 520, 590, 660, 730, 800, 870 Hz
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now);
+
+                    gain.gain.setValueAtTime(0.32, now);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+
+                    osc.connect(gain);
+                    gain.connect(out);
+
+                    osc.start(now);
+                    osc.stop(now + 0.13);
+                } catch (e) {}
+            }
+
+            // 6. Micro Interactive Hover Tick
+            function playHover() {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                try {
+                    const now = ctx.currentTime;
+                    const out = getMasterOut();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(1750, now);
+
+                    gain.gain.setValueAtTime(0.10, now);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.012);
+
+                    osc.connect(gain);
+                    gain.connect(out);
+
+                    osc.start(now);
+                    osc.stop(now + 0.014);
+                } catch (e) {}
+            }
+
+            // 7. Success Modal Pop-Up Chime & Error Alert Sounds
+            function playPopUp(type = 'success') {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                try {
+                    const now = ctx.currentTime;
+                    const out = getMasterOut();
+
+                    if (type === 'success') {
+                        // Resonant harmonic four-chord chime (C5, E5, G5, C6)
+                        const chords = [523.25, 659.25, 783.99, 1046.50];
+                        chords.forEach((freq, idx) => {
+                            const osc = ctx.createOscillator();
+                            const gain = ctx.createGain();
+                            const startTime = now + (idx * 0.065);
+
+                            osc.type = 'sine';
+                            osc.frequency.setValueAtTime(freq, startTime);
+
+                            gain.gain.setValueAtTime(0.001, startTime);
+                            gain.gain.linearRampToValueAtTime(0.32, startTime + 0.02);
+                            gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.65);
+
+                            osc.connect(gain);
+                            gain.connect(out);
+
+                            osc.start(startTime);
+                            osc.stop(startTime + 0.7);
+                        });
+                    } else if (type === 'error') {
+                        // Punchy dual-tone error alert bump
+                        const tones = [280, 200];
+                        tones.forEach((freq, idx) => {
+                            const osc = ctx.createOscillator();
+                            const gain = ctx.createGain();
+                            const startTime = now + (idx * 0.08);
+
+                            osc.type = 'triangle';
+                            osc.frequency.setValueAtTime(freq, startTime);
+
+                            gain.gain.setValueAtTime(0.32, startTime);
+                            gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.22);
+
+                            osc.connect(gain);
+                            gain.connect(out);
+
+                            osc.start(startTime);
+                            osc.stop(startTime + 0.24);
+                        });
+                    } else {
+                        // Soft clean bubble / glass pop
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(460, now);
+                        osc.frequency.exponentialRampToValueAtTime(920, now + 0.08);
+
+                        gain.gain.setValueAtTime(0.25, now);
+                        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
+
+                        osc.connect(gain);
+                        gain.connect(out);
+
+                        osc.start(now);
+                        osc.stop(now + 0.15);
+                    }
+                } catch (e) {}
+            }
+
+            // Pre-computed noise buffer for mechanical switch leaf click
+            let noiseBuffer = null;
+            function getNoiseBuffer(ctx) {
+                if (!noiseBuffer) {
+                    const bufferSize = ctx.sampleRate * 0.05;
+                    noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                    const data = noiseBuffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) {
+                        data[i] = Math.random() * 2 - 1;
+                    }
+                }
+                return noiseBuffer;
+            }
+
+            // 8. Authentic Loud Mechanical Keyboard Downstroke (Thock + Clack + Sub Punch)
+            function playMechanicalKey(keyType = 'default') {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                try {
+                    const now = ctx.currentTime;
+                    const out = getMasterOut();
+
+                    let baseFreq = 290;
+                    let decayTime = 0.048;
+                    let clickFreq = 3400;
+                    let vol = 0.42; // Loud, punchy, satisfying volume!
+
+                    if (keyType === 'space') {
+                        baseFreq = 165;
+                        decayTime = 0.065;
+                        clickFreq = 2200;
+                        vol = 0.48;
+                    } else if (keyType === 'enter') {
+                        baseFreq = 210;
+                        decayTime = 0.056;
+                        clickFreq = 2800;
+                        vol = 0.46;
+                    } else if (keyType === 'backspace' || keyType === 'delete') {
+                        baseFreq = 240;
+                        decayTime = 0.045;
+                        clickFreq = 3100;
+                        vol = 0.44;
+                    } else {
+                        // Natural acoustic pitch variance across keys (±8%)
+                        const jitter = (Math.random() - 0.5) * 0.16;
+                        baseFreq = baseFreq * (1 + jitter);
+                    }
+
+                    // Layer 1: Metallic switch leaf actuation / snap (Noise burst)
+                    const noise = ctx.createBufferSource();
+                    noise.buffer = getNoiseBuffer(ctx);
+
+                    const noiseFilter = ctx.createBiquadFilter();
+                    noiseFilter.type = 'bandpass';
+                    noiseFilter.frequency.setValueAtTime(clickFreq, now);
+                    noiseFilter.Q.setValueAtTime(2.0, now);
+
+                    const noiseGain = ctx.createGain();
+                    noiseGain.gain.setValueAtTime(vol * 0.95, now);
+                    noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.012);
+
+                    noise.connect(noiseFilter);
+                    noiseFilter.connect(noiseGain);
+                    noiseGain.connect(out);
+
+                    noise.start(now);
+                    noise.stop(now + 0.015);
+
+                    // Layer 2: Deep bottom-out body "Thock" (Triangle pitch sweep)
+                    const thockOsc = ctx.createOscillator();
+                    const thockGain = ctx.createGain();
+
+                    thockOsc.type = 'triangle';
+                    thockOsc.frequency.setValueAtTime(baseFreq, now);
+                    thockOsc.frequency.exponentialRampToValueAtTime(baseFreq * 0.35, now + decayTime);
+
+                    thockGain.gain.setValueAtTime(vol, now);
+                    thockGain.gain.exponentialRampToValueAtTime(0.0001, now + decayTime);
+
+                    thockOsc.connect(thockGain);
+                    thockGain.connect(out);
+
+                    thockOsc.start(now);
+                    thockOsc.stop(now + decayTime + 0.002);
+
+                    // Layer 3: Tactile sub-bass chest punch (130Hz -> 50Hz)
+                    const subOsc = ctx.createOscillator();
+                    const subGain = ctx.createGain();
+                    subOsc.type = 'sine';
+                    subOsc.frequency.setValueAtTime(130, now);
+                    subOsc.frequency.exponentialRampToValueAtTime(45, now + 0.035);
+
+                    subGain.gain.setValueAtTime(vol * 0.45, now);
+                    subGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
+
+                    subOsc.connect(subGain);
+                    subGain.connect(out);
+
+                    subOsc.start(now);
+                    subOsc.stop(now + 0.037);
+                } catch (e) {}
+            }
+
+            // 9. Mechanical Switch Upstroke Keycap Return Tick
+            function playMechanicalUp() {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                try {
+                    const now = ctx.currentTime;
+                    const out = getMasterOut();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(1450, now);
+                    osc.frequency.exponentialRampToValueAtTime(680, now + 0.015);
+
+                    gain.gain.setValueAtTime(0.20, now);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.018);
+
+                    osc.connect(gain);
+                    gain.connect(out);
+
+                    osc.start(now);
+                    osc.stop(now + 0.02);
+                } catch (e) {}
+            }
+
+            return {
+                playClick,
+                playSlide,
+                playSliderTick,
+                playPopUp,
+                playMechanicalKey,
+                playMechanicalUp,
+                playPinDot,
+                playFocus,
+                playHover,
+                getAudioContext
+            };
+        })();
+    </script>
+
+    <!-- Login Authentication Handler & Draggable Slider Logic -->
     <script type="module">
         import { loginUser } from "./script/auth.js";
 
-        // Fast Code Slider & Device PIN Unlock Engine
         let currentPinVal = '';
+        const sliderTrack = document.getElementById('authTabSlider');
+        const glider = document.getElementById('sliderGlider');
         const standardTab = document.getElementById('tabStandardLogin');
         const fastTab = document.getElementById('tabFastCodeLogin');
         const standardForm = document.getElementById('shopLoginForm');
         const fastPane = document.getElementById('fastCodePane');
-        const pinDisplay = document.getElementById('pinDisplayVisual');
+        const formSubheading = document.getElementById('formSubheading');
+        const errorAlertBox = document.getElementById('errorAlertBox');
+        const pinIndicatorStrip = document.getElementById('pinIndicatorStrip');
 
-        function updatePinDisplay() {
-            if (!pinDisplay) return;
-            if (!currentPinVal) {
-                pinDisplay.textContent = '••••••';
-                return;
-            }
-            let masked = '';
-            for (let i = 0; i < currentPinVal.length; i++) {
-                masked += '• ';
-            }
-            pinDisplay.textContent = masked.trim();
+        let lockoutTimerId = null;
+
+        // Real-time Clock (12-Hour Format with AM / PM)
+        function updateLiveClock() {
+            const clockEl = document.getElementById('clockDigits');
+            if (!clockEl) return;
+            const now = new Date();
+            let hours = now.getHours();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; // hour '0' becomes '12'
+            const hrs = String(hours).padStart(2, '0');
+            const mins = String(now.getMinutes()).padStart(2, '0');
+            const secs = String(now.getSeconds()).padStart(2, '0');
+            clockEl.textContent = `${hrs}:${mins}:${secs} ${ampm}`;
+        }
+        setInterval(updateLiveClock, 1000);
+        updateLiveClock();
+
+        function showError(msg) {
+            const errorBox = document.getElementById("errorAlertBox");
+            const errorMsg = document.getElementById("errorAlertMessage");
+            if (!errorBox || !errorMsg) return;
+            errorMsg.textContent = msg;
+            errorBox.classList.remove("d-none");
+            errorBox.style.animation = 'none';
+            void errorBox.offsetWidth;
+            errorBox.style.animation = '';
+            window.BCSSoundFX?.playPopUp('error');
         }
 
-        // ========================================================
-        // Animated Tick Under/Inside Circle Success Popup Trigger
-        // ========================================================
+        function setInputsLocked(isLocked) {
+            const userInput = document.getElementById('loginUser');
+            const passInput = document.getElementById('loginPass');
+            const pinInput = document.getElementById('loginPin');
+            const submitBtn = document.getElementById('btnSignIn');
+            const fastSubmitBtn = document.getElementById('btnSubmitFastPin');
+            const pinButtons = document.querySelectorAll('.pin-key-btn');
+
+            if (userInput) userInput.disabled = isLocked;
+            if (passInput) passInput.disabled = isLocked;
+            if (pinInput) pinInput.disabled = isLocked;
+            if (submitBtn) submitBtn.disabled = isLocked;
+            if (fastSubmitBtn) fastSubmitBtn.disabled = isLocked;
+            pinButtons.forEach(b => b.disabled = isLocked);
+        }
+
+        function startLockoutCountdown(seconds) {
+            if (lockoutTimerId) clearInterval(lockoutTimerId);
+            let remaining = Math.max(1, Math.round(seconds));
+            const lockoutUntil = Date.now() + remaining * 1000;
+            localStorage.setItem('bcs_lockout_until', lockoutUntil.toString());
+
+            setInputsLocked(true);
+
+            function tick() {
+                const now = Date.now();
+                const curUntil = parseInt(localStorage.getItem('bcs_lockout_until') || '0', 10);
+                remaining = Math.max(0, Math.ceil((curUntil - now) / 1000));
+
+                if (remaining <= 0) {
+                    clearInterval(lockoutTimerId);
+                    lockoutTimerId = null;
+                    localStorage.removeItem('bcs_lockout_until');
+                    localStorage.removeItem('bcs_local_fails');
+                    setInputsLocked(false);
+                    const errorBox = document.getElementById('errorAlertBox');
+                    if (errorBox) errorBox.classList.add('d-none');
+                    if (pinIndicatorStrip) {
+                        pinIndicatorStrip.classList.remove('locked');
+                        pinIndicatorStrip.innerHTML = `
+                            <div class="pin-dot" id="pindot-0"></div>
+                            <div class="pin-dot" id="pindot-1"></div>
+                            <div class="pin-dot" id="pindot-2"></div>
+                            <div class="pin-dot" id="pindot-3"></div>
+                            <div class="pin-dot" id="pindot-4"></div>
+                            <div class="pin-dot" id="pindot-5"></div>
+                        `;
+                        currentPinVal = '';
+                        updatePinDisplay();
+                    }
+                    const btn = document.getElementById("btnSignIn");
+                    const btnText = document.getElementById("btnSignInText");
+                    if (btn) btn.disabled = false;
+                    if (btnText) btnText.innerHTML = '<i class="bi bi-shield-lock-fill me-1"></i> Sign In to Terminal';
+                    return;
+                }
+
+                const msg = `Security Lockout: Too many failed login attempts. Terminal blocked for ${remaining}s.`;
+                showError(msg);
+
+                if (pinIndicatorStrip) {
+                    pinIndicatorStrip.classList.add('locked');
+                    pinIndicatorStrip.innerHTML = `<span class="pin-locked-text"><i class="bi bi-lock-fill me-2"></i>LOCKED (${remaining}s)</span>`;
+                }
+
+                const btnText = document.getElementById("btnSignInText");
+                if (btnText) btnText.innerHTML = `<i class="bi bi-lock-fill me-1"></i> Locked (${remaining}s)`;
+            }
+
+            tick();
+            lockoutTimerId = setInterval(tick, 1000);
+        }
+
+        function checkClientLockout() {
+            const lockoutUntil = parseInt(localStorage.getItem('bcs_lockout_until') || '0', 10);
+            const now = Date.now();
+            if (lockoutUntil > now) {
+                const secs = Math.ceil((lockoutUntil - now) / 1000);
+                startLockoutCountdown(secs);
+                return true;
+            }
+            return false;
+        }
+
+        function updatePinDisplay() {
+            if (!pinIndicatorStrip || pinIndicatorStrip.classList.contains('locked')) return;
+            for (let i = 0; i < 6; i++) {
+                const dot = document.getElementById(`pindot-${i}`);
+                if (!dot) continue;
+                if (i < currentPinVal.length) {
+                    if (!dot.classList.contains('filled')) {
+                        dot.classList.add('filled');
+                        window.BCSSoundFX?.playPinDot(i);
+                    }
+                } else {
+                    dot.classList.remove('filled');
+                }
+            }
+        }
+
         let isRedirecting = false;
         function triggerSuccessTickModal(userData, portNumber) {
             if (isRedirecting) return;
             isRedirecting = true;
 
-            // Hide fullscreen loader if active so the checkmark circle popup takes center stage
             try {
                 if (window.BCSLoader && typeof window.BCSLoader.hide === 'function') {
                     window.BCSLoader.hide();
@@ -1310,67 +1919,264 @@
                 } catch (e) {
                     modal.setAttribute('open', '');
                 }
+                window.BCSSoundFX?.playPopUp('success');
             }
 
-            // Countdown timer visual
             if (countdownEl) {
                 setTimeout(() => { countdownEl.textContent = '0'; }, 750);
             }
 
-            // Smooth redirect once the tick drawing & pulse animation concludes
             setTimeout(() => {
                 window.location.replace("dashboard.html");
             }, 1350);
         }
 
-        if (standardTab && fastTab) {
-            standardTab.addEventListener('click', () => {
+        // ========================================================
+        // DUAL-MODE SLIDER: DRAGGABLE BY MOUSE + DIRECTLY CLICKABLE
+        // WITH CINEMATIC CARD SIZE MORPH ANIMATION
+        // ========================================================
+        function switchMode(targetMode, animate = true) {
+            const currentMode = sliderTrack.getAttribute('data-active');
+            if (currentMode === targetMode && !animate) return;
+
+            if (animate && currentMode !== targetMode) {
+                window.BCSSoundFX?.playSlide(targetMode === 'fast' ? 'forward' : 'reverse');
+            }
+
+            const splitCard = document.getElementById('authSplitCard');
+            let initialHeight = 0;
+
+            if (splitCard && animate) {
+                // Record exact current height in pixels
+                initialHeight = splitCard.offsetHeight;
+                // Temporarily pin height so hiding/showing content doesn't snap instantly
+                splitCard.style.height = `${initialHeight}px`;
+                splitCard.style.transition = 'none';
+            }
+
+            sliderTrack.setAttribute('data-active', targetMode);
+
+            if (glider) {
+                glider.style.transition = animate ? 'transform 0.35s cubic-bezier(0.34, 1.42, 0.64, 1)' : 'none';
+                glider.style.transform = targetMode === 'fast' ? 'translateX(100%)' : 'translateX(0%)';
+            }
+
+            if (targetMode === 'standard') {
                 standardTab.classList.add('active');
                 fastTab.classList.remove('active');
-                standardForm.classList.remove('d-none');
-                fastPane.classList.add('d-none');
-            });
 
-            fastTab.addEventListener('click', () => {
+                if (currentMode !== 'standard') {
+                    fastPane.classList.add('d-none');
+                    fastPane.classList.remove('slide-right-enter');
+                    standardForm.classList.remove('d-none');
+                    standardForm.classList.remove('slide-left-enter');
+                    void standardForm.offsetWidth;
+                    standardForm.classList.add('slide-left-enter');
+                }
+
+                if (formSubheading) formSubheading.textContent = 'Authenticate operator credentials to unlock register';
+                if (errorAlertBox) errorAlertBox.classList.add('d-none');
+
+                setTimeout(() => {
+                    const userInput = document.getElementById('loginUser');
+                    if (userInput) userInput.focus();
+                }, 120);
+            } else {
                 fastTab.classList.add('active');
                 standardTab.classList.remove('active');
-                standardForm.classList.add('d-none');
-                fastPane.classList.remove('d-none');
+
+                if (currentMode !== 'fast') {
+                    standardForm.classList.add('d-none');
+                    standardForm.classList.remove('slide-left-enter');
+                    fastPane.classList.remove('d-none');
+                    fastPane.classList.remove('slide-right-enter');
+                    void fastPane.offsetWidth;
+                    fastPane.classList.add('slide-right-enter');
+                }
+
+                if (formSubheading) formSubheading.textContent = 'Enter security access code for instant station unlock';
+                if (errorAlertBox) errorAlertBox.classList.add('d-none');
                 currentPinVal = '';
                 updatePinDisplay();
-            });
+            }
+
+            // Cinematic Card Size Morph Animation
+            if (splitCard && animate && initialHeight > 0) {
+                // Measure new target height with the swapped content
+                splitCard.style.height = 'auto';
+                const targetHeight = splitCard.offsetHeight;
+
+                // Lock back to initial height before starting transition
+                splitCard.style.height = `${initialHeight}px`;
+                void splitCard.offsetHeight; // Force layout reflow
+
+                // Smoothly morph card to target height
+                requestAnimationFrame(() => {
+                    splitCard.style.transition = 'height 0.42s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease';
+                    splitCard.style.height = `${targetHeight}px`;
+                });
+
+                // Clear inline height once transition finishes so layout remains fluid
+                clearTimeout(splitCard._morphTimer);
+                splitCard._morphTimer = setTimeout(() => {
+                    splitCard.style.height = '';
+                    splitCard.style.transition = '';
+                }, 450);
+            }
         }
 
-        // Keypad buttons (no length limit)
-        document.querySelectorAll('.pin-btn[data-key]').forEach(btn => {
+        // 1. Direct Click Listeners
+        standardTab?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            window.BCSSoundFX?.playClick(880);
+            switchMode('standard', true);
+        });
+
+        fastTab?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            window.BCSSoundFX?.playClick(880);
+            switchMode('fast', true);
+        });
+
+        // 2. Mouse Drag & Slide Implementation
+        let isDragging = false;
+        let dragStartX = 0;
+        let initialTranslateX = 0;
+        let currentTranslatePx = 0;
+        let maxTravelPx = 0;
+
+        function startSliderDrag(e) {
+            isDragging = true;
+            sliderTrack.classList.add('is-dragging');
+            const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+            dragStartX = clientX;
+
+            const rect = sliderTrack.getBoundingClientRect();
+            maxTravelPx = (rect.width - 8) / 2;
+
+            const currentMode = sliderTrack.getAttribute('data-active') || 'standard';
+            initialTranslateX = currentMode === 'fast' ? maxTravelPx : 0;
+            currentTranslatePx = initialTranslateX;
+
+            if (glider) {
+                glider.style.transition = 'none'; // Instant 1:1 real-time drag response
+            }
+        }
+
+        let lastTickSegment = 0;
+        function moveSliderDrag(e) {
+            if (!isDragging || !glider) return;
+            const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+            const deltaX = clientX - dragStartX;
+
+            currentTranslatePx = Math.max(0, Math.min(maxTravelPx, initialTranslateX + deltaX));
+            glider.style.transform = `translateX(${currentTranslatePx}px)`;
+
+            const segment = Math.floor(currentTranslatePx / 22);
+            if (segment !== lastTickSegment) {
+                lastTickSegment = segment;
+                window.BCSSoundFX?.playSliderTick();
+            }
+        }
+
+        function endSliderDrag() {
+            if (!isDragging) return;
+            isDragging = false;
+            sliderTrack.classList.remove('is-dragging');
+
+            // If dragged past 50% threshold, activate Fast PIN; else Standard
+            const halfWay = maxTravelPx / 2;
+            if (currentTranslatePx > halfWay) {
+                switchMode('fast', true);
+            } else {
+                switchMode('standard', true);
+            }
+        }
+
+        if (sliderTrack) {
+            sliderTrack.addEventListener('mousedown', startSliderDrag);
+            window.addEventListener('mousemove', moveSliderDrag);
+            window.addEventListener('mouseup', endSliderDrag);
+
+            sliderTrack.addEventListener('touchstart', startSliderDrag, { passive: true });
+            window.addEventListener('touchmove', moveSliderDrag, { passive: true });
+            window.addEventListener('touchend', endSliderDrag);
+        }
+
+        // Global Mechanical Keyboard Typing Sound Listener (Inputs & Physical Keys)
+        window.addEventListener('keydown', (e) => {
+            // Ignore lone modifier/navigation keys
+            if (['Shift', 'Control', 'Alt', 'Meta', 'CapsLock', 'Tab', 'Escape'].includes(e.key)) {
+                return;
+            }
+            if (e.key.startsWith('F') && e.key.length <= 3) {
+                return; // F1-F12
+            }
+
+            let keyType = 'default';
+            if (e.key === ' ' || e.code === 'Space') {
+                keyType = 'space';
+            } else if (e.key === 'Enter') {
+                keyType = 'enter';
+            } else if (e.key === 'Backspace' || e.key === 'Delete') {
+                keyType = 'backspace';
+            }
+
+            window.BCSSoundFX?.playMechanicalKey(keyType);
+        });
+
+        // Keyup Upstroke Return Tick
+        window.addEventListener('keyup', (e) => {
+            if (['Shift', 'Control', 'Alt', 'Meta', 'CapsLock', 'Tab', 'Escape'].includes(e.key)) return;
+            if (e.key.startsWith('F') && e.key.length <= 3) return;
+            window.BCSSoundFX?.playMechanicalUp();
+        });
+
+        // Tactile Numpad Key Press with Mechanical Switch Sound & Micro-Ripple Animation
+        document.querySelectorAll('.pin-key-btn[data-key]').forEach(btn => {
             btn.addEventListener('click', () => {
+                if (currentPinVal.length >= 16) return;
+                window.BCSSoundFX?.playMechanicalKey('default');
                 currentPinVal += btn.dataset.key;
                 updatePinDisplay();
+                if (currentPinVal.length === 6) {
+                    setTimeout(checkAndSubmitPin, 180);
+                }
             });
         });
 
         document.getElementById('btnPinBackspace')?.addEventListener('click', () => {
+            window.BCSSoundFX?.playMechanicalKey('backspace');
             currentPinVal = currentPinVal.slice(0, -1);
             updatePinDisplay();
         });
 
         document.getElementById('btnPinClear')?.addEventListener('click', () => {
+            window.BCSSoundFX?.playMechanicalKey('delete');
             currentPinVal = '';
             updatePinDisplay();
         });
 
-        document.getElementById('btnSubmitFastPin')?.addEventListener('click', checkAndSubmitPin);
+        document.getElementById('btnSubmitFastPin')?.addEventListener('click', () => {
+            window.BCSSoundFX?.playClick(750);
+            checkAndSubmitPin();
+        });
 
-        // Hardware keyboard support when fast code pane is visible (no length limit)
+        // Hardware Keyboard Listeners for Fast PIN Entry
         window.addEventListener('keydown', (e) => {
             if (!fastPane || fastPane.classList.contains('d-none')) return;
             if (e.key >= '0' && e.key <= '9') {
+                if (currentPinVal.length >= 16) return;
                 currentPinVal += e.key;
                 updatePinDisplay();
+                if (currentPinVal.length === 6) {
+                    setTimeout(checkAndSubmitPin, 180);
+                }
             } else if (e.key === 'Backspace') {
                 currentPinVal = currentPinVal.slice(0, -1);
                 updatePinDisplay();
             } else if (e.key === 'Escape') {
+                window.BCSSoundFX?.playClick(440, 'triangle');
                 currentPinVal = '';
                 updatePinDisplay();
             } else if (e.key === 'Enter') {
@@ -1378,9 +2184,16 @@
             }
         });
 
-        // Fast PIN submission (Live backend verification strictly required - NO fake offline bypass)
         async function checkAndSubmitPin() {
+            if (checkClientLockout()) return;
             if (!currentPinVal) return;
+
+            const submitBtn = document.getElementById('btnSubmitFastPin');
+            const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Unlocking Station...';
+            }
 
             const defaultUser = localStorage.getItem('bcsDeviceUser') || 'admin';
             const localPortNumber = Math.floor(Math.random() * (65535 - 1024 + 1) + 1024).toString();
@@ -1402,6 +2215,9 @@
 
                 const data = await res.json().catch(() => ({}));
                 if (res.ok && data.is_verified && data.session_id) {
+                    localStorage.removeItem('bcs_local_fails');
+                    localStorage.removeItem('bcs_lockout_until');
+
                     localStorage.setItem('isAuthenticated', 'true');
                     localStorage.setItem('loggedInUserId', data.id || 'admin-default');
                     localStorage.setItem('loggedInUserName', data.username || defaultUser);
@@ -1411,35 +2227,64 @@
                     localStorage.setItem('sessionPort', localPortNumber);
                     localStorage.setItem('bcsDeviceUser', data.username || defaultUser);
 
-                    if (pinDisplay) {
-                        pinDisplay.style.borderColor = '#10b981';
-                        pinDisplay.style.color = '#10b981';
-                        pinDisplay.textContent = 'UNLOCKED';
+                    if (pinIndicatorStrip) {
+                        pinIndicatorStrip.style.borderColor = '#10b981';
+                        pinIndicatorStrip.innerHTML = `<span class="text-success fw-bold font-monospace"><i class="bi bi-shield-fill-check me-2"></i>UNLOCKED</span>`;
                     }
 
                     triggerSuccessTickModal(data, localPortNumber);
                     return;
                 } else {
-                    throw new Error(data.error || 'Invalid security code.');
+                    const errMsg = data.error || 'Invalid security code.';
+                    let fails = parseInt(localStorage.getItem('bcs_local_fails') || '0', 10) + 1;
+                    localStorage.setItem('bcs_local_fails', fails.toString());
+
+                    if (data.locked || res.status === 429 || fails >= 5 || errMsg.toLowerCase().includes('locked')) {
+                        const secs = data.seconds_remaining || 60;
+                        startLockoutCountdown(secs);
+                        return;
+                    }
+
+                    throw new Error(errMsg);
                 }
             } catch (err) {
                 console.warn('Fast login verification rejected:', err);
-                if (pinDisplay) {
-                    pinDisplay.style.borderColor = '#ef4444';
-                    pinDisplay.style.color = '#ef4444';
-                    pinDisplay.textContent = 'INVALID PIN';
+                const errMsg = err.message || 'Invalid security code.';
+                let fails = parseInt(localStorage.getItem('bcs_local_fails') || '0', 10);
+                const remaining = Math.max(1, 5 - fails);
+                showError(`${errMsg} (${remaining} attempt${remaining === 1 ? '' : 's'} remaining before lockout)`);
+
+                if (pinIndicatorStrip) {
+                    pinIndicatorStrip.style.borderColor = '#ef4444';
+                    pinIndicatorStrip.innerHTML = `<span class="text-danger fw-bold font-monospace"><i class="bi bi-x-circle-fill me-2"></i>INVALID PIN</span>`;
                     setTimeout(() => {
-                        pinDisplay.style.borderColor = '';
-                        pinDisplay.style.color = '';
-                        currentPinVal = '';
-                        updatePinDisplay();
+                        if (!checkClientLockout()) {
+                            pinIndicatorStrip.style.borderColor = '';
+                            pinIndicatorStrip.innerHTML = `
+                                <div class="pin-dot" id="pindot-0"></div>
+                                <div class="pin-dot" id="pindot-1"></div>
+                                <div class="pin-dot" id="pindot-2"></div>
+                                <div class="pin-dot" id="pindot-3"></div>
+                                <div class="pin-dot" id="pindot-4"></div>
+                                <div class="pin-dot" id="pindot-5"></div>
+                            `;
+                            currentPinVal = '';
+                            updatePinDisplay();
+                        }
                     }, 900);
+                }
+            } finally {
+                if (submitBtn && !isRedirecting && !lockoutTimerId) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnHtml;
                 }
             }
         }
 
+        // Initialize Login Terminal & Sync OS Theme
         function initLoginTerminal() {
-            // Sync dynamic version from Electron runtime
+            checkClientLockout();
+
             if (typeof require !== 'undefined') {
                 try {
                     const { ipcRenderer } = require('electron');
@@ -1472,25 +2317,22 @@
                 } catch(e) {}
             }
 
-            // Interactive 3D Parallax Tilt Effect on Card
-            const wrapper = document.getElementById('authCardWrapper');
-            const card = document.getElementById('authSplitCard');
-            if (wrapper && card && window.innerWidth > 992) {
-                window.addEventListener('mousemove', (e) => {
-                    const { clientX, clientY } = e;
-                    const xCenter = window.innerWidth / 2;
-                    const yCenter = window.innerHeight / 2;
-                    const rotateX = ((clientY - yCenter) / yCenter) * -3.5;
-                    const rotateY = ((clientX - xCenter) / xCenter) * 3.5;
-                    card.style.transform = `rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`;
+            // Input Field Focus Audio Feedback
+            ['loginUser', 'loginPass', 'loginPin'].forEach(id => {
+                const el = document.getElementById(id);
+                el?.addEventListener('focus', () => {
+                    window.BCSSoundFX?.playFocus();
                 });
+            });
 
-                window.addEventListener('mouseleave', () => {
-                    card.style.transform = 'rotateX(0deg) rotateY(0deg)';
+            // Interactive Hover Audio Haptics on Buttons, Tabs, Numpad & Links
+            const hoverSelector = 'button, .auth-tab-btn, .pin-key-btn, .input-action-icon-btn, .hero-logo-card, .system-badge-item, .customer-link-footer a, .hero-bottom-info a';
+            document.querySelectorAll(hoverSelector).forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    window.BCSSoundFX?.playHover();
                 });
-            }
+            });
 
-            // Focus on username input
             setTimeout(() => {
                 const userInput = document.getElementById("loginUser");
                 if (userInput) userInput.focus();
@@ -1509,9 +2351,10 @@
         const eyeIcon = document.getElementById("passwordEyeIcon");
 
         togglePassBtn?.addEventListener("click", () => {
+            window.BCSSoundFX?.playClick(960);
             const isPassword = passwordField.type === "password";
             passwordField.type = isPassword ? "text" : "password";
-            eyeIcon.className = isPassword ? "bi bi-eye-slash text-purple" : "bi bi-eye";
+            eyeIcon.className = isPassword ? "bi bi-eye-slash text-info" : "bi bi-eye";
         });
 
         const togglePinBtn = document.getElementById("togglePinBtn");
@@ -1519,12 +2362,13 @@
         const pinEyeIcon = document.getElementById("pinEyeIcon");
 
         togglePinBtn?.addEventListener("click", () => {
+            window.BCSSoundFX?.playClick(960);
             const isPassword = pinField.type === "password";
             pinField.type = isPassword ? "text" : "password";
-            pinEyeIcon.className = isPassword ? "bi bi-eye-slash text-purple" : "bi bi-eye";
+            pinEyeIcon.className = isPassword ? "bi bi-eye-slash text-info" : "bi bi-eye";
         });
 
-        // Caps Lock Detection
+        // CapsLock Alert
         const capsWarning = document.getElementById("capsLockWarning");
         passwordField?.addEventListener("keyup", (e) => {
             if (e.getModifierState && e.getModifierState("CapsLock")) {
@@ -1534,9 +2378,11 @@
             }
         });
 
-        // Form Submit Handler with Strict 3-Input Verification
+        // Standard 3-Input Form Submission
         document.getElementById("shopLoginForm").addEventListener("submit", async (e) => {
             e.preventDefault();
+            window.BCSSoundFX?.playClick(750);
+            if (checkClientLockout()) return;
 
             const user = document.getElementById("loginUser").value.trim();
             const pass = document.getElementById("loginPass").value;
@@ -1545,29 +2391,27 @@
             const btn = document.getElementById("btnSignIn");
             const btnText = document.getElementById("btnSignInText");
             const errorBox = document.getElementById("errorAlertBox");
-            const errorMsg = document.getElementById("errorAlertMessage");
 
-            // Strict 3-Input Client Validation (matching backend - no character length limits)
             if (!user || !pass || !pin) {
-                errorMsg.textContent = "All 3 credentials (Username, Password, and Access Code) are strictly required.";
-                errorBox.classList.remove("d-none");
+                showError("Please enter your Username, Account Password, and Security Access Code.");
                 return;
             }
 
             btn.disabled = true;
-            btnText.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Verifying All 3 Credentials...';
+            btnText.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Authenticating Credentials...';
             errorBox.classList.add("d-none");
 
-            // Trigger BCS Neon Laser Loader
             if (window.BCSLoader) {
-                window.BCSLoader.show("Verifying 3-Factor Credentials with Dedicated Server...");
+                window.BCSLoader.show("Verifying Credentials with Dedicated Server...");
             } else if (window.showBcsLoader) {
-                window.showBcsLoader("Verifying 3-Factor Credentials with Dedicated Server...");
+                window.showBcsLoader("Verifying Credentials with Dedicated Server...");
             }
 
             try {
                 const res = await loginUser(user, pass, pin);
                 if (res && res.is_verified) {
+                    localStorage.removeItem('bcs_local_fails');
+                    localStorage.removeItem('bcs_lockout_until');
                     triggerSuccessTickModal(res, localStorage.getItem('sessionPort'));
                 } else {
                     throw new Error(res && res.error ? res.error : "Authentication failed");
@@ -1584,10 +2428,22 @@
                     message = "Cannot reach server. Check network connection.";
                 }
 
-                errorMsg.textContent = message;
-                errorBox.classList.remove("d-none");
-                btn.disabled = false;
-                btnText.innerHTML = '<i class="bi bi-shield-lock-fill me-1"></i> Authenticate &amp; Sign In';
+                let fails = parseInt(localStorage.getItem('bcs_local_fails') || '0', 10) + 1;
+                localStorage.setItem('bcs_local_fails', fails.toString());
+
+                const lowerMsg = message.toLowerCase();
+                const isLocked = fails >= 5 || lowerMsg.includes('locked') || lowerMsg.includes('terminal locked') || lowerMsg.includes('too many failed');
+
+                if (isLocked) {
+                    const match = message.match(/(\d+)\s*second/i);
+                    const secs = match ? parseInt(match[1], 10) : 60;
+                    startLockoutCountdown(secs);
+                } else {
+                    const remaining = Math.max(1, 5 - fails);
+                    showError(`${message} (${remaining} attempt${remaining === 1 ? '' : 's'} remaining before lockout)`);
+                    btn.disabled = false;
+                    btnText.innerHTML = '<i class="bi bi-shield-lock-fill me-1"></i> Sign In to Terminal';
+                }
             }
         });
     </script>

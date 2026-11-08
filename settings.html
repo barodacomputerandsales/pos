@@ -806,6 +806,7 @@
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
 
@@ -980,7 +981,7 @@
     <script type="module">
         import { fetchAPI } from './script/api.js';
 
-        let appCurrentVersion = '2.3.8';
+        let appCurrentVersion = '2.4.7';
         let latestInstallerDownloadUrl = '';
 
         window.showAlert = function(title, message, type = 'success') {
@@ -1471,8 +1472,7 @@
                         } catch (e) {}
                         radarBox.classList.remove('d-none');
                         ipcRenderer.send('check_for_updates');
-                        ipcRenderer.send('download_update');
-                        showAlert('Software Updater Active', 'Redirected to Settings Updater Hub. Downloading and verifying update package...', 'info');
+                        showAlert('Software Updater Active', 'Checking for latest software updates from serverless edge...', 'info');
                     }
                 } else if (ipcRenderer) {
                     // Even on normal visit to settings, check if an update is already downloaded
