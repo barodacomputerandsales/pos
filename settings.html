@@ -981,7 +981,7 @@
     <script type="module">
         import { fetchAPI } from './script/api.js';
 
-        let appCurrentVersion = '2.4.7';
+        let appCurrentVersion = '2.4.8';
         let latestInstallerDownloadUrl = '';
 
         window.showAlert = function(title, message, type = 'success') {
@@ -1562,7 +1562,7 @@
 
                 if (remEl) remEl.textContent = `${rate.remainingThisHour} / ${rate.hourlyLimit}`;
                 if (timerEl) timerEl.textContent = `Resets in ${rate.resetInMinutes}m`;
-                if (tokEl) tokEl.textContent = `${rate.tokensUsedThisHour || 0} / ${rate.hourlyTokenLimit || 25000} tok`;
+                if (tokEl) tokEl.textContent = `${rate.tokensUsedThisHour || 0} / ${rate.hourlyTokenLimit || 3000} tok`;
                 if (pMaskEl && rate.primaryMasked) pMaskEl.textContent = rate.primaryMasked;
                 if (bMaskEl && rate.backupMasked) bMaskEl.textContent = rate.backupMasked;
                 if (modelEl && rate.activeModel) modelEl.textContent = rate.activeModel;
@@ -1577,7 +1577,7 @@
                     inputEl.value = rate.hourlyLimit;
                 }
                 if (tokLimitInputEl && document.activeElement !== tokLimitInputEl) {
-                    tokLimitInputEl.value = rate.hourlyTokenLimit || 25000;
+                    tokLimitInputEl.value = rate.hourlyTokenLimit || 3000;
                 }
             };
 
@@ -1586,7 +1586,7 @@
 
             document.getElementById('saveAiHourlyLimitBtn')?.addEventListener('click', () => {
                 const val = Number(document.getElementById('settingsAiHourlyLimitInput')?.value || 150);
-                const tokVal = Number(document.getElementById('settingsAiHourlyTokenLimitInput')?.value || 25000);
+                const tokVal = Number(document.getElementById('settingsAiHourlyTokenLimitInput')?.value || 3000);
                 if (window.BCSAICopilot) {
                     const updated = window.BCSAICopilot.setHourlyLimit(val, tokVal);
                     syncSettingsAiStatus();

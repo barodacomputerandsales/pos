@@ -10,8 +10,8 @@
 
     const API_BASE_URL = 'https://backend-bcs.bcsdeveloper.com/api';
     const DEFAULT_HOURLY_LIMIT = 150;
-    const DEFAULT_HOURLY_TOKEN_LIMIT = 25000;
-    const DEFAULT_LOW_TOKEN_MODEL = 'openai/gpt-oss-20b';
+    const DEFAULT_HOURLY_TOKEN_LIMIT = 3000;
+    const DEFAULT_LOW_TOKEN_MODEL = 'llama3.2:3b';
 
     function getAuthHeaders() {
         return {
@@ -43,7 +43,7 @@
         }
 
         let rawTokenLimit = Number(localStorage.getItem('bcs_ai_hourly_token_limit'));
-        if (!rawTokenLimit || rawTokenLimit <= 0) {
+        if (!rawTokenLimit || rawTokenLimit <= 0 || rawTokenLimit === 25000) {
             rawTokenLimit = DEFAULT_HOURLY_TOKEN_LIMIT;
             localStorage.setItem('bcs_ai_hourly_token_limit', String(DEFAULT_HOURLY_TOKEN_LIMIT));
         }
@@ -68,6 +68,12 @@
             localStorage.setItem('bcs_ai_rate_bucket', JSON.stringify(stored));
         }
 
+        // Migrate legacy model names
+        if (stored.activeModel === 'openai/gpt-oss-20b' || !stored.activeModel) {
+            stored.activeModel = DEFAULT_LOW_TOKEN_MODEL;
+            localStorage.setItem('bcs_ai_rate_bucket', JSON.stringify(stored));
+        }
+
         const usedReqs = Number(stored.usedThisHour || 0);
         const usedTokens = Number(stored.tokensUsedThisHour || 0);
         const reqsRemaining = Math.max(0, rawLimit - usedReqs);
@@ -89,7 +95,7 @@
             lastKeyUsed: stored.lastKeyUsed || 'primary',
             primaryMasked: stored.primaryMasked || 'gsk_kwGL...cSNf',
             backupMasked: stored.backupMasked || 'gsk_9r9z...BqYc',
-            activeModel: stored.activeModel || DEFAULT_LOW_TOKEN_MODEL,
+            activeModel: (stored.activeModel && stored.activeModel !== 'openai/gpt-oss-20b') ? stored.activeModel : DEFAULT_LOW_TOKEN_MODEL,
             isRequestLimited,
             isTokenLimited,
             isRateLimited,
@@ -207,6 +213,11 @@
         },
 
         async ask({ prompt = '', task = 'chat', contextData = null, model = DEFAULT_LOW_TOKEN_MODEL, temperature = 0.3 }) {
+            // Strictly enforce max 1 request at a time
+            if (this.isBusy) {
+                throw new Error('An AI request is currently in progress. Only 1 request allowed at a time.');
+            }
+
             // Sync latest state from local storage first
             const rateBefore = this.getRateStatus();
             if (rateBefore.isRateLimited) {
@@ -216,64 +227,77 @@
                 throw new Error(`${reason} Quota resets in ${rateBefore.resetInMinutes} min.`);
             }
 
-            // All AI requests are strictly managed by the native server backend (/api/ai/chat)
-            const res = await fetch(`${API_BASE_URL}/ai/chat`, {
-                method: 'POST',
-                headers: getAuthHeaders(),
-                body: JSON.stringify({
-                    prompt,
-                    messages: task === 'chat' ? this.history.slice(-4) : [],
-                    task,
-                    contextData,
-                    model,
-                    temperature,
-                    max_tokens: 350
-                })
-            });
+            this.isBusy = true;
+            this.updateStatusUI();
 
-            const data = await res.json().catch(() => ({}));
+            try {
+                // All AI requests are strictly managed by the native server backend (/api/ai/chat)
+                const res = await fetch(`${API_BASE_URL}/ai/chat`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({
+                        prompt,
+                        messages: task === 'chat' ? this.history.slice(-4) : [],
+                        task,
+                        contextData,
+                        model,
+                        temperature,
+                        max_tokens: 350
+                    })
+                });
 
-            if (res.status === 429) {
-                if (data.rateLimit) {
-                    syncServerRateState(data.rateLimit);
-                } else {
-                    // Force mark exhausted locally so UI blocks further tries until reset
+                const data = await res.json().catch(() => ({}));
+
+                if (res.status === 429) {
+                    if (data.rateLimit) {
+                        syncServerRateState(data.rateLimit);
+                    } else if (!data.concurrentBlocked) {
+                        // Force mark exhausted locally so UI blocks further tries until reset
+                        const local = getLocalRateState();
+                        const bucket = JSON.parse(localStorage.getItem('bcs_ai_rate_bucket') || '{}');
+                        bucket.usedThisHour = local.hourlyLimit;
+                        localStorage.setItem('bcs_ai_rate_bucket', JSON.stringify(bucket));
+                    }
+                    this.updateStatusUI();
+                    throw new Error(data.error || 'Hourly AI Rate Limit reached. Please wait for the next hour.');
+                }
+
+                // Support both enriched envelope and raw OpenAI completions
+                const isSuccess = data.success === true || (Array.isArray(data.choices) && data.choices.length > 0) || (typeof data.reply === 'string');
+                if (!res.ok || !isSuccess) {
+                    throw new Error(data.error || `Backend AI Error (${res.status})`);
+                }
+                if (!data.reply && data.choices?.[0]?.message?.content) {
+                    data.reply = data.choices[0].message.content;
+                }
+
+                // Always deduct request & token usage immediately (from server rateLimit or local fallback)
+                const tokensFromCall = Number(data.usage?.total_tokens || 120);
+                if (data.rateLimit && typeof data.rateLimit.usedThisHour === 'number') {
                     const local = getLocalRateState();
-                    const bucket = JSON.parse(localStorage.getItem('bcs_ai_rate_bucket') || '{}');
-                    bucket.usedThisHour = local.hourlyLimit;
-                    localStorage.setItem('bcs_ai_rate_bucket', JSON.stringify(bucket));
+                    const updatedServerRate = {
+                        ...data.rateLimit,
+                        usedThisHour: Math.max(Number(data.rateLimit.usedThisHour), local.usedThisHour + 1),
+                        tokensUsedThisHour: Math.max(Number(data.rateLimit.tokensUsedThisHour || 0), (local.tokensUsedThisHour || 0) + tokensFromCall)
+                    };
+                    const rawBucket = JSON.parse(localStorage.getItem('bcs_ai_rate_bucket') || '{}');
+                    rawBucket.lastKeyUsed = data.keySlotUsed || 'primary';
+                    localStorage.setItem('bcs_ai_rate_bucket', JSON.stringify(rawBucket));
+                    syncServerRateState(updatedServerRate, null, data.model);
+                } else {
+                    const rawBucket = JSON.parse(localStorage.getItem('bcs_ai_rate_bucket') || '{}');
+                    rawBucket.hourBucket = getCurrentHourBucket();
+                    rawBucket.usedThisHour = Number(rawBucket.usedThisHour || 0) + 1;
+                    rawBucket.tokensUsedThisHour = Number(rawBucket.tokensUsedThisHour || 0) + tokensFromCall;
+                    rawBucket.lastKeyUsed = data.keySlotUsed || 'primary';
+                    localStorage.setItem('bcs_ai_rate_bucket', JSON.stringify(rawBucket));
                 }
                 this.updateStatusUI();
-                throw new Error(data.error || 'Hourly AI Rate Limit reached. Please wait for the next hour.');
+                return data;
+            } finally {
+                this.isBusy = false;
+                this.updateStatusUI();
             }
-
-            if (!res.ok || !data.success) {
-                throw new Error(data.error || `Backend AI Error (${res.status})`);
-            }
-
-            // Always deduct request & token usage immediately (from server rateLimit or local fallback)
-            const tokensFromCall = Number(data.usage?.total_tokens || 120);
-            if (data.rateLimit && typeof data.rateLimit.usedThisHour === 'number') {
-                const local = getLocalRateState();
-                const updatedServerRate = {
-                    ...data.rateLimit,
-                    usedThisHour: Math.max(Number(data.rateLimit.usedThisHour), local.usedThisHour + 1),
-                    tokensUsedThisHour: Math.max(Number(data.rateLimit.tokensUsedThisHour || 0), (local.tokensUsedThisHour || 0) + tokensFromCall)
-                };
-                const rawBucket = JSON.parse(localStorage.getItem('bcs_ai_rate_bucket') || '{}');
-                rawBucket.lastKeyUsed = data.keySlotUsed || 'primary';
-                localStorage.setItem('bcs_ai_rate_bucket', JSON.stringify(rawBucket));
-                syncServerRateState(updatedServerRate, null, data.model);
-            } else {
-                const rawBucket = JSON.parse(localStorage.getItem('bcs_ai_rate_bucket') || '{}');
-                rawBucket.hourBucket = getCurrentHourBucket();
-                rawBucket.usedThisHour = Number(rawBucket.usedThisHour || 0) + 1;
-                rawBucket.tokensUsedThisHour = Number(rawBucket.tokensUsedThisHour || 0) + tokensFromCall;
-                rawBucket.lastKeyUsed = data.keySlotUsed || 'primary';
-                localStorage.setItem('bcs_ai_rate_bucket', JSON.stringify(rawBucket));
-            }
-            this.updateStatusUI();
-            return data;
         },
 
         updateStatusUI() {

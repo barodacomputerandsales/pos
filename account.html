@@ -461,6 +461,7 @@
                             <div><i class="bi bi-envelope text-info me-1"></i> Email: <span class="text-white" id="heroUserEmail">Not Set</span></div>
                             <div><i class="bi bi-clock-history text-success me-1"></i> Last Synced: <span class="text-white" id="heroLastSync">Just now</span></div>
                             <div><i class="bi bi-shield-lock-fill text-info me-1"></i> Security Code: <a href="javascript:void(0)" onclick="window.openQuickCodeModal()" class="text-info fw-bold text-decoration-none"><i class="bi bi-pencil-square"></i> Change Code</a></div>
+                            <div><i class="bi bi-grid-3x3-gap-fill text-success me-1"></i> Fast Login PIN: <a href="javascript:void(0)" onclick="window.openDirectFastPinModal()" class="text-success fw-bold text-decoration-none"><i class="bi bi-lightning-charge-fill"></i> Direct Change PIN</a></div>
                             <div id="avatarActionsContainer" class="d-none">
                                 <a href="javascript:void(0)" id="btnRemoveAvatar" class="text-danger fw-semibold text-decoration-none small"><i class="bi bi-trash3-fill me-1"></i>Remove Photo</a>
                             </div>
@@ -541,22 +542,32 @@
                                 </div>
 
                                 <div class="row g-3 mb-3">
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <label class="form-label text-muted small fw-semibold">ACCOUNT PASSWORD</label>
                                         <div class="input-group">
                                             <input type="password" class="form-control" value="••••••••" readonly disabled>
                                             <button type="button" class="btn btn-outline-warning" id="btnOpenChangePasswordModal" onclick="window.openQuickPasswordModal()">
-                                                <i class="bi bi-key-fill me-1"></i> Change Password
+                                                <i class="bi bi-key-fill me-1"></i> Change
                                             </button>
                                         </div>
                                         <small class="text-muted" style="font-size: 0.72rem;">Primary account authentication credential.</small>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
+                                        <label class="form-label text-muted small fw-semibold">FAST LOGIN PIN (DIRECT)</label>
+                                        <div class="input-group">
+                                            <input type="password" class="form-control mono text-center" id="previewFastPinInput" value="••••••" readonly disabled>
+                                            <button type="button" class="btn btn-outline-success" id="btnOpenDirectFastPinModal" onclick="window.openDirectFastPinModal()">
+                                                <i class="bi bi-lightning-charge-fill me-1"></i> Direct PIN
+                                            </button>
+                                        </div>
+                                        <small class="text-muted" style="font-size: 0.72rem;">Instant terminal PIN login (no password required).</small>
+                                    </div>
+                                    <div class="col-md-4">
                                         <label class="form-label text-muted small fw-semibold">SECURITY ACCESS CODE</label>
                                         <div class="input-group">
                                             <input type="password" class="form-control mono" value="••••••••" readonly disabled>
                                             <button type="button" class="btn btn-outline-info" id="btnOpenChangePinModal" onclick="window.openQuickCodeModal()">
-                                                <i class="bi bi-shield-lock-fill me-1"></i> Change Code
+                                                <i class="bi bi-shield-lock-fill me-1"></i> Change
                                             </button>
                                         </div>
                                         <small class="text-muted" style="font-size: 0.72rem;">Required 3rd factor on sign-in &amp; fast counter unlock.</small>
@@ -712,8 +723,7 @@
 
                 <div class="row g-4">
                     <!-- 1. Change Username Card -->
-                    <!-- 1. Change Username Card -->
-                    <div class="col-12 col-xl-4 col-md-6">
+                    <div class="col-12 col-xl-6 col-md-6">
                         <div class="solid-panel p-4 h-100" id="panelChangeUsername">
                             <div class="d-flex align-items-center justify-content-between mb-2">
                                 <h5 class="fw-bold text-white mb-0 d-flex align-items-center gap-2">
@@ -761,7 +771,7 @@
                     </div>
 
                     <!-- 2. Change Password Card -->
-                    <div class="col-12 col-xl-4 col-md-6">
+                    <div class="col-12 col-xl-6 col-md-6">
                         <div class="solid-panel p-4 h-100" id="panelChangePassword">
                             <h5 class="fw-bold text-white mb-2 d-flex align-items-center gap-2">
                                 <i class="bi bi-key-fill text-warning"></i> Change Password
@@ -809,8 +819,54 @@
                         </div>
                     </div>
 
-                    <!-- 3. Change Security Access Code Card -->
-                    <div class="col-12 col-xl-4 col-md-12">
+                    <!-- 3. Direct Fast Login PIN Card (Instant Setup) -->
+                    <div class="col-12 col-xl-6 col-md-6">
+                        <div class="solid-panel p-4 h-100" id="panelDirectFastPin" style="border: 1px solid rgba(16, 185, 129, 0.35) !important;">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <h5 class="fw-bold text-white mb-0 d-flex align-items-center gap-2">
+                                    <i class="bi bi-grid-3x3-gap-fill text-success"></i> Direct Fast Login PIN
+                                </h5>
+                                <span class="badge bg-success bg-opacity-15 text-success border border-success border-opacity-25 small">
+                                    <i class="bi bi-lightning-charge-fill me-1"></i> Direct / No Password
+                                </span>
+                            </div>
+                            <p class="text-muted small mb-3">Directly configure your workstation Fast Login PIN. Changes apply immediately to your active profile and terminal.</p>
+
+                            <form id="directFastPinForm">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small fw-semibold">NEW FAST LOGIN PIN (EXACTLY 6 DIGITS) <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control mono text-center fs-4 fw-bold letter-spacing-2" id="directNewPinInput" required placeholder="••••••" maxlength="6" minlength="6" pattern="[0-9]{6}" autocomplete="off" inputmode="numeric">
+                                        <button class="btn btn-outline-secondary" type="button" tabindex="-1" onclick="togglePasswordVisibility('directNewPinInput')">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                    <small class="text-muted" style="font-size: 0.72rem;">Must be exactly 6 numeric digits (0–9).</small>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label text-muted small fw-semibold">CONFIRM FAST LOGIN PIN (EXACTLY 6 DIGITS) <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control mono text-center fs-4 fw-bold letter-spacing-2" id="directConfirmPinInput" required placeholder="••••••" maxlength="6" minlength="6" pattern="[0-9]{6}" autocomplete="off" inputmode="numeric">
+                                        <button class="btn btn-outline-secondary" type="button" tabindex="-1" onclick="togglePasswordVisibility('directConfirmPinInput')">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                    <small class="text-muted" style="font-size: 0.72rem;">Must match the 6-digit PIN above.</small>
+                                </div>
+
+                                <button type="submit" class="btn btn-success text-white w-100 py-2 fw-bold d-flex align-items-center justify-content-center gap-2" id="btnSubmitDirectFastPin">
+                                    <i class="bi bi-lightning-charge-fill"></i> Save Fast Login PIN Directly
+                                </button>
+                                <div class="mt-2 text-center text-muted" style="font-size: 0.72rem;">
+                                    <i class="bi bi-shield-check text-success me-1"></i> Authenticated by active operator session. No old password required.
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- 4. Change Security Access Code Card -->
+                    <div class="col-12 col-xl-6 col-md-6">
                         <div class="solid-panel p-4 h-100" id="panelFastPin">
                             <div class="d-flex align-items-center justify-content-between mb-2">
                                 <h5 class="fw-bold text-white mb-0 d-flex align-items-center gap-2">
@@ -1030,6 +1086,59 @@
         </div>
     </div>
 
+    <!-- ==================== MODAL: DIRECT CHANGE FAST LOGIN PIN ==================== -->
+    <div class="modal fade" id="modalDirectFastPin" tabindex="-1" aria-labelledby="modalDirectFastPinLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content solid-panel" style="background: #111827 !important; border: 1.5px solid #10b981 !important; box-shadow: 0 10px 35px rgba(16, 185, 129, 0.25);">
+                <div class="modal-header border-bottom border-secondary border-opacity-25 pb-3">
+                    <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2" id="modalDirectFastPinLabel">
+                        <i class="bi bi-grid-3x3-gap-fill text-success"></i> Direct Change Fast Login PIN
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="d-flex align-items-center gap-2 p-2 rounded mb-3" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25);">
+                        <i class="bi bi-lightning-charge-fill text-success fs-5"></i>
+                        <span class="small text-light">Direct setup authenticated by your active session. No old password or email OTP needed.</span>
+                    </div>
+
+                    <form id="quickDirectFastPinForm">
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-semibold">NEW FAST LOGIN PIN (EXACTLY 6 DIGITS) <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="password" class="form-control mono text-center fs-3 fw-bold letter-spacing-3" id="quickDirectNewPin" required placeholder="••••••" maxlength="6" minlength="6" pattern="[0-9]{6}" autocomplete="off" inputmode="numeric">
+                                <button class="btn btn-outline-secondary" type="button" tabindex="-1" onclick="togglePasswordVisibility('quickDirectNewPin')">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            <small class="text-muted" style="font-size: 0.72rem;">Must be exactly 6 numeric digits (0–9).</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-semibold">CONFIRM NEW PIN (EXACTLY 6 DIGITS) <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="password" class="form-control mono text-center fs-3 fw-bold letter-spacing-3" id="quickDirectConfirmPin" required placeholder="••••••" maxlength="6" minlength="6" pattern="[0-9]{6}" autocomplete="off" inputmode="numeric">
+                                <button class="btn btn-outline-secondary" type="button" tabindex="-1" onclick="togglePasswordVisibility('quickDirectConfirmPin')">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            <small class="text-muted" style="font-size: 0.72rem;">Re-enter the exact 6 digits.</small>
+                        </div>
+
+                        <div id="quickDirectPinErrorAlert" class="alert alert-danger py-2 px-3 small d-none mb-3"></div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="button" class="btn btn-outline-secondary px-3 py-2" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-success text-white fw-bold px-4 py-2 d-flex align-items-center gap-2" id="btnSubmitQuickDirectPin">
+                                <i class="bi bi-lightning-charge-fill"></i> Save Fast PIN Directly
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ==================== MODAL: RE-AUTHENTICATION CHALLENGE ==================== -->
     <div class="modal fade" id="reauthModal" tabindex="-1" aria-labelledby="reauthModalLabel" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered">
@@ -1175,6 +1284,7 @@
         let credentialAuthModalInstance = null;
         let quickPassModalInstance = null;
         let quickPinModalInstance = null;
+        let directPinModalInstance = null;
 
         window.openQuickPasswordModal = function() {
             const m = document.getElementById('modalQuickChangePassword');
@@ -1197,6 +1307,322 @@
             }
             quickPinModalInstance.show();
         };
+
+        window.openDirectFastPinModal = function() {
+            const m = document.getElementById('modalDirectFastPin');
+            const err = document.getElementById('quickDirectPinErrorAlert');
+            if (err) err.classList.add('d-none');
+            document.getElementById('quickDirectFastPinForm')?.reset();
+            initTactilePinInputs();
+            if (!directPinModalInstance) {
+                directPinModalInstance = new bootstrap.Modal(m);
+            }
+            directPinModalInstance.show();
+        };
+
+        // ==================== FAST PIN TACTILE AUDIO SYNTHESIZER ====================
+        let bcsPinAudioCtx = null;
+        function getBcsAudioContext() {
+            if (!bcsPinAudioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioContextClass) {
+                    bcsPinAudioCtx = new AudioContextClass();
+                }
+            }
+            if (bcsPinAudioCtx && bcsPinAudioCtx.state === 'suspended') {
+                bcsPinAudioCtx.resume().catch(() => {});
+            }
+            return bcsPinAudioCtx;
+        }
+
+        function playBcsPinSound(type, index = 0) {
+            try {
+                const ctx = getBcsAudioContext();
+                if (!ctx) return;
+                const now = ctx.currentTime;
+
+                if (type === 'digit') {
+                    // Ascending crystal frequency per digit: 520, 580, 650, 720, 800, 880 Hz
+                    const freqs = [520, 580, 650, 720, 800, 880];
+                    const freq = freqs[Math.min(index, freqs.length - 1)] || 660;
+
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now);
+
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.11);
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.12);
+                } else if (type === 'backspace') {
+                    // Soft tactile downward switch tick
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(380, now);
+                    osc.frequency.exponentialRampToValueAtTime(220, now + 0.05);
+
+                    gain.gain.setValueAtTime(0.18, now);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.055);
+                } else if (type === 'error') {
+                    // Alert buzz tone
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(190, now);
+                    osc.frequency.setValueAtTime(140, now + 0.1);
+
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.26);
+                } else if (type === 'success') {
+                    // Harmonious four-tone chord (C5, E5, G5, C6)
+                    const notes = [523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, idx) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        const startTime = now + (idx * 0.06);
+
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, startTime);
+                        gain.gain.setValueAtTime(0.22, startTime);
+                        gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.35);
+
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start(startTime);
+                        osc.stop(startTime + 0.36);
+                    });
+                }
+            } catch (e) {}
+        }
+
+        // Apply audio & numeric 6-character enforcement to PIN fields
+        function initTactilePinInputs() {
+            const pinFieldIds = ['quickDirectNewPin', 'quickDirectConfirmPin', 'directNewPinInput', 'directConfirmPinInput', 'credAuthOtpInput'];
+            pinFieldIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el || el.dataset.soundBound) return;
+                el.dataset.soundBound = 'true';
+                let lastLen = (el.value || '').length;
+
+                el.addEventListener('focus', () => getBcsAudioContext());
+                el.addEventListener('input', () => {
+                    const cleanVal = el.value.replace(/\D/g, '').slice(0, 6);
+                    if (el.value !== cleanVal) el.value = cleanVal;
+                    const curLen = cleanVal.length;
+
+                    if (curLen > lastLen) {
+                        playBcsPinSound('digit', curLen - 1);
+                    } else if (curLen < lastLen) {
+                        playBcsPinSound('backspace');
+                    }
+                    lastLen = curLen;
+                });
+            });
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initTactilePinInputs);
+        } else {
+            initTactilePinInputs();
+        }
+
+        // Actual Fast PIN Persistence (Edge API, Local SQLite WAL DB & Device Cache)
+        async function applyFastPinDirectPersistence(rawPin) {
+            const currentUsername = currentAccount?.username || localStorage.getItem('loggedInUserName') || 'admin';
+            const sid = localStorage.getItem('sessionId') || '';
+            const pinHash = await sha256Hex(rawPin);
+
+            // 1. Direct Edge/Backend API Update
+            try {
+                const res = await fetchAPI('auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'set_security_code',
+                        code: rawPin,
+                        username: currentUsername,
+                        session_id: sid
+                    })
+                });
+                if (res && res.error && !res.success) {
+                    console.warn('Backend sync warning:', res.error);
+                }
+            } catch (netErr) {
+                console.warn('Network sync notice (local WAL will take precedence):', netErr);
+            }
+
+            // 2. Persist to local SQLite WAL database in users table
+            if (currentAccount && currentAccount.id) {
+                try {
+                    await updateDocument('users', currentAccount.id, {
+                        security_code: pinHash,
+                        fast_pin: pinHash,
+                        raw_security_code: rawPin,
+                        updatedAt: new Date().toISOString()
+                    });
+                    currentAccount.security_code = pinHash;
+                    currentAccount.fast_pin = pinHash;
+                    currentAccount.raw_security_code = rawPin;
+                } catch (dbErr) {
+                    console.warn('SQLite users table update notice:', dbErr);
+                }
+            }
+
+            // 3. Persist to terminal local storage for instant offline Fast PIN unlock
+            localStorage.setItem('bcsDevicePinHash', pinHash);
+            localStorage.setItem('bcsDeviceUser', currentUsername);
+
+            // 4. Update preview fields if present
+            const previewEl = document.getElementById('previewFastPinInput');
+            if (previewEl) previewEl.value = '••••••';
+        }
+
+        // Shared Direct Fast PIN Updater with Character Limit (Min 6, Max 6) & Email OTP Guard
+        async function executeDirectFastPinUpdate(rawPin, submitBtn, errEl, modalToClose) {
+            // Strict 6-digit character limit validation
+            if (!rawPin || rawPin.length !== 6 || !/^\d{6}$/.test(rawPin)) {
+                playBcsPinSound('error');
+                const errMsg = 'Fast Login PIN must be exactly 6 numeric digits (0–9).';
+                if (errEl) {
+                    errEl.textContent = errMsg;
+                    errEl.classList.remove('d-none');
+                } else {
+                    showCustomAlert('Invalid PIN Length', errMsg, 'error');
+                }
+                return false;
+            }
+
+            const currentUsername = currentAccount?.username || localStorage.getItem('loggedInUserName') || 'admin';
+            const hasExistingPin = Boolean(
+                (currentAccount && (currentAccount.security_code || currentAccount.fast_pin)) ||
+                localStorage.getItem('bcsDevicePinHash')
+            );
+
+            // If PIN is already configured, enforce Email OTP verification before changing
+            if (hasExistingPin) {
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Dispatching OTP...';
+                }
+                if (errEl) errEl.classList.add('d-none');
+
+                try {
+                    const emailDispatched = await sendCredentialOtpAndOpenModal({
+                        type: 'fast_pin',
+                        label: 'Fast Login PIN',
+                        data: { newPin: rawPin, modalToClose }
+                    });
+
+                    if (emailDispatched && modalToClose) {
+                        modalToClose.hide();
+                    }
+                    return true;
+                } catch (err) {
+                    playBcsPinSound('error');
+                    if (errEl) {
+                        errEl.textContent = err.message || 'Failed to dispatch email verification code.';
+                        errEl.classList.remove('d-none');
+                    } else {
+                        showCustomAlert('OTP Dispatch Error', err.message, 'error');
+                    }
+                    return false;
+                } finally {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="bi bi-lightning-charge-fill"></i> Save Fast PIN Directly';
+                    }
+                }
+            }
+
+            // Initial setup: Apply directly without requiring existing PIN verification
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Saving Fast PIN...';
+            }
+            if (errEl) errEl.classList.add('d-none');
+
+            try {
+                if (window.showBcsLoader) window.showBcsLoader("Activating Fast Login PIN...");
+                await applyFastPinDirectPersistence(rawPin);
+
+                if (modalToClose) {
+                    modalToClose.hide();
+                }
+
+                if (window.hideBcsLoader) window.hideBcsLoader();
+                playBcsPinSound('success');
+                showCustomAlert('Fast Login PIN Activated', `Fast Login PIN for "${currentUsername}" is now configured. You can use it on the login screen numpad.`, 'success');
+                await loadAccountDetails();
+                return true;
+            } catch (err) {
+                if (window.hideBcsLoader) window.hideBcsLoader();
+                playBcsPinSound('error');
+                if (errEl) {
+                    errEl.textContent = err.message || 'Failed to update Fast Login PIN.';
+                    errEl.classList.remove('d-none');
+                } else {
+                    showCustomAlert('Update Failed', err.message, 'error');
+                }
+                return false;
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="bi bi-lightning-charge-fill"></i> Save Fast PIN Directly';
+                }
+            }
+        }
+
+        // Modal: Quick Direct Fast PIN Form Handler
+        document.getElementById('quickDirectFastPinForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const p1 = document.getElementById('quickDirectNewPin').value.trim();
+            const p2 = document.getElementById('quickDirectConfirmPin').value.trim();
+            const errEl = document.getElementById('quickDirectPinErrorAlert');
+            const btn = document.getElementById('btnSubmitQuickDirectPin');
+
+            if (p1 !== p2) {
+                playBcsPinSound('error');
+                if (errEl) {
+                    errEl.textContent = 'New 6-digit PIN and confirmation PIN do not match.';
+                    errEl.classList.remove('d-none');
+                }
+                return;
+            }
+
+            await executeDirectFastPinUpdate(p1, btn, errEl, directPinModalInstance);
+        });
+
+        // Tab 2: Direct Fast Login PIN Form Handler
+        document.getElementById('directFastPinForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const p1 = document.getElementById('directNewPinInput').value.trim();
+            const p2 = document.getElementById('directConfirmPinInput').value.trim();
+            const btn = document.getElementById('btnSubmitDirectFastPin');
+
+            if (p1 !== p2) {
+                playBcsPinSound('error');
+                showCustomAlert('PIN Mismatch', 'New 6-digit PIN and confirmation PIN do not match.', 'error');
+                return;
+            }
+
+            const ok = await executeDirectFastPinUpdate(p1, btn, null, null);
+            if (ok) {
+                document.getElementById('directFastPinForm')?.reset();
+            }
+        });
 
         // Quick Password Form Submit Handler
         document.getElementById('quickChangePasswordForm')?.addEventListener('submit', async (e) => {
@@ -2095,12 +2521,14 @@
             }
 
             if (Date.now() > pendingCredentialAction.expiresAt) {
+                playBcsPinSound('error');
                 errEl.textContent = 'Authorization code has expired. Please request a new code.';
                 errEl.classList.remove('d-none');
                 return;
             }
 
             if (entered !== pendingCredentialAction.otp) {
+                playBcsPinSound('error');
                 errEl.textContent = 'Invalid 6-digit authorization code. Please verify the code sent to your email.';
                 errEl.classList.remove('d-none');
                 return;
@@ -2112,7 +2540,17 @@
             try {
                 if (window.showBcsLoader) window.showBcsLoader("Applying Verified " + pendingCredentialAction.label + "...");
 
-                if (pendingCredentialAction.type === 'username') {
+                if (pendingCredentialAction.type === 'fast_pin') {
+                    const newPin = pendingCredentialAction.data.newPin;
+                    await applyFastPinDirectPersistence(newPin);
+                    if (pendingCredentialAction.data?.modalToClose) {
+                        pendingCredentialAction.data.modalToClose.hide();
+                    }
+                    document.getElementById('directFastPinForm')?.reset();
+                    document.getElementById('quickDirectFastPinForm')?.reset();
+                    playBcsPinSound('success');
+                    showCustomAlert('Fast Login PIN Changed', 'Your 6-digit Fast Login PIN was verified via email and updated successfully.', 'success');
+                } else if (pendingCredentialAction.type === 'username') {
                     const newUsername = pendingCredentialAction.data.newUsername;
                     const res = await fetchAPI('auth/login', {
                         method: 'POST',

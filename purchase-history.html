@@ -353,6 +353,9 @@
                     <!-- Populated dynamically -->
                 </div>
                 <div class="modal-footer border-secondary border-opacity-25 pt-2">
+                    <a href="#" class="btn btn-warning me-auto" id="modalEditBtn" data-permission="edit_purchase">
+                        <i class="bi bi-pencil-square me-1"></i> Edit Purchase
+                    </a>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-outline-info" id="modalPrintBtn">
                         <i class="bi bi-printer me-1"></i> Print Invoice
@@ -369,7 +372,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
-        import { getCollection, deleteDocument } from './script/api.js';
+        import { getCollection, deleteDocument, updateDocument } from './script/api.js';
 
         let allPurchases = [];
         let activeModalRecord = null;
@@ -539,6 +542,9 @@
                                 <button type="button" class="btn btn-outline-info view-details-btn" data-id="${p.id}" title="View Details" data-permission="view_purchases">
                                     <i class="bi bi-eye"></i>
                                 </button>
+                                <a href="add-purchase.html?edit=${p.id}" class="btn btn-outline-warning edit-invoice-btn" title="Edit Purchase" data-permission="edit_purchase">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
                                 <button type="button" class="btn btn-outline-secondary print-invoice-btn" data-id="${p.id}" title="Print" data-permission="export_purchases">
                                     <i class="bi bi-printer"></i>
                                 </button>
@@ -661,7 +667,7 @@
                 </div>
 
                 <div class="d-flex justify-content-end mb-3">
-                    <div style="width: 280px;" class="p-3 rounded bg-secondary bg-opacity-10 border border-secondary border-opacity-25 small">
+                    <div style="width: 300px;" class="p-3 rounded bg-secondary bg-opacity-10 border border-secondary border-opacity-25 small">
                         <div class="d-flex justify-content-between mb-1">
                             <span class="text-muted">Items Subtotal:</span>
                             <span class="font-monospace">${formatCurrency(record.subtotal)}</span>
@@ -671,8 +677,20 @@
                             <span class="font-monospace text-danger">-${formatCurrency(record.discount)}</span>
                         </div>
                         <div class="d-flex justify-content-between mb-1">
-                            <span class="text-muted">Shipping &amp; Tax:</span>
-                            <span class="font-monospace">+${formatCurrency(Number(record.shipping || 0) + Number(record.tax || 0))}</span>
+                            <span class="text-muted">Tax / VAT:</span>
+                            <span class="font-monospace text-light">+${formatCurrency(record.tax || 0)}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">Shipping Cost:</span>
+                            <span class="font-monospace text-light">+${formatCurrency(record.shipping || 0)}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">Carry Charge:</span>
+                            <span class="font-monospace text-light">+${formatCurrency(record.carryCharge || 0)}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">Maintenance:</span>
+                            <span class="font-monospace text-light">+${formatCurrency(record.maintenance || 0)}</span>
                         </div>
                         <div class="d-flex justify-content-between fw-bold fs-6 border-top border-secondary border-opacity-25 pt-1 mt-1 text-info">
                             <span>Grand Total:</span>
@@ -696,6 +714,11 @@
                     </div>
                 ` : ''}
             `;
+
+            const editBtn = document.getElementById('modalEditBtn');
+            if (editBtn) {
+                editBtn.href = `add-purchase.html?edit=${encodeURIComponent(record.id)}`;
+            }
 
             detailsModal.show();
         }
@@ -744,7 +767,7 @@
                         <tbody>
                             ${items.map(it => `
                                 <tr style="border-bottom: 1px solid #e2e8f0;">
-                                    <td style="padding: 8px;">${it.name}</td>
+                                    <td style="padding: 8px;">${it.name} ${it.lotNumber ? `<small style="color: #64748b;">(Lot: ${it.lotNumber})</small>` : ''}</td>
                                     <td style="padding: 8px; text-align: center;">${it.quantity} ${it.unit || 'Pcs'}</td>
                                     <td style="padding: 8px; text-align: right;">৳${Number(it.buyPrice).toFixed(2)}</td>
                                     <td style="padding: 8px; text-align: right;">৳${Number(it.subtotal).toFixed(2)}</td>
@@ -754,7 +777,7 @@
                     </table>
 
                     <div style="display: flex; justify-content: flex-end; margin-bottom: 30px;">
-                        <div style="width: 260px; font-size: 13px;">
+                        <div style="width: 280px; font-size: 13px;">
                             <div style="display: flex; justify-content: space-between; padding: 4px 0;">
                                 <span>Subtotal:</span>
                                 <span>৳${Number(record.subtotal).toFixed(2)}</span>
@@ -764,8 +787,20 @@
                                 <span>-৳${Number(record.discount || 0).toFixed(2)}</span>
                             </div>
                             <div style="display: flex; justify-content: space-between; padding: 4px 0;">
-                                <span>Shipping &amp; Tax:</span>
-                                <span>+৳${(Number(record.shipping || 0) + Number(record.tax || 0)).toFixed(2)}</span>
+                                <span>Tax / VAT:</span>
+                                <span>+৳${Number(record.tax || 0).toFixed(2)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+                                <span>Shipping Cost:</span>
+                                <span>+৳${Number(record.shipping || 0).toFixed(2)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+                                <span>Carry Charge:</span>
+                                <span>+৳${Number(record.carryCharge || 0).toFixed(2)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+                                <span>Maintenance:</span>
+                                <span>+৳${Number(record.maintenance || 0).toFixed(2)}</span>
                             </div>
                             <div style="display: flex; justify-content: space-between; padding: 6px 0; border-top: 2px solid #333; font-weight: bold; font-size: 15px;">
                                 <span>Grand Total:</span>
@@ -792,22 +827,57 @@
             printArea.style.display = 'none';
         }
 
-        // Delete Confirmation
+        // Delete Confirmation & Stock Rollback Option
         async function confirmDeleteInvoice(id) {
             const record = allPurchases.find(p => p.id === id);
             if (!record) return;
 
-            if (!confirm(`Are you sure you want to delete purchase invoice ${record.invoiceNo}? Note: To reverse stock quantities, manual adjustments may be required.`)) {
+            let invoiceItems = [];
+            try {
+                invoiceItems = typeof record.items === 'string' ? JSON.parse(record.items) : (record.items || []);
+            } catch(e) { invoiceItems = []; }
+
+            const itemCount = invoiceItems.length;
+            const confirmMsg = `Are you sure you want to permanently delete purchase invoice #${record.invoiceNo} (${formatCurrency(record.grandTotal)})?\n\n` +
+                               `Click OK to DELETE and automatically REVERSE ${itemCount} purchased product stock quantities.\n` +
+                               `Click CANCEL to abort.`;
+
+            if (!confirm(confirmMsg)) {
                 return;
             }
 
             if (window.showBcsLoader) {
-                window.showBcsLoader("Deleting Purchase Invoice...");
+                window.showBcsLoader("Deleting Purchase & Reverting Stock...");
             }
 
             try {
+                // Revert stock for products in this purchase
+                if (invoiceItems.length > 0) {
+                    const productsList = await getCollection('products');
+                    const productsMap = {};
+                    productsList.forEach(p => { productsMap[p.id] = p; });
+
+                    for (const it of invoiceItems) {
+                        const prod = productsMap[it.productId];
+                        if (prod) {
+                            const newQty = Math.max(0, Number(prod.quantity || 0) - Number(it.quantity || 0));
+                            let updatedLots = prod.lots;
+                            if (typeof updatedLots === 'string') {
+                                try { updatedLots = JSON.parse(updatedLots); } catch(e) { updatedLots = []; }
+                            }
+                            if (Array.isArray(updatedLots) && it.lotNumber) {
+                                updatedLots = updatedLots.filter(l => l.lotNumber !== it.lotNumber);
+                            }
+                            await updateDocument('products', it.productId, {
+                                quantity: newQty,
+                                lots: updatedLots
+                            });
+                        }
+                    }
+                }
+
                 await deleteDocument('purchases', id);
-                showCustomAlert("Success", `Invoice ${record.invoiceNo} deleted successfully.`, "success");
+                showCustomAlert("Success", `Invoice ${record.invoiceNo} deleted and catalog stock reverted.`, "success");
                 await loadPurchases();
             } catch (err) {
                 console.error("Failed to delete purchase:", err);

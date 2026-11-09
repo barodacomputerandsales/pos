@@ -179,7 +179,7 @@
                         <i class="bi bi-stars me-1"></i> RULEARE NATIVE AI
                     </span>
                     <span class="badge rounded-pill bg-success bg-opacity-25 text-success border border-success border-opacity-25" id="aiPageModelBadge" style="font-size: 0.75rem;">
-                        openai/gpt-oss-20b (Low-Token)
+                        llama3.2:3b (Ruleare Engine)
                     </span>
                 </div>
                 <h2 class="fw-bold mb-1 text-white">BCS AI Intelligence Studio</h2>
@@ -383,7 +383,7 @@
             }
             if (limitLabel) limitLabel.textContent = `/ ${rate.hourlyLimit} reqs`;
             if (timerEl) timerEl.textContent = `Resets in ${rate.resetInMinutes} min (UTC Hour Bucket)`;
-            if (tokensEl) tokensEl.textContent = `${rate.tokensUsedThisHour || 0} / ${rate.hourlyTokenLimit || 25000} tokens`;
+            if (tokensEl) tokensEl.textContent = `${rate.tokensUsedThisHour || 0} / ${rate.hourlyTokenLimit || 3000} tokens`;
             if (maskEl && rate.primaryMasked) maskEl.textContent = rate.primaryMasked;
             if (modelBadge && rate.activeModel) modelBadge.textContent = `${rate.activeModel} (Low-Token)`;
 
@@ -498,7 +498,7 @@
                         ${actionHtml}
                         <div class="mt-2 pt-2 border-top border-secondary border-opacity-25 small opacity-75 d-flex align-items-center gap-2" style="font-size: 0.72rem;">
                             ${keyBadge}
-                            <span>• ${res.model || 'openai/gpt-oss-20b'}</span>
+                            <span>• ${res.model || 'llama3.2:3b'}</span>
                             <span>• ${tokText}</span>
                             <span>• ${window.BCSAICopilot.getRateStatus().remainingThisHour} reqs left/hr</span>
                         </div>

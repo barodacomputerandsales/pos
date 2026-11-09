@@ -11,6 +11,7 @@ const APP_ID = 'com.bcsdeveloper.pos';
 if (process.platform === 'win32') {
   app.setAppUserModelId(APP_ID);
 }
+app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
 
 let mainWindow;
 
